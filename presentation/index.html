@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Warehouse de Oportunidades no Canadá · Tópicos Avançados em Banco de Dados · IFAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    /* Mascotes do Canadá (substituem as imagens do Duolingo) */
+    .ob-duo.mascot, .dl-gif.mascot, .hero-duo.mascot, .dl-ava.mascot, .ts-char.mascot, .hero-gif.mascot {
+      background: none; border: none; box-shadow: none;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ob-duo.mascot { font-size: 78px; line-height: 1; }
+    .ob-duo.sm.mascot { font-size: 58px; }
+    .dl-gif.mascot { width: 208px; height: 208px; font-size: 120px; }
+    .hero-duo.mascot { width: 300px; height: 300px; font-size: 150px; }
+    .dl-ava.mascot { font-size: 74px; }
+    .ts-char.mascot { font-size: 96px; }
+    .hero-gif.mascot { width: 300px; font-size: 120px; }
+
+    /* Abertura criativa — Canadá */
+    .scene-canada { background: linear-gradient(160deg, #fff 0%, #ffe4e1 100%); gap: 16px; cursor: pointer; }
+    .scene-canada .ca-leaf { font-size: 130px; line-height: 1; animation: caPulse 1.6s ease-in-out infinite; filter: drop-shadow(0 10px 18px rgba(213,43,30,.35)); }
+    .scene-canada .ca-title { font-size: 44px; font-weight: 900; color: #D52B1E; letter-spacing: 1px; }
+    .scene-canada .ca-sub { font-size: 19px; font-weight: 800; color: #1F2937; max-width: 760px; text-align: center; line-height: 1.4; }
+    .scene-canada .ca-hint { margin-top: 10px; font-size: 14px; font-weight: 900; color: #9E1B14; text-transform: uppercase; letter-spacing: 1.5px; }
+    @keyframes caPulse { 0%,100% { transform: scale(1) rotate(-4deg); } 50% { transform: scale(1.12) rotate(4deg); } }
+
+    .splash-wordmark-text {
+      font-size: 34px; font-weight: 900; letter-spacing: 2px; color: #D52B1E;
+      filter: drop-shadow(0 5px 0 rgba(0,0,0,.08));
+    }
+    .splash-canada {
+      font-size: 18px; font-weight: 900; letter-spacing: 1.5px; color: #9E1B14;
+      text-transform: uppercase; margin-top: 2px;
+    }
+
+    /* Perguntas analíticas */
+    .q-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-top: 4px; }
+    .q-grid .q {
+      background: #fff; border: 2px solid var(--swan); border-radius: 14px;
+      padding: 10px 14px; font-size: 14.5px; font-weight: 700; color: var(--eel);
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .q-grid .q b { color: var(--cardinal); font-weight: 900; flex: none; }
+
+    /* Diagrama Star Schema */
+    .dw { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 4px; }
+    .dw-fact {
+      background: #fff; border: 2px solid var(--swan); border-bottom-width: 6px; border-radius: 18px;
+      padding: 14px 16px; text-align: center;
+    }
+    .dw-fact h3 { margin: 0 0 8px; color: var(--jeans); font-size: 18px; font-weight: 900; }
+    .dw-fact .dim { display: block; font-size: 13px; font-weight: 800; color: var(--hare); line-height: 1.5; }
+    .dw-fact .shared {
+      display: inline-block; margin-top: 8px; background: #fff3cd; color: #7a5b00;
+      font-size: 11.5px; font-weight: 900; padding: 3px 9px; border-radius: 999px;
+    }
+
+    .chart-box { background: #fff; border: 2px solid var(--swan); border-radius: 18px; padding: 14px; display: flex; align-items: center; justify-content: center; }
+    .chart-box img { max-width: 100%; max-height: 430px; width: auto; height: auto; object-fit: contain; display: block; margin: 0 auto; border-radius: 12px; }
+    .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .split-2 { display: grid; grid-template-columns: 1.05fr .95fr; gap: 22px; align-items: center; }
+  </style>
+</head>
+<body>
+<div id="pres">
+  <div id="viewport">
+    <div id="scaler">
+
+      <!-- 01 — ABERTURA CRIATIVA: folha de maple → loader → capa -->
+      <section class="slide intro" data-title="Abertura" data-cta="">
+
+        <!-- CENA 1 · Canadá -->
+        <div class="scene scene-canada" id="scene-canada" role="button" tabindex="0" aria-label="Começar a apresentação">
+          <div class="ca-leaf">🍁</div>
+          <div class="ca-title">DATA WAREHOUSE CANADÁ</div>
+          <div class="ca-sub">De Brasília a Ottawa: onde vale a pena ser desenvolvedor imigrante?</div>
+          <div class="ca-hint">▶ Clique na folha para começar</div>
+        </div>
+
+        <!-- CENA 2 · Loader -->
+        <div class="scene scene-loader">
+          <div class="dl-gif mascot">🦫</div>
+          <div class="dl-bar"><i></i></div>
+          <div class="dl-text">CARREGANDO…</div>
+          <div class="dl-tip">O castor está cruzando os dados do Statistics Canada com o Job Bank… 🦫🍁</div>
+        </div>
+
+        <!-- CENA 3 · Capa -->
+        <div class="scene scene-cover">
+          <div class="splash-center">
+            <div class="hero-duo mascot">🍁</div>
+            <div class="splash-wordmark-text">DATA WAREHOUSE CANADÁ</div>
+            <div class="splash-canada">Desenvolvedores imigrantes · províncias · dados oficiais</div>
+            <div class="splash-tag">Tópicos Avançados em Banco de Dados</div>
+            <h1 class="splash-title">Onde vale a pena ser dev imigrante no Canadá?</h1>
+            <p class="splash-sub">Statistics Canada · Job Bank/ESDC · Censo 2021 · NOC 21232 · IFAL · 2026.1</p>
+            <button class="hero-cta" data-advance>COMEÇAR</button>
+          </div>
+        </div>
+
+        <div class="corner-num">01</div>
+      </section>
+
+      <!-- 02 — SUMÁRIO -->
+      <section class="slide trail-slide" data-title="Sumário" data-cta="">
+        <div class="ts-head">
+          <span class="ts-eyebrow">🍁 A NOSSA TRILHA</span>
+          <h2 class="ts-title">Sumário</h2>
+        </div>
+        <div class="ts-char mascot">🦫</div>
+        <ol class="trail2">
+          <li style="--x:430px"><span class="tn2 cur"><span class="ic">🍁</span></span><span class="tn2-label">Problema e objetivo</span></li>
+          <li style="--x:520px"><span class="tn2"><span class="ic">🎯</span></span><span class="tn2-label">Meta SMART</span></li>
+          <li style="--x:560px"><span class="tn2"><span class="ic">🗄️</span></span><span class="tn2-label">Bases de dados oficiais</span></li>
+          <li style="--x:520px"><span class="tn2"><span class="ic">🔎</span></span><span class="tn2-label">As 10 perguntas</span></li>
+          <li style="--x:430px"><span class="tn2"><span class="ic">📊</span></span><span class="tn2-label">EDA das bases</span></li>
+          <li style="--x:360px"><span class="tn2"><span class="ic">⭐</span></span><span class="tn2-label">Modelo Star Schema</span></li>
+          <li style="--x:410px"><span class="tn2 gold"><span class="ic">🏆</span></span><span class="tn2-label">Entregáveis &amp; conclusão</span></li>
+        </ol>
+        <div class="corner-num">02</div>
+      </section>
+
+      <!-- 03 — PROBLEMA E ESCOPO -->
+      <section class="slide" data-title="Problema e escopo">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">Quem quer imigrar como <strong>desenvolvedor</strong> precisa escolher uma província — mas <strong>salário</strong>, <strong>comunidade brasileira</strong> e <strong>moradia</strong> raramente estão no mesmo lugar. 🍁</div>
+          </div>
+          <p class="lead step" style="margin:2px 0 4px;">🎯 <strong>Objetivo:</strong> construir um Data Warehouse em Oracle para comparar oportunidades entre as 13 províncias e territórios.</p>
+          <div style="display:flex; gap:10px; margin:-4px 0 2px;">
+            <span class="tag wcag">🇨🇦 Escopo: 13 províncias e territórios</span>
+          </div>
+          <div class="grid c3">
+            <div class="card green step"><span class="ico">💼</span><h3>Salário</h3><p>Remuneração de Software Developers (NOC 21232) por província — Job Bank/ESDC.</p></div>
+            <div class="card yellow step"><span class="ico">👥</span><h3>Comunidade</h3><p>Imigrantes nascidos no Brasil e períodos de chegada — Censo 2021.</p></div>
+            <div class="card blue step"><span class="ico">🏠</span><h3>Moradia</h3><p>Inquilinos com gasto ≥ 30% da renda e core housing need — Censo 2021.</p></div>
+          </div>
+        </div>
+        <div class="corner-num">03</div>
+      </section>
+
+      <!-- 04 — META SMART -->
+      <section class="slide" data-title="Meta SMART">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🫎</div>
+            <div class="bubble">Meta clara, métricas claras: entregar o modelo e os dicionários que <strong>permitem responder às 10 perguntas</strong> <strong>sem estimar valores ausentes</strong>. 🎯</div>
+          </div>
+          <div class="grid c3">
+            <div class="card green step"><span class="ico">🎯</span><h3>S · Específica</h3><p>Construir um DW em Oracle com dados oficiais de imigração, salários e habitação.</p></div>
+            <div class="card yellow step"><span class="ico">📏</span><h3>M · Mensurável</h3><p>Apresentar modelo Star Schema, dicionários e script SQL que permitem responder às 10 perguntas.</p></div>
+            <div class="card blue step"><span class="ico">🛠️</span><h3>A · Atingível</h3><p>Três bases oficiais já baixadas e filtradas, com modelo viável em Oracle.</p></div>
+            <div class="card purple step"><span class="ico">💡</span><h3>R · Relevante</h3><p>Apoiar a decisão de devs imigrantes sobre a melhor província.</p></div>
+            <div class="card red step"><span class="ico">⏰</span><h3>T · Temporal</h3><p>Até a data final da disciplina (cronograma do docente).</p></div>
+          </div>
+        </div>
+        <div class="corner-num">04</div>
+      </section>
+
+      <!-- 05 — BASES DE DADOS -->
+      <section class="slide" data-title="Bases de dados">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">O requisito mínimo é <strong>2 bases diferentes</strong>; usamos <strong>3 oficiais</strong> para comparar melhor as províncias. 🗄️</div>
+          </div>
+          <div class="grid c3">
+            <div class="card blue step"><span class="ico">🧑‍🤝‍🧑</span><h3>StatCan 98-10-0307-01</h3><p>Censo 2021 — imigrantes por país de nascimento, período e província.</p></div>
+            <div class="card green step"><span class="ico">💼</span><h3>Job Bank/ESDC 2025</h3><p>Salários de NOC 21232 por região — referência 2023–2024.</p></div>
+            <div class="card purple step"><span class="ico">🏠</span><h3>StatCan 98-10-0258-01</h3><p>Censo 2021 — indicadores de habitação por posse (tenure).</p></div>
+          </div>
+          <p class="muted step" style="font-weight:800; font-size:13px; text-align:center;">📌 Imigração e habitação são do Censo 2021; salários são 2023–2024 — cada fato terá sua própria dimensão de tempo.</p>
+        </div>
+        <div class="corner-num">05</div>
+      </section>
+
+      <!-- 06 — AS 10 PERGUNTAS -->
+      <section class="slide" data-title="As 10 perguntas">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">O DW precisa responder <strong>estas 10 perguntas</strong> — sem chute, sem estimar dado ausente. 🔎</div>
+          </div>
+          <div class="q-grid">
+            <div class="q step"><b>1</b> Quais províncias têm os maiores salários medianos de NOC 21232?</div>
+            <div class="q step"><b>2</b> Qual a diferença de mediana entre duas províncias escolhidas?</div>
+            <div class="q step"><b>3</b> Onde há mais imigrantes nascidos no Brasil?</div>
+            <div class="q step"><b>4</b> Qual a participação brasileira no total de imigrantes por província?</div>
+            <div class="q step"><b>5</b> Qual período de imigração concentra mais brasileiros?</div>
+            <div class="q step"><b>6</b> Quais províncias unem salário alto e comunidade brasileira numerosa?</div>
+            <div class="q step"><b>7</b> Qual província tem a maior amplitude salarial (high − low)?</div>
+            <div class="q step"><b>8</b> Onde o salário não é publicado (só regional ou N/A)?</div>
+            <div class="q step"><b>9</b> Onde inquilinos mais gastam ≥ 30% da renda em moradia?</div>
+            <div class="q step"><b>10</b> Qual província tem o melhor equilíbrio entre salário, comunidade e moradia?</div>
+          </div>
+        </div>
+        <div class="corner-num">06</div>
+      </section>
+
+      <!-- 07 — EDA · SALÁRIOS -->
+      <section class="slide" data-title="EDA · Salários">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">Só <strong>9 de 13</strong> jurisdições publicam salário provincial de NOC 21232. <span class="crit">PEI e territórios ficam N/A.</span> 💼</div>
+          </div>
+          <div class="split-2">
+            <div class="chart-box step"><img src="images/fig_salario_mediano.png" alt="Gráfico de salário mediano NOC 21232 por província"></div>
+            <div class="kv step">
+              <div class="k">🥇 Maior mediana</div><div class="v">BC — 52,40 CAD/hora</div>
+              <div class="k">🥉 Menor mediana</div><div class="v">NS — 40,87 CAD/hora</div>
+              <div class="k">📈 Maior amplitude</div><div class="v">BC — 52,88 (84,13 − 31,25)</div>
+              <div class="k">🚫 Sem dado</div><div class="v">PEI, Yukon, NWT, Nunavut</div>
+            </div>
+          </div>
+        </div>
+        <div class="corner-num">07</div>
+      </section>
+
+      <!-- 08 — EDA · IMIGRAÇÃO -->
+      <section class="slide" data-title="EDA · Imigração">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🫎</div>
+            <div class="bubble">Brasileiros concentrados em <strong>ON, QC e BC</strong>; mais da metade chegou entre <strong>2011–2021</strong>. 👥</div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-box step"><img src="images/fig_comunidade_brasileira.png" alt="Províncias com maior comunidade brasileira"></div>
+            <div class="chart-box step"><img src="images/fig_imigracao_periodos.png" alt="Imigrantes brasileiros por período de imigração"></div>
+          </div>
+        </div>
+        <div class="corner-num">08</div>
+      </section>
+
+      <!-- 09 — EDA · HABITAÇÃO -->
+      <section class="slide" data-title="EDA · Habitação">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble"><strong>ON (38,4%)</strong> e <strong>BC (37,8%)</strong> têm os maiores percentuais de inquilinos gastando <strong>≥ 30% da renda</strong> em moradia. 🏠</div>
+          </div>
+          <div class="split-2">
+            <div class="chart-box step"><img src="images/fig_moradia_inquilinos.png" alt="Percentual de inquilinos com moradia inacessível por província"></div>
+            <div class="kv step">
+              <div class="k">🔴 Inacessível</div><div class="v">ON 38,4% · BC 37,8% · NS 34,7%</div>
+              <div class="k">🟢 Mais acessível</div><div class="v">Nunavut 5,2% · NWT 15,6%</div>
+              <div class="k">🏠 Core housing need</div><div class="v">Nunavut 32,9% no total; QC tem o menor entre inquilinos (11,9%)</div>
+            </div>
+          </div>
+        </div>
+        <div class="corner-num">09</div>
+      </section>
+
+      <!-- 10 — CRUZAMENTO -->
+      <section class="slide" data-title="Salário × comunidade">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🫎</div>
+            <div class="bubble"><strong>BC</strong> combina a maior mediana com a 3ª maior comunidade; <strong>ON</strong> tem a maior comunidade e a 2ª mediana. 🍁</div>
+          </div>
+          <div class="chart-box step"><img src="images/fig_salario_vs_brasileiros.png" alt="Dispersão salário mediano versus comunidade brasileira"></div>
+        </div>
+        <div class="corner-num">10</div>
+      </section>
+
+      <!-- 11 — MODELO STAR SCHEMA -->
+      <section class="slide" data-title="Modelo Star Schema">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">Três <strong>esquemas estrela</strong> com <strong>dimensões conformadas</strong>, <strong>surrogate keys</strong> e fatos sem misturar granularidade. ⭐</div>
+          </div>
+          <div class="dw">
+            <div class="dw-fact step">
+              <h3>fato_salario</h3>
+              <span class="dim">dim_provincia</span>
+              <span class="dim">dim_ocupacao</span>
+              <span class="dim">dim_tempo_salario</span>
+              <span class="dim">dim_fonte</span>
+              <span class="shared">medidas: low · median · high · amplitude</span>
+            </div>
+            <div class="dw-fact step">
+              <h3>fato_imigracao</h3>
+              <span class="dim">dim_provincia</span>
+              <span class="dim">dim_pais_nascimento</span>
+              <span class="dim">dim_periodo_imigracao</span>
+              <span class="dim">dim_tempo_censo</span>
+              <span class="shared">medida: qt_imigrantes (aditiva)</span>
+            </div>
+            <div class="dw-fact step">
+              <h3>fato_habitacao</h3>
+              <span class="dim">dim_provincia</span>
+              <span class="dim">dim_tenencia</span>
+              <span class="dim">dim_indicador_habitacao</span>
+              <span class="dim">dim_tempo_censo</span>
+              <span class="shared">medida: vl_medida (contagem ou %)</span>
+            </div>
+          </div>
+          <p class="muted step" style="font-weight:800; font-size:13px; text-align:center;">🔗 dim_provincia é a dimensão conformada compartilhada pelos três fatos.</p>
+        </div>
+        <div class="corner-num">11</div>
+      </section>
+
+      <!-- 12 — TRATAMENTO E IMPACTO -->
+      <section class="slide" data-title="Tratamento e impacto">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">Toda alteração na base OLTP é <strong>justificada</strong> e o impacto é medido. <strong>Nunca estimamos valores.</strong> 🛠️</div>
+          </div>
+          <div class="kv">
+            <div class="k step">🗄️ Raw preservado</div><div class="v step">Downloads oficiais sem alteração, com URL, data de extração e checksum.</div>
+            <div class="k step">🔎 Filtros</div><div class="v step">Job Bank: 44.376 registros → 86 de NOC 21232 → 9 provinciais usados. StatCan habitação: 2.988 → 117 (13 províncias × 9 indicadores).</div>
+            <div class="k step">🔗 Normalização</div><div class="v step">Nome da província em inglês como chave de cruzamento; DGUID canônico; sigla Job Bank.</div>
+            <div class="k step">🚫 Ausências</div><div class="v step">PEI só aparece como região econômica (ER1110); territórios sem salário publicado — mantidos como N/A/NULL.</div>
+          </div>
+        </div>
+        <div class="corner-num">12</div>
+      </section>
+
+      <!-- 13 — LIMITAÇÕES -->
+      <section class="slide" data-title="Limitações">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🫎</div>
+            <div class="bubble">Transparência é regra: <strong>o que os dados não contam</strong>, a gente declara. ⚠️</div>
+          </div>
+          <div class="grid c2">
+            <div class="card red step"><span class="ico">📅</span><h3>Bases temporais diferentes</h3><p>Censo 2021 (imigração/habitação) vs. salários 2023–2024 — nunca tratados como o mesmo ano.</p></div>
+            <div class="card yellow step"><span class="ico">🚫</span><h3>Sem salário em 4 jurisdições</h3><p>PEI, Yukon, NWT e Nunavut não publicam salário provincial de NOC 21232 no release usado.</p></div>
+            <div class="card blue step"><span class="ico">👥</span><h3>Yukon sem brasileiros</h3><p>Censo 2021 registrou 0 imigrantes nascidos no Brasil em Yukon.</p></div>
+            <div class="card purple step"><span class="ico">📊</span><h3>Percentuais derivados</h3><p>Habitação já traz percentuais calculados; participação brasileira será calculada no BI, não armazenada.</p></div>
+          </div>
+        </div>
+        <div class="corner-num">13</div>
+      </section>
+
+      <!-- 14 — ENTREGÁVEIS DA ENTREGA 1 -->
+      <section class="slide" data-title="Entrega 1 · Entregáveis" data-cta="CONCLUIR">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">Entrega 1 pronta: <strong>modelo, dicionários, EDA e script SQL</strong> — tudo documentado e sem estimar ausências. 🍁</div>
+          </div>
+          <ul class="duo-list" style="display:grid; grid-auto-flow:column; grid-template-rows:repeat(2,auto); gap:13px 24px; margin-top:4px;">
+            <li class="step"><span class="bullet">1</span> Apresentação com slides (esta).</li>
+            <li class="step"><span class="bullet">2</span> Trabalho escrito padrão IFAL (DOCX).</li>
+            <li class="step"><span class="bullet">3</span> Dicionários da base OLTP e do DW.</li>
+            <li class="step"><span class="bullet">4</span> Modelo Star Schema + script SQL Oracle.</li>
+          </ul>
+          <p class="muted step" style="font-weight:800; font-size:13px; margin-top:10px;">Próximas etapas: ETL no Pentaho, dashboards e grafos.</p>
+        </div>
+        <div class="corner-num">14</div>
+      </section>
+
+      <!-- 15 — OBRIGADO -->
+      <section class="slide" data-title="Obrigado!" data-cta="">
+        <div class="ob-stage" style="align-items:center; text-align:center;">
+          <div class="hero-gif mascot float">🍁</div>
+          <div class="bubble" style="margin:0 auto; max-width:680px">Data Warehouse planejado para <strong>comparar oportunidades</strong> — sem chute, só dado oficial. 🦫</div>
+          <h1 class="title" style="font-size:40px">Obrigado! Perguntas?</h1>
+          <p class="subtitle">Statistics Canada · Job Bank/ESDC · Oracle · IFAL · 2026.1</p>
+        </div>
+        <div class="corner-num">15</div>
+      </section>
+
+      <!-- ===== Chrome de onboarding ===== -->
+      <div class="ob-chrome">
+        <div class="ob-bar"><div class="ob-fill" id="ob-fill"></div></div>
+      </div>
+      <div class="ob-cta" id="ob-cta-wrap">
+        <button class="foot-back" id="ob-back" aria-label="Voltar">‹ Voltar</button>
+        <span class="foot-count" id="counter">1 / 15</span>
+        <button class="duo-btn" id="ob-cta">CONTINUAR</button>
+      </div>
+      <button class="toc-toggle" id="toc-toggle" aria-label="Sumário">☰</button>
+      <aside class="toc-panel" id="toc-panel"><h4>Passos</h4><ul class="toc-list" id="toc-list"></ul></aside>
+
+    </div><!-- /scaler -->
+  </div><!-- /viewport -->
+</div><!-- /pres -->
+
+<script src="js/engine.js"></script>
+<script src="js/intro.js"></script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+INTEGRANTES DA EQUIPE:
+Eliezir Moreira e Raphael Phillipe
+
+*META SMART:*
+Até 14/12, desenvolver e documentar um Data Warehouse em Oracle integrando três bases oficiais (Statistics Canada - Censo 2021: imigração e habitação; Job Bank/ESDC: salários NOC 21232) para comparar, entre as províncias e territórios canadenses, a distribuição de imigrantes brasileiros, a remuneração de desenvolvedores de software e a acessibilidade habitacional, respondendo às dez perguntas analíticas do plano com cargas idempotentes e sem estimar valores ausentes.
+
+*S (Específica):* construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
+*M (Mensurável):* responder às dez perguntas do plano com as métricas abaixo e comprovar a idempotência das cargas por auditoria.
+*A (Atingível):* duas bases no escopo mínimo + uma complementar, com ETL em Pentaho Data Integration e fontes já baixadas e filtradas.
+*R (Relevante):* apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense.
+*T (Temporal):* até a data final da disciplina (substituir pelo prazo exato do cronograma).
+
+*MÉTRICAS (respondem às dez perguntas do plano):*
+
+* Quantidade de imigrantes brasileiros por província;
+* Percentual de brasileiros entre os imigrantes por província (calculado: brasileiros / total de imigrantes; não armazenar como medida aditiva);
+* Distribuição dos imigrantes brasileiros por período de imigração;
+* Salário mínimo de desenvolvedores de software (NOC 21232);
+* Salário mediano de desenvolvedores de software (NOC 21232);
+* Salário máximo de desenvolvedores de software (NOC 21232);
+* Amplitude salarial (high wage - low wage);
+* Disponibilidade de publicação salarial por jurisdição (província, região econômica ou N/A);
+* Proporção de inquilinos com gasto de 30% ou mais da renda em moradia;
+* Indicador de equilíbrio entre remuneração, comunidade brasileira e acessibilidade habitacional.
+
+*BASES DE DADOS:*
+
+* *Statistics Canada — Census 2021, tabela 98-10-0307-01:* dados de imigração por país de nascimento, período de imigração e localização geográfica (províncias/territórios).
+  [Statistics Canada — Census 2021](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810030701)
+
+* *Government of Canada — Job Bank/ESDC:* dados salariais de Software Developers and Programmers (NOC 21232) por região; release 2025, referência salarial 2023–2024.
+  [Government of Canada — Wages Dataset](https://open.canada.ca/data/en/dataset/adad580f-76b0-4502-bd05-20c125de9116)
+
+* *Statistics Canada — Census 2021, tabela 98-10-0258-01:* indicadores de habitação por posse (custo de moradia, comprometimento de 30% ou mais da renda e core housing need).
+  [Statistics Canada — Housing indicators](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810025801)
+
+*OBSERVAÇÃO:* imigração e habitação referem-se ao Censo 2021; salários têm referência 2023–2024. Cada fato usará sua própria dimensão de tempo; os períodos não serão tratados como um mesmo ano.
