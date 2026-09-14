@@ -95,10 +95,10 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
 | `sk_fato_salario` | NUMBER | 15 | `PK_FATO_SALARIO` | Surrogate key (SEQ_FATO_SALARIO) |
-| `sk_provincia` | NUMBER | 10 | `FK_FATO_SALARIO_DIM_PROVINCIA` | → `dim_provincia` |
-| `sk_ocupacao` | NUMBER | 10 | `FK_FATO_SALARIO_DIM_OCUPACAO` | → `dim_ocupacao` |
-| `sk_tempo_salario` | NUMBER | 10 | `FK_FATO_SALARIO_DIM_TEMPO_SALARIO` | → `dim_tempo_salario` |
-| `sk_fonte` | NUMBER | 10 | `FK_FATO_SALARIO_DIM_FONTE` | → `dim_fonte` |
+| `sk_provincia` | NUMBER | 10 | `FK_FATO_SAL_DIM_PROVINCIA` | → `dim_provincia` |
+| `sk_ocupacao` | NUMBER | 10 | `FK_FATO_SAL_DIM_OCUPACAO` | → `dim_ocupacao` |
+| `sk_tempo_salario` | NUMBER | 10 | `FK_FATO_SAL_DIM_TEMPO_SAL` | → `dim_tempo_salario` |
+| `sk_fonte` | NUMBER | 10 | `FK_FATO_SAL_DIM_FONTE` | → `dim_fonte` |
 | `vl_salario_minimo` | NUMBER | 10,2 | — | `Low_Wage` (CAD/hora) |
 | `vl_salario_mediano` | NUMBER | 10,2 | — | `Median_Wage` (CAD/hora) |
 | `vl_salario_maximo` | NUMBER | 10,2 | — | `High_Wage` (CAD/hora) |
@@ -115,11 +115,11 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
 | `sk_fato_imigracao` | NUMBER | 15 | `PK_FATO_IMIGRACAO` | Surrogate key (SEQ_FATO_IMIGRACAO) |
-| `sk_provincia` | NUMBER | 10 | `FK_FATO_IMIGRACAO_DIM_PROVINCIA` | → `dim_provincia` |
-| `sk_pais_nascimento` | NUMBER | 10 | `FK_FATO_IMIGRACAO_DIM_PAIS` | → `dim_pais_nascimento` |
-| `sk_periodo_imigracao` | NUMBER | 10 | `FK_FATO_IMIGRACAO_DIM_PERIODO` | → `dim_periodo_imigracao` |
-| `sk_tempo_censo` | NUMBER | 10 | `FK_FATO_IMIGRACAO_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
-| `sk_fonte` | NUMBER | 10 | `FK_FATO_IMIGRACAO_DIM_FONTE` | → `dim_fonte` |
+| `sk_provincia` | NUMBER | 10 | `FK_FATO_IMIG_DIM_PROVINCIA` | → `dim_provincia` |
+| `sk_pais_nascimento` | NUMBER | 10 | `FK_FATO_IMIG_DIM_PAIS` | → `dim_pais_nascimento` |
+| `sk_periodo_imigracao` | NUMBER | 10 | `FK_FATO_IMIG_DIM_PERIODO` | → `dim_periodo_imigracao` |
+| `sk_tempo_censo` | NUMBER | 10 | `FK_FATO_IMIG_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
+| `sk_fonte` | NUMBER | 10 | `FK_FATO_IMIG_DIM_FONTE` | → `dim_fonte` |
 | `qt_imigrantes` | NUMBER | 12 | `CK_FATO_IMIGRACAO_QT` (`>= 0`) | Contagem de imigrantes (medida aditiva) |
 
 A **participação brasileira** não é coluna do fato; é calculada na apresentação:
@@ -132,11 +132,11 @@ A **participação brasileira** não é coluna do fato; é calculada na apresent
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
 | `sk_fato_habitacao` | NUMBER | 15 | `PK_FATO_HABITACAO` | Surrogate key (SEQ_FATO_HABITACAO) |
-| `sk_provincia` | NUMBER | 10 | `FK_FATO_HABITACAO_DIM_PROVINCIA` | → `dim_provincia` |
-| `sk_tenencia` | NUMBER | 10 | `FK_FATO_HABITACAO_DIM_TENENCIA` | → `dim_tenencia` |
-| `sk_indicador_habitacao` | NUMBER | 10 | `FK_FATO_HABITACAO_DIM_INDICADOR` | → `dim_indicador_habitacao` |
-| `sk_tempo_censo` | NUMBER | 10 | `FK_FATO_HABITACAO_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
-| `sk_fonte` | NUMBER | 10 | `FK_FATO_HABITACAO_DIM_FONTE` | → `dim_fonte` |
+| `sk_provincia` | NUMBER | 10 | `FK_FATO_HAB_DIM_PROVINCIA` | → `dim_provincia` |
+| `sk_tenencia` | NUMBER | 10 | `FK_FATO_HAB_DIM_TENENCIA` | → `dim_tenencia` |
+| `sk_indicador_habitacao` | NUMBER | 10 | `FK_FATO_HAB_DIM_INDICADOR` | → `dim_indicador_habitacao` |
+| `sk_tempo_censo` | NUMBER | 10 | `FK_FATO_HAB_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
+| `sk_fonte` | NUMBER | 10 | `FK_FATO_HAB_DIM_FONTE` | → `dim_fonte` |
 | `vl_medida` | NUMBER | 15,2 | `CK_FATO_HABITACAO_VL` (`>= 0`) | Contagem ou percentual (ver `dim_indicador_habitacao.tp_medida`) |
 
 ## 3. Staging (espelha os CSVs antes das transformações)

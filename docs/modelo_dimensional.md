@@ -1,8 +1,12 @@
-# Modelo Lógico/Físico do Data Warehouse (Star Schema)
+# Modelo Lógico/Físico do Data Warehouse
 
-Modelo proposto para a Entrega 1. São **três esquemas estrela com dimensões conformadas**: salários, imigração e habitação compartilham `dim_provincia` (e cada fato tem sua própria dimensão de tempo, pois as bases têm referências temporais diferentes). Essa separação evita repetir salários em cada período de imigração e produzir somas incorretas.
+Modelo proposto para a Entrega 1: uma **constelação de fatos composta por três Star Schemas integrados por dimensões conformadas**. Salários, imigração e habitação compartilham `dim_provincia` (e cada fato tem sua própria dimensão de tempo, pois as bases têm referências temporais diferentes). Essa separação evita repetir salários em cada período de imigração e produzir somas incorretas.
 
-## 1. Diagrama Star Schema
+## 1. Diagrama dimensional
+
+![Diagrama da constelação de fatos com PKs, FKs e cardinalidades](figuras/modelo_constelacao.png)
+
+A figura apresenta PKs, FKs e cardinalidades 1:N. Cada fato tem o próprio grão; `dim_provincia`, `dim_fonte` e `dim_tempo_censo` são dimensões conformadas reutilizadas quando aplicável.
 
 ```mermaid
 erDiagram
@@ -67,7 +71,7 @@ Observações:
 
 ## 4. Mapeamento origem → destino (resumo)
 
-| Origem (OLTP) | Destino (DW) | Regra |
+| Origem (dataset público) | Destino (DW) | Regra |
 |---|---|---|
 | Job Bank `prov` + `ER_Name` | `dim_provincia.sg_provincia_jobbank`, `nm_provincia` | Normalizar pelo nome em inglês; `NAT`/regiões econômicas não entram no fato provincial |
 | Job Bank `NOC_CNP`, `NOC_Title_eng` | `dim_ocupacao` | Filtrar `NOC_CNP = NOC_21232` |
@@ -82,4 +86,4 @@ Observações:
 2. **Dimensões conformadas** — `dim_provincia` e `dim_tempo_censo` são reutilizadas entre fatos.
 3. **Surrogate keys em todas as dimensões** — as chaves naturais (`DGUID`, `NOC_CNP`, códigos StatCan) ficam como `AK` (alternate keys) para o ETL fazer o *lookup*.
 4. **Percentuais não são armazenados** — participação brasileira e percentuais habitacionais são calculados na camada de apresentação para evitar soma incorreta de fatos não aditivos.
-5. **Ausências preservadas** — onde não há salário publicado, a linha do fato não é inserida (ou é marcada como indisponível via dimensão de status); nenhum valor é estimado.
+5. **Ausências preservadas** — onde não há salário provincial publicado, a linha não é inserida em `fato_salario`; consultas partem de `dim_provincia` com `LEFT JOIN` e exibem `N/A`. Nenhum valor é estimado e jurisdições sem salário não entram no indicador combinado.

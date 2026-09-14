@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <style>
+    text{font-family:Arial,sans-serif;fill:#14213d}.title{font-size:30px;font-weight:bold}.small{font-size:17px}.key{font-size:15px}.fact{fill:#c1121f;stroke:#780000;stroke-width:3}.dim{fill:#e8f1f8;stroke:#1d4e72;stroke-width:3}.boxTitle{fill:#fff;font-size:21px;font-weight:bold}.dimTitle{font-size:19px;font-weight:bold}.line{stroke:#52616b;stroke-width:2.5}.card{font-size:18px;font-weight:bold;fill:#c1121f}
+  </style>
+  <rect width="1400" height="980" fill="white"/>
+  <text x="700" y="44" text-anchor="middle" class="title">Constelação de fatos: três Star Schemas com dimensões conformadas</text>
+  <text x="700" y="73" text-anchor="middle" class="small">PK = chave primária · FK = chave estrangeira · 1:N = uma dimensão para muitas linhas de fato</text>
+
+  <!-- connectors -->
+  <g class="line">
+    <line x1="565" y1="285" x2="400" y2="175"/><line x1="565" y1="285" x2="400" y2="365"/><line x1="835" y1="285" x2="1000" y2="175"/><line x1="835" y1="285" x2="1000" y2="365"/>
+    <line x1="565" y1="525" x2="400" y2="515"/><line x1="565" y1="525" x2="400" y2="705"/><line x1="835" y1="525" x2="1000" y2="515"/><line x1="835" y1="525" x2="1000" y2="705"/>
+    <line x1="700" y1="355" x2="700" y2="465"/><line x1="700" y1="595" x2="700" y2="705"/>
+  </g>
+  <g class="card"><text x="483" y="210">1</text><text x="530" y="260">N</text><text x="483" y="390">1</text><text x="530" y="335">N</text><text x="915" y="210">1</text><text x="858" y="260">N</text><text x="915" y="390">1</text><text x="858" y="335">N</text><text x="480" y="535">1</text><text x="530" y="520">N</text><text x="480" y="710">1</text><text x="530" y="670">N</text><text x="915" y="535">1</text><text x="858" y="520">N</text><text x="915" y="710">1</text><text x="858" y="670">N</text><text x="710" y="420">1:N</text><text x="710" y="680">1:N</text></g>
+
+  <!-- dimensions -->
+  <g class="dim"><rect x="130" y="115" rx="10" width="270" height="120"/><text x="265" y="150" text-anchor="middle" class="dimTitle">dim_ocupacao</text><text x="150" y="185" class="key">PK sk_ocupacao</text><text x="150" y="211" class="key">AK cd_noc</text></g>
+  <g class="dim"><rect x="130" y="315" rx="10" width="270" height="120"/><text x="265" y="350" text-anchor="middle" class="dimTitle">dim_tempo_salario</text><text x="150" y="385" class="key">PK sk_tempo_salario</text><text x="150" y="411" class="key">AK cd_periodo_referencia</text></g>
+  <g class="dim"><rect x="1000" y="115" rx="10" width="270" height="120"/><text x="1135" y="150" text-anchor="middle" class="dimTitle">dim_provincia</text><text x="1020" y="185" class="key">PK sk_provincia</text><text x="1020" y="211" class="key">AK cd_dguid</text></g>
+  <g class="dim"><rect x="1000" y="315" rx="10" width="270" height="120"/><text x="1135" y="350" text-anchor="middle" class="dimTitle">dim_fonte</text><text x="1020" y="385" class="key">PK sk_fonte</text><text x="1020" y="411" class="key">AK cd_fonte</text></g>
+  <g class="dim"><rect x="130" y="455" rx="10" width="270" height="120"/><text x="265" y="490" text-anchor="middle" class="dimTitle">dim_pais_nascimento</text><text x="150" y="525" class="key">PK sk_pais_nascimento</text><text x="150" y="551" class="key">AK cd_pais_nascimento</text></g>
+  <g class="dim"><rect x="130" y="645" rx="10" width="270" height="120"/><text x="265" y="680" text-anchor="middle" class="dimTitle">dim_periodo_imigracao</text><text x="150" y="715" class="key">PK sk_periodo_imigracao</text><text x="150" y="741" class="key">AK cd_periodo_imigracao</text></g>
+  <g class="dim"><rect x="1000" y="455" rx="10" width="270" height="120"/><text x="1135" y="490" text-anchor="middle" class="dimTitle">dim_tenencia</text><text x="1020" y="525" class="key">PK sk_tenencia</text><text x="1020" y="551" class="key">AK cd_tenencia</text></g>
+  <g class="dim"><rect x="1000" y="645" rx="10" width="270" height="120"/><text x="1135" y="680" text-anchor="middle" class="dimTitle">dim_indicador_habitacao</text><text x="1020" y="715" class="key">PK sk_indicador_habitacao</text><text x="1020" y="741" class="key">AK cd_indicador_habitacao</text></g>
+  <g class="dim"><rect x="565" y="765" rx="10" width="270" height="115"/><text x="700" y="800" text-anchor="middle" class="dimTitle">dim_tempo_censo</text><text x="585" y="835" class="key">PK sk_tempo_censo</text><text x="585" y="861" class="key">AK nr_ano_censo</text></g>
+
+  <!-- facts -->
+  <g class="fact"><rect x="565" y="225" rx="10" width="270" height="130"/><text x="700" y="260" text-anchor="middle" class="boxTitle">fato_salario</text><text x="585" y="295" class="boxTitle" style="font-size:15px">PK sk_fato_salario</text><text x="585" y="320" class="boxTitle" style="font-size:14px">FK provincia · ocupacao</text><text x="585" y="342" class="boxTitle" style="font-size:14px">FK tempo_salario · fonte</text></g>
+  <g class="fact"><rect x="565" y="465" rx="10" width="270" height="130"/><text x="700" y="500" text-anchor="middle" class="boxTitle">fato_imigracao</text><text x="585" y="535" class="boxTitle" style="font-size:15px">PK sk_fato_imigracao</text><text x="585" y="560" class="boxTitle" style="font-size:14px">FK provincia · pais · periodo</text><text x="585" y="582" class="boxTitle" style="font-size:14px">FK tempo_censo · fonte</text></g>
+  <g class="fact"><rect x="565" y="705" rx="10" width="270" height="130"/><text x="700" y="740" text-anchor="middle" class="boxTitle">fato_habitacao</text><text x="585" y="775" class="boxTitle" style="font-size:15px">PK sk_fato_habitacao</text><text x="585" y="800" class="boxTitle" style="font-size:14px">FK provincia · tenencia · indicador</text><text x="585" y="822" class="boxTitle" style="font-size:14px">FK tempo_censo · fonte</text></g>
+</svg>

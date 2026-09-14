@@ -1,6 +1,8 @@
-# Dicionário de Dados — Bases OLTP (origem)
+# Dicionário de Dados — Bases de origem
 
-Este documento descreve as bases operacionais de origem ("OLTP") usadas no projeto, seguindo a abordagem do exemplo da disciplina (CSVs públicos tratados como sistema OLTP de origem). Os arquivos brutos são preservados sem alteração em `raw/`; as extrações e filtros usados nas análises ficam em `filtered/`.
+Este documento descreve os datasets públicos de origem usados no projeto. Eles **não são sistemas OLTP transacionais clássicos**: são arquivos analíticos públicos tratados como camada de origem do processo dimensional, conforme a organização solicitada na disciplina. Os arquivos brutos são preservados sem alteração em `raw/`; as extrações e filtros usados nas análises ficam em `filtered/`.
+
+As duas fontes institucionais são Statistics Canada e Job Bank/ESDC. Elas fornecem três conjuntos de dados: imigração, habitação e salários.
 
 ## 1. Government of Canada — Job Bank / ESDC Wages
 
@@ -38,6 +40,8 @@ Descrição: salários publicados pelo Job Bank para ocupações NOC (National O
 | 22 | `EmployeesWithNonWageBenefit_Pct` | % de empregados com benefícios não salariais | Numérico (texto) | 0–100 ou vazio | `94.8` |
 
 ### 1.2 Observações importantes
+
+**Nulabilidade:** no dataset Job Bank, `Low_Wage_Salaire_Minium`, `Median_Wage_Salaire_Median`, `High_Wage_Salaire_Maximal`, `Average_Wage_Salaire_Moyen`, `Quartile1_Wage_Salaire_Quartile1`, `Quartile3_Wage_Salaire_Quartile3`, `Wage_Comment_E`, `Wage_Comment_F` e `EmployeesWithNonWageBenefit_Pct` podem estar vazios. Os demais campos são tratados como obrigatórios para uma linha recebida; no staging, todos são inicialmente `VARCHAR2` para preservar o valor original.
 
 - O arquivo bruto tem **20.301 / 20.012 / 20.288 células vazias** em low/median/high (≈45% dos 44.376 registros). Para `NOC_21232`, a ausência ocorre principalmente em regiões econômicas e territórios, indicada por `Wage_Comment_E`.
 - Para `NOC_21232`, o recorte usado é `Reference_Period = 2023-2024`, `Annual_Wage_Flag = 0` (salário por hora) e `Source2025_NHQ = LFS 2023-24 PR NOC5` no nível provincial.
@@ -79,6 +83,8 @@ Cada coluna de medida é seguida de uma coluna `Symbol` (supressão/qualidade). 
 
 ### 2.2 Observações importantes
 
+**Nulabilidade:** os campos de identificação e medidas usados no recorte (`REF_DATE`, `GEO`, `DGUID`, `Age (8D)`, `Gender (3)`, `Place of birth (290)`, `Coordinate`, `Immigrants[3]` e períodos `[4]` a `[8]`) não podem ser nulos para carga no DW. As colunas `Symbol` podem estar vazias; valores suprimidos ou marcados no arquivo de origem não são convertidos em zero.
+
 - As colunas de período são **partições** do total de imigrantes: `Before 1980` + `1980-1990` + `1991-2000` + `2001-2010` + `2011-2021` = `Immigrants[3]`.
 - `Total – Place of birth` fornece o denominador (total de imigrantes da província); `Brazil` fornece o numerador.
 - O DGUID é a chave geográfica canônica do Statistics Canada; o Job Bank usa `prov`/`ER_Code`, por isso o mapeamento é feito por nome em inglês.
@@ -109,12 +115,14 @@ Descrição: indicadores habitacionais por posse (total, proprietário, inquilin
 
 ### 3.2 Observações importantes
 
+**Nulabilidade:** `REF_DATE`, `GEO`, `DGUID`, `Census year (2)`, `Housing indicators (9)`, `Coordinate` e as quatro medidas de `Tenure` são obrigatórios para carga no DW. `Symbol` pode estar vazio; supressões são mantidas como dado indisponível, nunca como zero.
+
 - `Affordability: unaffordable housing` corresponde à moradia com **gasto de 30% ou mais da renda** em custos de abrigo (indicador usado na pergunta 9 do plano).
 - As linhas `Percent of households in …` já são percentuais derivados (0–100); as demais linhas são contagens.
 - No recorte usado, `Tenure (4):Renter[3]` é a medida principal para a pergunta sobre inquilinos; `Owner[2]` e `Total[1]` permitem comparar proprietários vs. inquilinos.
 
-## 4. Artefato de junção (staging, não é OLTP)
+## 4. Artefato de junção (staging, não é dataset de origem)
 
 **Arquivo:** `canada_provinces_brazil_software_developer_wages.csv` — 13 linhas, 16 colunas.
 
-Resultado do *left join* das 13 jurisdições do StatCan com os salários provinciais do Job Bank pelo nome da província em inglês. `N/A` é preservado onde o Job Bank não publica salário provincial (PEI, Yukon, NWT, Nunavut). Este arquivo **não** é base OLTP; é um artefato de staging usado para validar o cruzamento e a EDA.
+Resultado do *left join* das 13 jurisdições do StatCan com os salários provinciais do Job Bank pelo nome da província em inglês. `N/A` é preservado onde o Job Bank não publica salário provincial (PEI, Yukon, NWT, Nunavut). Este arquivo **não** é dataset de origem; é um artefato de staging usado para validar o cruzamento e a EDA.

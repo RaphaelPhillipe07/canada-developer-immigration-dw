@@ -1,22 +1,29 @@
-==============================
-TABLESPACES
-==============================
+-- ==============================
+-- TABLESPACES
+-- ==============================
+
+-- PRÉ-REQUISITO: esta seção deve ser executada por usuário com privilégio DBA
+-- (CREATE TABLESPACE). Ajuste os caminhos abaixo ao diretório de datafiles do
+-- ambiente Oracle. Depois de criar os tablespaces, o dono do DW precisa de
+-- CREATE TABLE, CREATE SEQUENCE, CREATE INDEX e quota em TS_DW_DADOS/TS_DW_INDICES.
+DEFINE DW_DATAFILE = 'ts_dw_dados01.dbf'
+DEFINE DW_INDEXFILE = 'ts_dw_indices01.dbf'
 
 CREATE TABLESPACE TS_DW_DADOS
-    DATAFILE 'ts_dw_dados01.dbf' SIZE 200M
+    DATAFILE '&DW_DATAFILE' SIZE 200M
     AUTOEXTEND ON NEXT 20M MAXSIZE 2G
     EXTENT MANAGEMENT LOCAL
     SEGMENT SPACE MANAGEMENT AUTO;
 
 CREATE TABLESPACE TS_DW_INDICES
-    DATAFILE 'ts_dw_indices01.dbf' SIZE 100M
+    DATAFILE '&DW_INDEXFILE' SIZE 100M
     AUTOEXTEND ON NEXT 10M MAXSIZE 1G
     EXTENT MANAGEMENT LOCAL
     SEGMENT SPACE MANAGEMENT AUTO;
 
-==============================
-SEQUENCES
-==============================
+-- ==============================
+-- SEQUENCES
+-- ==============================
 
 CREATE SEQUENCE SEQ_DIM_PROVINCIA           START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_OCUPACAO            START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
@@ -31,9 +38,9 @@ CREATE SEQUENCE SEQ_FATO_SALARIO            START WITH 1 INCREMENT BY 1 NOCACHE 
 CREATE SEQUENCE SEQ_FATO_IMIGRACAO          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_FATO_HABITACAO          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
-==============================
-STAGING
-==============================
+-- ==============================
+-- STAGING
+-- ==============================
 
 -- 3.1 Job Bank / ESDC Wages (job_bank_wages_2025.csv)
 CREATE TABLE stg_job_bank_wages (
@@ -112,9 +119,9 @@ CREATE TABLE stg_statcan_habitacao (
     tenure_gov_4_symbol   VARCHAR2(10)
 ) TABLESPACE TS_DW_DADOS;
 
-==============================
-DIMENSÕES
-==============================
+-- ==============================
+-- DIMENSÕES
+-- ==============================
 
 CREATE TABLE dim_provincia (
     sk_provincia         NUMBER(10)   CONSTRAINT NN_DIM_PROVINCIA_SK        NOT NULL,
@@ -218,9 +225,9 @@ CREATE TABLE dim_fonte (
         USING INDEX TABLESPACE TS_DW_INDICES
 ) TABLESPACE TS_DW_DADOS;
 
-==============================
-FATOS
-==============================
+-- ==============================
+-- FATOS
+-- ==============================
 
 CREATE TABLE fato_salario (
     sk_fato_salario       NUMBER(15)    CONSTRAINT NN_FATO_SALARIO_SK NOT NULL,
@@ -301,9 +308,9 @@ CREATE TABLE fato_habitacao (
     CONSTRAINT CK_FATO_HABITACAO_VL CHECK (vl_medida >= 0)
 ) TABLESPACE TS_DW_DADOS;
 
-==============================
-ÍNDICES ADICIONAIS (FKS E FILTROS)
-==============================
+-- ==============================
+-- ÍNDICES ADICIONAIS (FKS E FILTROS)
+-- ==============================
 
 CREATE INDEX IDX_FATO_SAL_SK_PROVINCIA ON fato_salario (sk_provincia)         TABLESPACE TS_DW_INDICES;
 CREATE INDEX IDX_FATO_SAL_SK_OCUPACAO  ON fato_salario (sk_ocupacao)          TABLESPACE TS_DW_INDICES;
@@ -316,4 +323,3 @@ CREATE INDEX IDX_FATO_IMIG_SK_PERIODO   ON fato_imigracao (sk_periodo_imigracao)
 CREATE INDEX IDX_FATO_HAB_SK_PROVINCIA ON fato_habitacao (sk_provincia)        TABLESPACE TS_DW_INDICES;
 CREATE INDEX IDX_FATO_HAB_SK_TENENCIA  ON fato_habitacao (sk_tenencia)         TABLESPACE TS_DW_INDICES;
 CREATE INDEX IDX_FATO_HAB_SK_INDICADOR ON fato_habitacao (sk_indicador_habitacao) TABLESPACE TS_DW_INDICES;
-

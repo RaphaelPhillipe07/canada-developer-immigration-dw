@@ -10,7 +10,7 @@
 <body>
 <header><div class="eyebrow">Tópicos Avançados de Banco de Dados · Projeto em dupla</div><h1>Data Warehouse de oportunidades para desenvolvedores imigrantes no Canadá</h1><p>Planejamento das quatro entregas: fontes oficiais, modelo dimensional, ETL idempotente, dashboards e grafos.</p></header>
 <main>
-<section><h2>1. Problema, escopo e objetivo</h2><p>O projeto comparará províncias e territórios canadenses para apoiar profissionais de desenvolvimento de software que pretendem imigrar. A análise combinará remuneração, presença de imigrantes nascidos no Brasil e acessibilidade habitacional.</p><div class="callout"><strong>Objetivo geral:</strong> construir um Data Warehouse que permita comparar oportunidades para desenvolvedores de software nas províncias e territórios canadenses a partir de indicadores oficiais de mercado, imigração e moradia.</div><p><strong>Meta SMART:</strong> até a data final definida pelo docente, implementar e documentar um DW em Oracle, com cargas idempotentes de três datasets oficiais, capaz de responder às dez perguntas deste plano sem estimar valores ausentes.</p><p class="small">O projeto organiza indicadores para comparação; não afirma causalidade entre salário, comunidade brasileira e qualidade de vida.</p></section>
+<section><h2>1. Problema, escopo e objetivo</h2><p>O projeto comparará províncias e territórios canadenses para apoiar profissionais de desenvolvimento de software que pretendem imigrar. A análise combinará remuneração, presença de imigrantes nascidos no Brasil e acessibilidade habitacional.</p><div class="callout"><strong>Objetivo geral:</strong> construir um Data Warehouse que permita comparar oportunidades para desenvolvedores de software nas províncias e territórios canadenses a partir de indicadores oficiais de mercado, imigração e moradia.</div><p><strong>Meta SMART:</strong> até 14 de dezembro de 2026, implementar e documentar um DW em Oracle, com cargas idempotentes de três datasets oficiais, capaz de responder às dez perguntas deste plano sem estimar valores ausentes.</p><p class="small">O projeto organiza indicadores para comparação; não afirma causalidade entre salário, comunidade brasileira e qualidade de vida.</p></section>
 
 <section><h2>2. Bases oficiais selecionadas</h2><p>O requisito mínimo é duas bases diferentes. Serão usados três datasets independentes, todos oficiais, para tornar a análise de “melhor província” mais completa.</p>
 <table><thead><tr><th>Dataset</th><th>Órgão e período</th><th>Uso e campos principais</th></tr></thead><tbody>
@@ -19,7 +19,7 @@
 <tr><td><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810025801">Statistics Canada 98-10-0258-01</a><br><span class="small">Housing indicators by tenure</span></td><td>Statistics Canada<br>Censo 2021</td><td>Acessibilidade habitacional: custo de moradia, comprometimento de 30% ou mais da renda e <em>core housing need</em>, por província/território.</td></tr>
 </tbody></table>
 <div class="callout warning"><strong>Referências temporais:</strong> imigração e habitação são do Censo 2021; salários são 2023-2024. Cada fato terá sua própria dimensão de tempo. Não serão tratados como dados do mesmo ano.</div>
-<p class="small">Os arquivos de origem são CSV/ZIP públicos, não sistemas OLTP transacionais internos. No texto serão descritos com precisão como <strong>bases operacionais de origem</strong>, seguindo o uso de CSVs no exemplo da disciplina.</p></section>
+<p class="small">Os arquivos de origem são CSV/ZIP públicos, não sistemas OLTP transacionais internos. No texto serão descritos com precisão como <strong>datasets públicos de origem</strong>, usados como camada operacional do processo dimensional.</p></section>
 
 <section><h2>3. Perguntas analíticas</h2><ol>
 <li>Quais províncias possuem os maiores salários medianos para NOC 21232?</li><li>Qual é a diferença de salário mediano entre duas províncias selecionadas?</li><li>Em quais províncias há maior número de imigrantes nascidos no Brasil?</li><li>Qual é a participação de brasileiros no total de imigrantes de cada província?</li><li>Qual período de imigração concentra mais brasileiros em cada província?</li><li>Quais províncias combinam salário mediano alto e comunidade brasileira numerosa?</li><li>Qual província possui a maior amplitude salarial (<code>high wage - low wage</code>)?</li><li>Quais jurisdições têm salário não publicado, apenas regional ou indisponível para NOC 21232?</li><li>Quais províncias apresentam maior proporção de inquilinos com gasto de 30% ou mais da renda em moradia?</li><li>Quais províncias oferecem melhor equilíbrio entre remuneração, comunidade brasileira e acessibilidade habitacional?</li>
@@ -48,15 +48,15 @@
 <div class="callout warning"><strong>Atenção:</strong> dados devem contemplar 2 (duas) bases diferentes; além do objetivo, o trabalho deve apresentar pelo menos uma META SMART e 10 (dez) perguntas que serão possíveis de responder usando o Data Warehouse.</div>
 <h3>Conteúdo exigido</h3><ul>
 <li><strong>Apresentação COM SLIDES.</strong></li>
-<li><strong>Trabalho Escrito:</strong> definição do projeto/escopo (introdução, detalhes sobre o sistema/dados OLTP e os requisitos/objetivos atendidos pelo DW); dicionário de dados da base OLTP; análise exploratória da base OLTP; justificar e analisar o impacto de toda e qualquer alteração realizada na base OLTP (exclusão de linhas, alteração de valores etc.); modelo lógico/físico do DW (Star Schema); dicionário de dados do DW; <strong>ANEXO</strong> com script SQL Oracle (tabelas com constraints e tablespaces, sequências, tablespaces etc.).</li>
+<li><strong>Trabalho Escrito:</strong> definição do projeto/escopo (introdução, detalhes sobre os dados de origem e os requisitos/objetivos atendidos pelo DW); dicionário de dados das fontes; análise exploratória; justificar e analisar o impacto de toda transformação; modelo lógico/físico do DW (constelação de fatos); dicionário de dados do DW; <strong>ANEXO</strong> com script SQL Oracle (tabelas com constraints, tablespaces e sequências).</li>
 </ul>
 <h3>O que já foi feito</h3><ul>
 <li>Slides: <code>presentation/index.html</code> (abrir no navegador).</li>
-<li>Trabalho escrito padrão IFAL: <code>docs/Trabalho_Escrito_Nota1.docx</code>.</li>
+<li>Trabalho escrito padrão IFAL: <code>docs/dw_canada.docx</code>.</li>
 <li>Dicionários e EDA: <code>docs/dicionario_oltp.md</code>, <code>docs/eda_oltp.md</code>, <code>docs/dicionario_dw.md</code>.</li>
 <li>Modelo dimensional: <code>docs/modelo_dimensional.md</code>.</li>
-<li>Script SQL Oracle: <code>sql/nota1_ddl_oracle.sql</code>.</li>
-<li>Gráficos: <code>planning/figuras/</code>; scripts auxiliares em <code>scripts/</code>.</li>
+<li>Script SQL Oracle: <code>sql/script_oracle.sql</code>.</li>
+<li>Gráficos: <code>docs/figuras/</code> e <code>presentation/images/</code>; scripts auxiliares em <code>scripts/</code>.</li>
 </ul></section>
 
 <section><h2>7. Entrega 2 - ETL e evidências de execução</h2><span class="tag">Trabalho em dupla</span>

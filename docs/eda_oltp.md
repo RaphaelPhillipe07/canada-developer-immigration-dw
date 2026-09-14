@@ -1,11 +1,11 @@
-# Roteiro da Análise Exploratória — Bases OLTP
+# Roteiro da Análise Exploratória — Bases de origem
 
-Roteiro e resultados da EDA exigida na Entrega 1. O script `scripts/eda_oltp.py` lê os arquivos preservados em `raw/` e `filtered/`, imprime um resumo em Markdown e **não altera nenhum dado**.
+Roteiro e resultados da EDA exigida na Entrega 1. O script de apoio `tools/apoio_nao_avaliado/eda_oltp.py` lê os arquivos preservados em `raw/` e `filtered/`, imprime um resumo em Markdown e **não altera nenhum dado**.
 
 ## 1. Como executar
 
 ```bash
-python scripts/eda_oltp.py
+python tools/apoio_nao_avaliado/eda_oltp.py
 ```
 
 Requisitos: apenas a biblioteca padrão do Python 3 (sem dependências externas).
@@ -14,17 +14,17 @@ Requisitos: apenas a biblioteca padrão do Python 3 (sem dependências externas)
 
 | Arquivo | Papel na EDA |
 |---|---|
-| `raw/job_bank_wages_2025.csv` | Base OLTP bruta de salários (Job Bank/ESDC) |
+| `raw/job_bank_wages_2025.csv` | Dataset bruto de salários (Job Bank/ESDC) |
 | `filtered/job_bank_wages_2025_noc_21232.csv` | Recorte provincial NOC 21232 usado para a análise salarial |
-| `filtered/statcan_98100307_brazil_provinces_territories.csv` | Extração da OLTP do Statistics Canada (Censo 2021, imigração) |
-| `filtered/statcan_98100258_housing_provinces_territories.csv` | Extração da OLTP do Statistics Canada (Censo 2021, habitação) |
+| `filtered/statcan_98100307_brazil_provinces_territories.csv` | Extração de origem do Statistics Canada (Censo 2021, imigração) |
+| `filtered/statcan_98100258_housing_provinces_territories.csv` | Extração de origem do Statistics Canada (Censo 2021, habitação) |
 | `canada_provinces_brazil_software_developer_wages.csv` | Junção staging das duas fontes principais (validação do cruzamento) |
 
 Observação: o ZIP bruto do Statistics Canada de imigração (383 MB) não está versionado; a EDA de imigração usa a extração `filtered/` que preserva os nomes originais das colunas. O ZIP de habitação (60 KB) está preservado em `raw/98100258-eng.zip`.
 
 ## 3. Resultados
 
-### 3.1 Job Bank — arquivo bruto (OLTP de salários)
+### 3.1 Job Bank — dataset bruto de salários
 
 - **44.376 registros** e **516 ocupações NOC distintas**.
 - A ocupação de interesse, `NOC_21232` (Software developers and programmers), tem **86 registros**.
@@ -186,7 +186,7 @@ Leitura: **ON e BC** têm os maiores percentuais de inquilinos comprometendo ≥
 3. **Comunidade brasileira:** concentra-se em ON (23.120), QC (9.700) e BC (8.765); Yukon não registrou brasileiros no Censo 2021.
 4. **Perfil temporal:** a chegada de brasileiros é predominantemente recente (2011–2021 = 27.740).
 5. **Habitação:** ON e BC concentram os maiores percentuais de inquilinos com gasto ≥ 30% da renda (38,4% e 37,8%); Quebec, apesar da 2ª maior comunidade brasileira, tem os menores percentuais de inquilinos em core housing need (11,9%) e inacessibilidade (25,2%).
-6. **Cruzamento inicial:** BC combina a maior mediana salarial com a 3ª maior comunidade brasileira, mas tem alto custo de moradia para inquilinos; ON tem a maior comunidade e a 2ª maior mediana, também com moradia cara. A resposta à pergunta 10 (melhor equilíbrio) dependerá do peso atribuído a cada indicador — a ser definido na Entrega 3.
+6. **Cruzamento inicial:** BC combina a maior mediana salarial com a 3ª maior comunidade brasileira, mas tem alto custo de moradia para inquilinos; ON tem a maior comunidade e a 2ª maior mediana, também com moradia cara. Para a pergunta 10, o ranking será calculado somente para jurisdições com os três indicadores disponíveis: 40% salário mediano normalizado, 30% comunidade brasileira normalizada e 30% acessibilidade normalizada de forma inversa. Valores salariais N/A não recebem imputação nem entram no ranking.
 7. **Impacto das transformações:** os filtros aplicados (Age/Gender totais, `Brazil`/`Total – Place of birth`, `NOC_CNP = NOC_21232`, nível provincial, `Census year = 2021`) reduziram 44.376 registros do Job Bank para 9 registros provinciais usados na análise e 2.988 registros de habitação para 117; nenhum valor foi estimado — ausências permanecem como `N/A`/`NULL`.
 
 ## 5. Limitações e próximos passos
