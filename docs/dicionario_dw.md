@@ -41,7 +41,16 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `nr_ano_censo` | NUMBER | 4 | `AK_DIM_TEMPO_CENSO`, `NN_DIM_TEMPO_CENSO_ANO` | 2021 |
 | `dt_referencia` | DATE | — | — | 15/05/2021 (referência do Censo) |
 
-### 1.5 `dim_pais_nascimento`
+### 1.5 `dim_disponibilidade_salario`
+
+| Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
+|---|---|---|---|---|
+| `sk_disponibilidade_salario` | NUMBER | 10 | `PK_DIM_DISP_SALARIO` | Surrogate key (SEQ_DIM_DISPONIBILIDADE_SALARIO) |
+| `cd_disponibilidade` | VARCHAR2 | 24 | `AK_DIM_DISP_SALARIO`, `NN_DIM_DISP_SAL_CD`, `CK_DIM_DISP_SALARIO_CD` | `PROVINCIAL_PUBLICADO`, `APENAS_REGIONAL` ou `INDISPONIVEL` |
+| `ds_disponibilidade` | VARCHAR2 | 120 | `NN_DIM_DISP_SAL_DS` | Texto para exibição |
+| `fl_comparavel_provincial` | NUMBER | 1 | `NN_DIM_DISP_SAL_COMP`, `CK_DIM_DISP_SALARIO_COMP` | 1 somente para dado provincial comparável |
+
+### 1.6 `dim_pais_nascimento`
 
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
@@ -49,7 +58,7 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `cd_pais_nascimento` | VARCHAR2 | 30 | `AK_DIM_PAIS_NASCIMENTO`, `NN_DIM_PAIS_NASCIMENTO_CD` | `BRA` ou `TOTAL` |
 | `nm_pais_nascimento` | VARCHAR2 | 80 | `NN_DIM_PAIS_NASCIMENTO_NM` | `Brazil` ou `Total – Place of birth` |
 
-### 1.6 `dim_periodo_imigracao`
+### 1.7 `dim_periodo_imigracao`
 
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
@@ -58,7 +67,7 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `ds_periodo_imigracao` | VARCHAR2 | 40 | `NN_DIM_PERIODO_IMIGRACAO_DS` | `Before 1980`, `1980 to 1990`, … |
 | `nr_ordem` | NUMBER | 2 | — | Ordem cronológica p/ eixo do gráfico |
 
-### 1.7 `dim_tenencia`
+### 1.8 `dim_tenencia`
 
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
@@ -66,7 +75,7 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `cd_tenencia` | VARCHAR2 | 10 | `AK_DIM_TENENCIA`, `NN_DIM_TENENCIA_CD` | `TOTAL`, `OWNER`, `RENTER`, `GOV` |
 | `ds_tenencia` | VARCHAR2 | 60 | `NN_DIM_TENENCIA_DS` | Descrição da posse |
 
-### 1.8 `dim_indicador_habitacao`
+### 1.9 `dim_indicador_habitacao`
 
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
@@ -75,7 +84,7 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `ds_indicador_habitacao` | VARCHAR2 | 120 | — | Descrição resumida |
 | `tp_medida` | VARCHAR2 | 10 | `CK_DIM_INDICADOR_HABITACAO_TP` (`CONTAGEM`/`PERCENTUAL`) | Tipo de medida |
 
-### 1.9 `dim_fonte`
+### 1.10 `dim_fonte`
 
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
@@ -90,7 +99,7 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 
 ### 2.1 `fato_salario`
 
-**Grão:** província + ocupação + período salarial.
+**Grão:** jurisdição + ocupação + período salarial; há uma linha para cada jurisdição, inclusive quando o salário está apenas regional ou indisponível.
 
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
@@ -98,6 +107,7 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `sk_provincia` | NUMBER | 10 | `FK_FATO_SAL_DIM_PROVINCIA` | → `dim_provincia` |
 | `sk_ocupacao` | NUMBER | 10 | `FK_FATO_SAL_DIM_OCUPACAO` | → `dim_ocupacao` |
 | `sk_tempo_salario` | NUMBER | 10 | `FK_FATO_SAL_DIM_TEMPO_SAL` | → `dim_tempo_salario` |
+| `sk_disponibilidade_salario` | NUMBER | 10 | `FK_FATO_SAL_DIM_DISP` | → `dim_disponibilidade_salario` |
 | `sk_fonte` | NUMBER | 10 | `FK_FATO_SAL_DIM_FONTE` | → `dim_fonte` |
 | `vl_salario_minimo` | NUMBER | 10,2 | — | `Low_Wage` (CAD/hora) |
 | `vl_salario_mediano` | NUMBER | 10,2 | — | `Median_Wage` (CAD/hora) |
@@ -107,6 +117,8 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `vl_quartil3` | NUMBER | 10,2 | — | `Quartile3_Wage` |
 | `vl_amplitude_salarial` | NUMBER | 10,2 | — | `vl_salario_maximo - vl_salario_minimo` (derivada) |
 | `fl_salario_anual` | NUMBER | 1 | `CK_FATO_SALARIO_FL_ANUAL` (0/1) | `Annual_Wage_Flag` (0 = hora, 1 = anual) |
+| `cd_regiao_origem` | VARCHAR2 | 10 | — | Código `ER_Code` do Job Bank; preenchido somente para `APENAS_REGIONAL` |
+| `nm_regiao_origem` | VARCHAR2 | 120 | — | `ER_Name` do Job Bank; preenchido somente para `APENAS_REGIONAL` |
 
 ### 2.2 `fato_imigracao`
 

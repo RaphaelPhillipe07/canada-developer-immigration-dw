@@ -28,6 +28,7 @@ CREATE TABLESPACE TS_DW_INDICES
 CREATE SEQUENCE SEQ_DIM_PROVINCIA           START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_OCUPACAO            START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_TEMPO_SALARIO       START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_DIM_DISPONIBILIDADE_SALARIO START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_TEMPO_CENSO         START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_PAIS_NASCIMENTO     START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_PERIODO_IMIGRACAO   START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
@@ -158,6 +159,21 @@ CREATE TABLE dim_tempo_salario (
         USING INDEX TABLESPACE TS_DW_INDICES
 ) TABLESPACE TS_DW_DADOS;
 
+-- Classifica a cobertura salarial do Job Bank por jurisdição.
+-- Somente PROVINCIAL_PUBLICADO pode entrar em rankings provinciais.
+CREATE TABLE dim_disponibilidade_salario (
+    sk_disponibilidade_salario NUMBER(10)   CONSTRAINT NN_DIM_DISP_SAL_SK NOT NULL,
+    cd_disponibilidade          VARCHAR2(24) CONSTRAINT NN_DIM_DISP_SAL_CD NOT NULL,
+    ds_disponibilidade          VARCHAR2(120) CONSTRAINT NN_DIM_DISP_SAL_DS NOT NULL,
+    fl_comparavel_provincial    NUMBER(1) CONSTRAINT NN_DIM_DISP_SAL_COMP NOT NULL,
+    CONSTRAINT PK_DIM_DISP_SALARIO PRIMARY KEY (sk_disponibilidade_salario)
+        USING INDEX TABLESPACE TS_DW_INDICES,
+    CONSTRAINT AK_DIM_DISP_SALARIO UNIQUE (cd_disponibilidade)
+        USING INDEX TABLESPACE TS_DW_INDICES,
+    CONSTRAINT CK_DIM_DISP_SALARIO_CD CHECK (cd_disponibilidade IN ('PROVINCIAL_PUBLICADO', 'APENAS_REGIONAL', 'INDISPONIVEL')),
+    CONSTRAINT CK_DIM_DISP_SALARIO_COMP CHECK (fl_comparavel_provincial IN (0, 1))
+) TABLESPACE TS_DW_DADOS;
+
 CREATE TABLE dim_tempo_censo (
     sk_tempo_censo NUMBER(10) CONSTRAINT NN_DIM_TEMPO_CENSO_SK  NOT NULL,
     nr_ano_censo   NUMBER(4)  CONSTRAINT NN_DIM_TEMPO_CENSO_ANO NOT NULL,
@@ -234,6 +250,7 @@ CREATE TABLE fato_salario (
     sk_provincia          NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_PROVINCIA NOT NULL,
     sk_ocupacao           NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_OCUPACAO NOT NULL,
     sk_tempo_salario      NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_TEMPO NOT NULL,
+    sk_disponibilidade_salario NUMBER(10) CONSTRAINT NN_FATO_SALARIO_SK_DISP NOT NULL,
     sk_fonte              NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_FONTE NOT NULL,
     vl_salario_minimo     NUMBER(10,2),
     vl_salario_mediano    NUMBER(10,2),
@@ -243,6 +260,8 @@ CREATE TABLE fato_salario (
     vl_quartil3           NUMBER(10,2),
     vl_amplitude_salarial NUMBER(10,2),
     fl_salario_anual      NUMBER(1),
+    cd_regiao_origem      VARCHAR2(10),
+    nm_regiao_origem      VARCHAR2(120),
     CONSTRAINT PK_FATO_SALARIO PRIMARY KEY (sk_fato_salario)
         USING INDEX TABLESPACE TS_DW_INDICES,
     CONSTRAINT AK_FATO_SALARIO UNIQUE (sk_provincia, sk_ocupacao, sk_tempo_salario)
@@ -253,6 +272,8 @@ CREATE TABLE fato_salario (
         REFERENCES dim_ocupacao (sk_ocupacao),
     CONSTRAINT FK_FATO_SAL_DIM_TEMPO_SAL FOREIGN KEY (sk_tempo_salario)
         REFERENCES dim_tempo_salario (sk_tempo_salario),
+    CONSTRAINT FK_FATO_SAL_DIM_DISP FOREIGN KEY (sk_disponibilidade_salario)
+        REFERENCES dim_disponibilidade_salario (sk_disponibilidade_salario),
     CONSTRAINT FK_FATO_SAL_DIM_FONTE FOREIGN KEY (sk_fonte)
         REFERENCES dim_fonte (sk_fonte),
     CONSTRAINT CK_FATO_SALARIO_FL_ANUAL CHECK (fl_salario_anual IN (0, 1))
@@ -315,6 +336,7 @@ CREATE TABLE fato_habitacao (
 CREATE INDEX IDX_FATO_SAL_SK_PROVINCIA ON fato_salario (sk_provincia)         TABLESPACE TS_DW_INDICES;
 CREATE INDEX IDX_FATO_SAL_SK_OCUPACAO  ON fato_salario (sk_ocupacao)          TABLESPACE TS_DW_INDICES;
 CREATE INDEX IDX_FATO_SAL_SK_TEMPO     ON fato_salario (sk_tempo_salario)     TABLESPACE TS_DW_INDICES;
+CREATE INDEX IDX_FATO_SAL_SK_DISP      ON fato_salario (sk_disponibilidade_salario) TABLESPACE TS_DW_INDICES;
 
 CREATE INDEX IDX_FATO_IMIG_SK_PROVINCIA ON fato_imigracao (sk_provincia)       TABLESPACE TS_DW_INDICES;
 CREATE INDEX IDX_FATO_IMIG_SK_PAIS      ON fato_imigracao (sk_pais_nascimento) TABLESPACE TS_DW_INDICES;

@@ -1,0 +1,400 @@
+<!-- ============================================================
+     SLIDES DE SCHEMA — GUARDADOS PARA UMA PRÓXIMA ENTREGA
+     Retirados de presentation/index.html em 14/09/2026.
+
+     Restam aqui os 3 slides de aprofundamento do modelo dimensional
+     (a constelação e a estrela de fato_salario voltaram para o deck em 14/09/2026):
+       1. Grão e medidas                   (aditividade + dim_disponibilidade_salario)
+       2. Star Schema · fato_imigracao
+       3. Star Schema · fato_habitacao
+
+     COMO RESTAURAR
+     Colar os <section> abaixo de volta no index.html, logo antes do slide
+     "Obrigado!". O CSS deles continua em css/theme.css (classes .const-svg,
+     .grain, .note, .star-svg e .dc/.dh/.dt) — nada foi removido de lá, então
+     voltam a funcionar sem ajuste. A numeração e o índice são gerados em
+     tempo de execução por js/engine.js: não há nada para renumerar.
+
+     REGERAR EM VEZ DE COLAR
+     gerar_estrelas.py (nesta pasta) reconstrói os três diagramas de estrela a
+     partir de sql/script_oracle.sql, com colunas, tipos e setas derivados do
+     DDL. Se o modelo mudar, prefira rodar o script a editar o HTML na mão.
+     ============================================================ -->
+
+      <section class="slide" data-title="Grão e medidas">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🫎</div>
+            <div class="bubble">Definir o <strong>grão</strong> é a decisão mais importante do modelo: ele determina o que pode ser somado — e o que <strong>nunca</strong> pode. 📐</div>
+          </div>
+
+          <div class="grain step">
+            <div class="grain-row grain-head">
+              <span>FATO</span><span>MEDIDAS</span><span>ADITIVIDADE</span>
+            </div>
+            <div class="grain-row">
+              <span class="gf">fato_salario</span>
+              <span>vl_salario_minimo · mediano · maximo · medio · quartil1 · quartil3 · amplitude</span>
+              <span class="bad">Não aditiva — mediana de medianas não existe. Comparar, nunca somar.</span>
+            </div>
+            <div class="grain-row">
+              <span class="gf">fato_imigracao</span>
+              <span>qt_imigrantes</span>
+              <span class="good">Aditiva — soma por província, período ou país.</span>
+            </div>
+            <div class="grain-row">
+              <span class="gf">fato_habitacao</span>
+              <span>vl_medida</span>
+              <span class="warn">Depende de <b>tp_medida</b>: CONTAGEM é aditiva, PERCENTUAL não.</span>
+            </div>
+          </div>
+
+          <div class="note step">
+            <span class="note-h">⚠️ O dado que falta também é dado</span>
+            <p>Salário provincial de NOC 21232 existe em apenas <b>9</b> das 13 jurisdições. Em vez de deixar <code>NULL</code> solto, criamos <b>dim_disponibilidade_salario</b> com três estados — <code>PROVINCIAL_PUBLICADO</code> (9), <code>APENAS_REGIONAL</code> (PEI, só ER1110) e <code>INDISPONIVEL</code> (Yukon, NWT, Nunavut). Por isso <b>fato_salario tem 13 linhas</b>, uma por jurisdição: a ausência fica consultável e responde a Pergunta 10 — e nada é estimado.</p>
+          </div>
+
+          <p class="goal-foot step">A participação brasileira (%) <b>não</b> é armazenada: é calculada como <code>Brazil / Total</code> na apresentação, para não virar medida somável por engano.</p>
+        </div>
+        <div class="corner-num">12</div>
+      </section>
+
+      <section class="slide" data-title="Star Schema · fato_imigracao">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">A estrela da <strong>comunidade</strong>. <code>qt_imigrantes</code> é a única medida, e é <strong>aditiva</strong> — some por província, por país ou por período. 👥</div>
+          </div>
+          <svg class="star-svg step" viewBox="-8 -6 1144 326" role="img" aria-label="Star Schema · fato_imigracao">
+            <defs>
+              <marker id="pt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#3d6ea8"/>
+              </marker>
+              <style>
+                .dh{font-family:'DM Mono',monospace;font-size:11.5px;font-weight:500;fill:#fff}
+                .dn{font-family:'DM Mono',monospace;font-size:8px;fill:rgba(255,255,255,.72)}
+                .dc{font-family:'DM Mono',monospace;font-size:9.5px;fill:#25313f}
+                .dc.pk{font-weight:600;fill:#0d1b2a}
+                .dc.ak{font-weight:600;fill:#8a6412}
+                .dc.fk{fill:#3d6ea8}
+                .dt{font-family:'DM Mono',monospace;font-size:8.2px;fill:#93a1b0}
+                .dsep{stroke:#edf1f5;stroke-width:1}
+                .dln{stroke:#3d6ea8;stroke-width:1.5;fill:none}
+              </style>
+            </defs>
+            <g>
+            <rect x="0" y="0" width="300" height="100.5" rx="4" fill="#fff" stroke="#c92832" stroke-width="1.6"/>
+            <path d="M0 23 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="0" y="4" width="300" height="19" fill="#1d3557"/>
+            <rect x="0" y="0" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="10" y="16">dim_provincia</text>
+            <text class="dn" x="291" y="16" text-anchor="end">13 linhas</text>
+            <rect x="1" y="23" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="10" y="33.95">sk_provincia</text>
+            <text class="dt" x="291" y="33.95" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="0" y1="38.5" x2="300" y2="38.5"/>
+            <rect x="1" y="38.5" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="10" y="49.45">cd_dguid</text>
+            <text class="dt" x="291" y="49.45" text-anchor="end">VARCHAR2(16)</text>
+            <line class="dsep" x1="0" y1="54" x2="300" y2="54"/>
+            <text class="dc" x="10" y="64.95">nm_provincia</text>
+            <text class="dt" x="291" y="64.95" text-anchor="end">VARCHAR2(60)</text>
+            <line class="dsep" x1="0" y1="69.5" x2="300" y2="69.5"/>
+            <text class="dc" x="10" y="80.45">sg_provincia_jobbank</text>
+            <text class="dt" x="291" y="80.45" text-anchor="end">VARCHAR2(4)</text>
+            <line class="dsep" x1="0" y1="85" x2="300" y2="85"/>
+            <text class="dc" x="10" y="95.95">nm_pais</text>
+            <text class="dt" x="291" y="95.95" text-anchor="end">VARCHAR2(20)</text>
+            </g>
+            <g>
+            <rect x="0" y="114.5" width="300" height="69.5" rx="4" fill="#fff" stroke="#c9d3dd" stroke-width="1"/>
+            <path d="M0 137.5 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="0" y="118.5" width="300" height="19" fill="#1d3557"/>
+            <rect x="0" y="114.5" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="10" y="130.5">dim_pais_nascimento</text>
+            <text class="dn" x="291" y="130.5" text-anchor="end">2 linhas</text>
+            <rect x="1" y="137.5" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="10" y="148.45">sk_pais_nascimento</text>
+            <text class="dt" x="291" y="148.45" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="0" y1="153" x2="300" y2="153"/>
+            <rect x="1" y="153" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="10" y="163.95">cd_pais_nascimento</text>
+            <text class="dt" x="291" y="163.95" text-anchor="end">VARCHAR2(30)</text>
+            <line class="dsep" x1="0" y1="168.5" x2="300" y2="168.5"/>
+            <text class="dc" x="10" y="179.45">nm_pais_nascimento</text>
+            <text class="dt" x="291" y="179.45" text-anchor="end">VARCHAR2(80)</text>
+            </g>
+            <g>
+            <rect x="0" y="198" width="300" height="116" rx="4" fill="#fff" stroke="#c92832" stroke-width="1.6"/>
+            <path d="M0 221 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="0" y="202" width="300" height="19" fill="#1d3557"/>
+            <rect x="0" y="198" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="10" y="214">dim_fonte</text>
+            <text class="dn" x="291" y="214" text-anchor="end">3 linhas</text>
+            <rect x="1" y="221" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="10" y="231.95">sk_fonte</text>
+            <text class="dt" x="291" y="231.95" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="0" y1="236.5" x2="300" y2="236.5"/>
+            <rect x="1" y="236.5" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="10" y="247.45">cd_fonte</text>
+            <text class="dt" x="291" y="247.45" text-anchor="end">VARCHAR2(20)</text>
+            <line class="dsep" x1="0" y1="252" x2="300" y2="252"/>
+            <text class="dc" x="10" y="262.95">nm_fonte</text>
+            <text class="dt" x="291" y="262.95" text-anchor="end">VARCHAR2(120)</text>
+            <line class="dsep" x1="0" y1="267.5" x2="300" y2="267.5"/>
+            <text class="dc" x="10" y="278.45">ds_url</text>
+            <text class="dt" x="291" y="278.45" text-anchor="end">VARCHAR2(500)</text>
+            <line class="dsep" x1="0" y1="283" x2="300" y2="283"/>
+            <text class="dc" x="10" y="293.95">dt_extracao</text>
+            <text class="dt" x="291" y="293.95" text-anchor="end">DATE</text>
+            <line class="dsep" x1="0" y1="298.5" x2="300" y2="298.5"/>
+            <text class="dc" x="10" y="309.45">ds_checksum</text>
+            <text class="dt" x="291" y="309.45" text-anchor="end">VARCHAR2(128)</text>
+            </g>
+            <g>
+            <rect x="828" y="72.75" width="300" height="85" rx="4" fill="#fff" stroke="#c9d3dd" stroke-width="1"/>
+            <path d="M828 95.75 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="828" y="76.75" width="300" height="19" fill="#1d3557"/>
+            <rect x="828" y="72.75" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="838" y="88.75">dim_periodo_imigracao</text>
+            <text class="dn" x="1119" y="88.75" text-anchor="end">5 linhas</text>
+            <rect x="829" y="95.75" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="838" y="106.7">sk_periodo_imigracao</text>
+            <text class="dt" x="1119" y="106.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="828" y1="111.25" x2="1128" y2="111.25"/>
+            <rect x="829" y="111.25" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="838" y="122.2">cd_periodo_imigracao</text>
+            <text class="dt" x="1119" y="122.2" text-anchor="end">VARCHAR2(20)</text>
+            <line class="dsep" x1="828" y1="126.75" x2="1128" y2="126.75"/>
+            <text class="dc" x="838" y="137.7">ds_periodo_imigracao</text>
+            <text class="dt" x="1119" y="137.7" text-anchor="end">VARCHAR2(40)</text>
+            <line class="dsep" x1="828" y1="142.25" x2="1128" y2="142.25"/>
+            <text class="dc" x="838" y="153.2">nr_ordem</text>
+            <text class="dt" x="1119" y="153.2" text-anchor="end">NUMBER(2)</text>
+            </g>
+            <g>
+            <rect x="828" y="171.75" width="300" height="69.5" rx="4" fill="#fff" stroke="#c92832" stroke-width="1.6"/>
+            <path d="M828 194.75 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="828" y="175.75" width="300" height="19" fill="#1d3557"/>
+            <rect x="828" y="171.75" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="838" y="187.75">dim_tempo_censo</text>
+            <text class="dn" x="1119" y="187.75" text-anchor="end">1 linha</text>
+            <rect x="829" y="194.75" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="838" y="205.7">sk_tempo_censo</text>
+            <text class="dt" x="1119" y="205.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="828" y1="210.25" x2="1128" y2="210.25"/>
+            <rect x="829" y="210.25" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="838" y="221.2">nr_ano_censo</text>
+            <text class="dt" x="1119" y="221.2" text-anchor="end">NUMBER(4)</text>
+            <line class="dsep" x1="828" y1="225.75" x2="1128" y2="225.75"/>
+            <text class="dc" x="838" y="236.7">dt_referencia</text>
+            <text class="dt" x="1119" y="236.7" text-anchor="end">DATE</text>
+            </g>
+            <path class="dln" d="M300 30.75 C359.4 30.75 348.6 137.5 402 137.5" marker-end="url(#pt)"/>
+            <path class="dln" d="M300 145.25 C359.4 145.25 348.6 153 402 153" marker-end="url(#pt)"/>
+            <path class="dln" d="M828 103.5 C768.6 103.5 779.4 168.5 726 168.5" marker-end="url(#pt)"/>
+            <path class="dln" d="M828 202.5 C768.6 202.5 779.4 184 726 184" marker-end="url(#pt)"/>
+            <path class="dln" d="M300 228.75 C359.4 228.75 348.6 199.5 402 199.5" marker-end="url(#pt)"/>
+            <g>
+            <rect x="408" y="91.25" width="312" height="131.5" rx="4" fill="#fff" stroke="#c9d3dd" stroke-width="1"/>
+            <path d="M408 114.25 h312 v-19 a4 4 0 0 1 -4 4 h-304 a4 4 0 0 1 -4 -4 z" fill="#c92832" transform="translate(0,0)"/>
+            <rect x="408" y="95.25" width="312" height="19" fill="#c92832"/>
+            <rect x="408" y="91.25" width="312" height="8" rx="4" fill="#c92832"/>
+            <text class="dh" x="418" y="107.25">fato_imigracao</text>
+            <text class="dn" x="711" y="107.25" text-anchor="end">130 linhas</text>
+            <rect x="409" y="114.25" width="310" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="418" y="125.2">sk_fato_imigracao</text>
+            <text class="dt" x="711" y="125.2" text-anchor="end">NUMBER(15)</text>
+            <line class="dsep" x1="408" y1="129.75" x2="720" y2="129.75"/>
+            <text class="dc fk" x="418" y="140.7">sk_provincia</text>
+            <text class="dt" x="711" y="140.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="145.25" x2="720" y2="145.25"/>
+            <text class="dc fk" x="418" y="156.2">sk_pais_nascimento</text>
+            <text class="dt" x="711" y="156.2" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="160.75" x2="720" y2="160.75"/>
+            <text class="dc fk" x="418" y="171.7">sk_periodo_imigracao</text>
+            <text class="dt" x="711" y="171.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="176.25" x2="720" y2="176.25"/>
+            <text class="dc fk" x="418" y="187.2">sk_tempo_censo</text>
+            <text class="dt" x="711" y="187.2" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="191.75" x2="720" y2="191.75"/>
+            <text class="dc fk" x="418" y="202.7">sk_fonte</text>
+            <text class="dt" x="711" y="202.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="207.25" x2="720" y2="207.25"/>
+            <text class="dc" x="418" y="218.2">qt_imigrantes</text>
+            <text class="dt" x="711" y="218.2" text-anchor="end">NUMBER(12)</text>
+            </g>
+          </svg>
+        </div>
+        <div class="corner-num">13</div>
+      </section>
+
+      <section class="slide" data-title="Star Schema · fato_habitacao">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">A estrela da <strong>moradia</strong>. <code>vl_medida</code> guarda contagem <i>ou</i> percentual — quem diz qual é <code>dim_indicador_habitacao.tp_medida</code>. 🏠</div>
+          </div>
+          <svg class="star-svg step" viewBox="-8 -6 1144 326" role="img" aria-label="Star Schema · fato_habitacao">
+            <defs>
+              <marker id="pt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="#3d6ea8"/>
+              </marker>
+              <style>
+                .dh{font-family:'DM Mono',monospace;font-size:11.5px;font-weight:500;fill:#fff}
+                .dn{font-family:'DM Mono',monospace;font-size:8px;fill:rgba(255,255,255,.72)}
+                .dc{font-family:'DM Mono',monospace;font-size:9.5px;fill:#25313f}
+                .dc.pk{font-weight:600;fill:#0d1b2a}
+                .dc.ak{font-weight:600;fill:#8a6412}
+                .dc.fk{fill:#3d6ea8}
+                .dt{font-family:'DM Mono',monospace;font-size:8.2px;fill:#93a1b0}
+                .dsep{stroke:#edf1f5;stroke-width:1}
+                .dln{stroke:#3d6ea8;stroke-width:1.5;fill:none}
+              </style>
+            </defs>
+            <g>
+            <rect x="0" y="0" width="300" height="100.5" rx="4" fill="#fff" stroke="#c92832" stroke-width="1.6"/>
+            <path d="M0 23 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="0" y="4" width="300" height="19" fill="#1d3557"/>
+            <rect x="0" y="0" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="10" y="16">dim_provincia</text>
+            <text class="dn" x="291" y="16" text-anchor="end">13 linhas</text>
+            <rect x="1" y="23" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="10" y="33.95">sk_provincia</text>
+            <text class="dt" x="291" y="33.95" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="0" y1="38.5" x2="300" y2="38.5"/>
+            <rect x="1" y="38.5" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="10" y="49.45">cd_dguid</text>
+            <text class="dt" x="291" y="49.45" text-anchor="end">VARCHAR2(16)</text>
+            <line class="dsep" x1="0" y1="54" x2="300" y2="54"/>
+            <text class="dc" x="10" y="64.95">nm_provincia</text>
+            <text class="dt" x="291" y="64.95" text-anchor="end">VARCHAR2(60)</text>
+            <line class="dsep" x1="0" y1="69.5" x2="300" y2="69.5"/>
+            <text class="dc" x="10" y="80.45">sg_provincia_jobbank</text>
+            <text class="dt" x="291" y="80.45" text-anchor="end">VARCHAR2(4)</text>
+            <line class="dsep" x1="0" y1="85" x2="300" y2="85"/>
+            <text class="dc" x="10" y="95.95">nm_pais</text>
+            <text class="dt" x="291" y="95.95" text-anchor="end">VARCHAR2(20)</text>
+            </g>
+            <g>
+            <rect x="0" y="114.5" width="300" height="69.5" rx="4" fill="#fff" stroke="#c9d3dd" stroke-width="1"/>
+            <path d="M0 137.5 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="0" y="118.5" width="300" height="19" fill="#1d3557"/>
+            <rect x="0" y="114.5" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="10" y="130.5">dim_tenencia</text>
+            <text class="dn" x="291" y="130.5" text-anchor="end">4 linhas</text>
+            <rect x="1" y="137.5" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="10" y="148.45">sk_tenencia</text>
+            <text class="dt" x="291" y="148.45" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="0" y1="153" x2="300" y2="153"/>
+            <rect x="1" y="153" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="10" y="163.95">cd_tenencia</text>
+            <text class="dt" x="291" y="163.95" text-anchor="end">VARCHAR2(10)</text>
+            <line class="dsep" x1="0" y1="168.5" x2="300" y2="168.5"/>
+            <text class="dc" x="10" y="179.45">ds_tenencia</text>
+            <text class="dt" x="291" y="179.45" text-anchor="end">VARCHAR2(60)</text>
+            </g>
+            <g>
+            <rect x="0" y="198" width="300" height="116" rx="4" fill="#fff" stroke="#c92832" stroke-width="1.6"/>
+            <path d="M0 221 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="0" y="202" width="300" height="19" fill="#1d3557"/>
+            <rect x="0" y="198" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="10" y="214">dim_fonte</text>
+            <text class="dn" x="291" y="214" text-anchor="end">3 linhas</text>
+            <rect x="1" y="221" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="10" y="231.95">sk_fonte</text>
+            <text class="dt" x="291" y="231.95" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="0" y1="236.5" x2="300" y2="236.5"/>
+            <rect x="1" y="236.5" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="10" y="247.45">cd_fonte</text>
+            <text class="dt" x="291" y="247.45" text-anchor="end">VARCHAR2(20)</text>
+            <line class="dsep" x1="0" y1="252" x2="300" y2="252"/>
+            <text class="dc" x="10" y="262.95">nm_fonte</text>
+            <text class="dt" x="291" y="262.95" text-anchor="end">VARCHAR2(120)</text>
+            <line class="dsep" x1="0" y1="267.5" x2="300" y2="267.5"/>
+            <text class="dc" x="10" y="278.45">ds_url</text>
+            <text class="dt" x="291" y="278.45" text-anchor="end">VARCHAR2(500)</text>
+            <line class="dsep" x1="0" y1="283" x2="300" y2="283"/>
+            <text class="dc" x="10" y="293.95">dt_extracao</text>
+            <text class="dt" x="291" y="293.95" text-anchor="end">DATE</text>
+            <line class="dsep" x1="0" y1="298.5" x2="300" y2="298.5"/>
+            <text class="dc" x="10" y="309.45">ds_checksum</text>
+            <text class="dt" x="291" y="309.45" text-anchor="end">VARCHAR2(128)</text>
+            </g>
+            <g>
+            <rect x="828" y="72.75" width="300" height="85" rx="4" fill="#fff" stroke="#c9d3dd" stroke-width="1"/>
+            <path d="M828 95.75 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="828" y="76.75" width="300" height="19" fill="#1d3557"/>
+            <rect x="828" y="72.75" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="838" y="88.75">dim_indicador_habitacao</text>
+            <text class="dn" x="1119" y="88.75" text-anchor="end">9 linhas</text>
+            <rect x="829" y="95.75" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="838" y="106.7">sk_indicador_habitacao</text>
+            <text class="dt" x="1119" y="106.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="828" y1="111.25" x2="1128" y2="111.25"/>
+            <rect x="829" y="111.25" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="838" y="122.2">cd_indicador_habitacao</text>
+            <text class="dt" x="1119" y="122.2" text-anchor="end">VARCHAR2(60)</text>
+            <line class="dsep" x1="828" y1="126.75" x2="1128" y2="126.75"/>
+            <text class="dc" x="838" y="137.7">ds_indicador_habitacao</text>
+            <text class="dt" x="1119" y="137.7" text-anchor="end">VARCHAR2(120)</text>
+            <line class="dsep" x1="828" y1="142.25" x2="1128" y2="142.25"/>
+            <text class="dc" x="838" y="153.2">tp_medida</text>
+            <text class="dt" x="1119" y="153.2" text-anchor="end">VARCHAR2(10)</text>
+            </g>
+            <g>
+            <rect x="828" y="171.75" width="300" height="69.5" rx="4" fill="#fff" stroke="#c92832" stroke-width="1.6"/>
+            <path d="M828 194.75 h300 v-19 a4 4 0 0 1 -4 4 h-292 a4 4 0 0 1 -4 -4 z" fill="#1d3557" transform="translate(0,0)"/>
+            <rect x="828" y="175.75" width="300" height="19" fill="#1d3557"/>
+            <rect x="828" y="171.75" width="300" height="8" rx="4" fill="#1d3557"/>
+            <text class="dh" x="838" y="187.75">dim_tempo_censo</text>
+            <text class="dn" x="1119" y="187.75" text-anchor="end">1 linha</text>
+            <rect x="829" y="194.75" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="838" y="205.7">sk_tempo_censo</text>
+            <text class="dt" x="1119" y="205.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="828" y1="210.25" x2="1128" y2="210.25"/>
+            <rect x="829" y="210.25" width="298" height="15.5" fill="#f4f7fa"/>
+            <text class="dc ak" x="838" y="221.2">nr_ano_censo</text>
+            <text class="dt" x="1119" y="221.2" text-anchor="end">NUMBER(4)</text>
+            <line class="dsep" x1="828" y1="225.75" x2="1128" y2="225.75"/>
+            <text class="dc" x="838" y="236.7">dt_referencia</text>
+            <text class="dt" x="1119" y="236.7" text-anchor="end">DATE</text>
+            </g>
+            <path class="dln" d="M300 30.75 C359.4 30.75 348.6 137.5 402 137.5" marker-end="url(#pt)"/>
+            <path class="dln" d="M300 145.25 C359.4 145.25 348.6 153 402 153" marker-end="url(#pt)"/>
+            <path class="dln" d="M828 103.5 C768.6 103.5 779.4 168.5 726 168.5" marker-end="url(#pt)"/>
+            <path class="dln" d="M828 202.5 C768.6 202.5 779.4 184 726 184" marker-end="url(#pt)"/>
+            <path class="dln" d="M300 228.75 C359.4 228.75 348.6 199.5 402 199.5" marker-end="url(#pt)"/>
+            <g>
+            <rect x="408" y="91.25" width="312" height="131.5" rx="4" fill="#fff" stroke="#c9d3dd" stroke-width="1"/>
+            <path d="M408 114.25 h312 v-19 a4 4 0 0 1 -4 4 h-304 a4 4 0 0 1 -4 -4 z" fill="#c92832" transform="translate(0,0)"/>
+            <rect x="408" y="95.25" width="312" height="19" fill="#c92832"/>
+            <rect x="408" y="91.25" width="312" height="8" rx="4" fill="#c92832"/>
+            <text class="dh" x="418" y="107.25">fato_habitacao</text>
+            <text class="dn" x="711" y="107.25" text-anchor="end">468 linhas</text>
+            <rect x="409" y="114.25" width="310" height="15.5" fill="#f4f7fa"/>
+            <text class="dc pk" x="418" y="125.2">sk_fato_habitacao</text>
+            <text class="dt" x="711" y="125.2" text-anchor="end">NUMBER(15)</text>
+            <line class="dsep" x1="408" y1="129.75" x2="720" y2="129.75"/>
+            <text class="dc fk" x="418" y="140.7">sk_provincia</text>
+            <text class="dt" x="711" y="140.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="145.25" x2="720" y2="145.25"/>
+            <text class="dc fk" x="418" y="156.2">sk_tenencia</text>
+            <text class="dt" x="711" y="156.2" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="160.75" x2="720" y2="160.75"/>
+            <text class="dc fk" x="418" y="171.7">sk_indicador_habitacao</text>
+            <text class="dt" x="711" y="171.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="176.25" x2="720" y2="176.25"/>
+            <text class="dc fk" x="418" y="187.2">sk_tempo_censo</text>
+            <text class="dt" x="711" y="187.2" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="191.75" x2="720" y2="191.75"/>
+            <text class="dc fk" x="418" y="202.7">sk_fonte</text>
+            <text class="dt" x="711" y="202.7" text-anchor="end">NUMBER(10)</text>
+            <line class="dsep" x1="408" y1="207.25" x2="720" y2="207.25"/>
+            <text class="dc" x="418" y="218.2">vl_medida</text>
+            <text class="dt" x="711" y="218.2" text-anchor="end">NUMBER(15,2)</text>
+            </g>
+          </svg>
+        </div>
+        <div class="corner-num">14</div>
+      </section>

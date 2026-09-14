@@ -50,7 +50,7 @@ Descrição: salários publicados pelo Job Bank para ocupações NOC (National O
 ## 2. Statistics Canada — Census 2021, tabela 98-10-0307-01 (Imigração)
 
 **Fonte:** [Statistics Canada — Census 2021](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810030701)
-**Arquivo bruto:** ZIP de 383 MB (preservado como asset; não versionado no Git)
+**Arquivo bruto:** ZIP de cerca de 383 MB, não versionado no Git devido ao tamanho. Download reproduzível: `https://www150.statcan.gc.ca/n1/en/tbl/csv/98100307-eng.zip` (extração realizada em 14 set. 2026). Depois do download, registrar `shasum -a 256 98100307-eng.zip` em `dim_fonte.ds_checksum`, descompactar e aplicar os filtros documentados. O checksum não é informado como valor fixo porque o ZIP não está presente para verificação no repositório.
 **Extração analisada:** `filtered/statcan_98100307_brazil_provinces_territories.csv` — 26 registros = 13 províncias/territórios × 2 recortes (`Brazil` e `Total – Place of birth`), com `Age (8D) = Total - Age` e `Gender (3) = Total - Gender`.
 
 Descrição: estoque de imigrantes por país de nascimento, período de imigração e localização geográfica, no Censo 2021.
@@ -85,14 +85,14 @@ Cada coluna de medida é seguida de uma coluna `Symbol` (supressão/qualidade). 
 
 **Nulabilidade:** os campos de identificação e medidas usados no recorte (`REF_DATE`, `GEO`, `DGUID`, `Age (8D)`, `Gender (3)`, `Place of birth (290)`, `Coordinate`, `Immigrants[3]` e períodos `[4]` a `[8]`) não podem ser nulos para carga no DW. As colunas `Symbol` podem estar vazias; valores suprimidos ou marcados no arquivo de origem não são convertidos em zero.
 
-- As colunas de período são **partições** do total de imigrantes: `Before 1980` + `1980-1990` + `1991-2000` + `2001-2010` + `2011-2021` = `Immigrants[3]`.
+- As colunas de período são **partições conceituais** do total de imigrantes (`Before 1980` + `1980-1990` + `1991-2000` + `2001-2010` + `2011-2021` ≈ `Immigrants[3]`), mas a igualdade **não é exata**: o Censo 2021 aplica arredondamento aleatório de base 5 a cada célula publicada, de forma independente. Na extração, a soma dos períodos fecha exatamente com `Immigrants[3]` em apenas **8 das 26 linhas**; nas demais a diferença é de no máximo 10 e sempre múltipla de 5. Consequência para o DW: **não derivar** o total a partir da soma dos períodos (nem o contrário), carregar as duas medidas como vêm da fonte e **não “corrigir” a diferença** — ela é característica do dado publicado, não erro de carga.
 - `Total – Place of birth` fornece o denominador (total de imigrantes da província); `Brazil` fornece o numerador.
 - O DGUID é a chave geográfica canônica do Statistics Canada; o Job Bank usa `prov`/`ER_Code`, por isso o mapeamento é feito por nome em inglês.
 
 ## 3. Statistics Canada — Census 2021, tabela 98-10-0258-01 (Habitação)
 
 **Fonte:** [Statistics Canada — Housing indicators](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810025801)
-**Arquivo bruto:** `raw/98100258-eng.zip` (60 KB) → `raw/98100258_extracted/98100258.csv` — 2.988 registros (Canada + províncias + CMAs/CAs, Censos 2016 e 2021)
+**Arquivo bruto:** `raw/98100258-eng.zip` (60 KB) → `raw/98100258_extracted/98100258.csv` — 2.990 registros (Canada + províncias + CMAs/CAs, Censos 2016 e 2021)
 **Extração analisada:** `filtered/statcan_98100258_housing_provinces_territories.csv` — 117 registros = 13 províncias/territórios × 9 indicadores, Censo 2021
 
 Descrição: indicadores habitacionais por posse (total, proprietário, inquilino e moradia fornecida pelo governo local/First Nation/Indian band).

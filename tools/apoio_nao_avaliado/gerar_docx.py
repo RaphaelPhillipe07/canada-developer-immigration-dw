@@ -106,7 +106,7 @@ def mono(text):
     par = doc.add_paragraph()
     run = par.add_run(text)
     run.font.name = "Consolas"
-    run.font.size = Pt(8.5)
+    run.font.size = Pt(9)
     force_font(run, "Consolas")
     par.paragraph_format.space_after = Pt(0)
     par.paragraph_format.line_spacing = 1.0
@@ -124,6 +124,10 @@ def table(headers, rows, widths=None, font_size=10):
         run.font.name = "Times New Roman"
         run.font.size = Pt(font_size)
         force_font(run)
+    tr_pr = hdr[0]._tc.getparent().get_or_add_trPr()
+    header = OxmlElement("w:tblHeader")
+    header.set(qn("w:val"), "true")
+    tr_pr.append(header)
     for row in rows:
         cells = t.add_row().cells
         for i, val in enumerate(row):
@@ -132,6 +136,9 @@ def table(headers, rows, widths=None, font_size=10):
             run.font.name = "Times New Roman"
             run.font.size = Pt(font_size)
             force_font(run)
+        tr_pr = cells[0]._tc.getparent().get_or_add_trPr()
+        cant_split = OxmlElement("w:cantSplit")
+        tr_pr.append(cant_split)
     if widths:
         for i, w in enumerate(widths):
             for row in t.rows:
@@ -171,28 +178,22 @@ def add_page_number_footer():
     force_font(run)
 
 
-def add_toc():
-    par = doc.add_paragraph()
-    run = par.add_run()
-    fld1 = OxmlElement("w:fldChar")
-    fld1.set(qn("w:fldCharType"), "begin")
-    instr = OxmlElement("w:instrText")
-    instr.set(qn("xml:space"), "preserve")
-    instr.text = r'TOC \o "1-2" \h \z \u'
-    fld2 = OxmlElement("w:fldChar")
-    fld2.set(qn("w:fldCharType"), "separate")
-    fld3 = OxmlElement("w:fldChar")
-    fld3.set(qn("w:fldCharType"), "end")
-    placeholder = OxmlElement("w:t")
-    placeholder.text = "Abra no Word e pressione F9 (ou clique com o botão direito → Atualizar campo) para gerar o sumário."
-    run._r.append(fld1)
-    run._r.append(instr)
-    run._r.append(fld2)
-    run._r.append(placeholder)
-    run._r.append(fld3)
-    run.font.name = "Times New Roman"
-    run.font.size = Pt(12)
-    force_font(run)
+def add_toc(entries):
+    for title, page in entries:
+        par = doc.add_paragraph()
+        par.paragraph_format.space_after = Pt(2)
+        left = par.add_run(title)
+        left.font.name = "Times New Roman"
+        left.font.size = Pt(12)
+        force_font(left)
+        tab = par.add_run("\t")
+        tab.font.name = "Times New Roman"
+        page_run = par.add_run(str(page))
+        page_run.font.name = "Times New Roman"
+        page_run.font.size = Pt(12)
+        force_font(page_run)
+        tabs = par.paragraph_format.tab_stops
+        tabs.add_tab_stop(Cm(15.5), 2, 1)
 
 
 add_page_number_footer()
@@ -238,8 +239,20 @@ center("14 de dezembro de 2026", bold=True, size=12, space_after=0)
 page_break()
 
 # ---------------------------------------------------------------- SUMÁRIO
-h1("Sumário")
-add_toc()
+p("SUMÁRIO", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=18)
+add_toc([
+    ("1. Tema", 4), ("2. Delimitação do Tema", 4), ("3. Problema", 4),
+    ("4. Hipótese", 4), ("5. Justificativa", 4), ("6. Objetivo Geral", 4),
+    ("7. Objetivos Específicos", 5), ("8. Meta SMART", 5),
+    ("9. Descrição do Sistema e dos Dados de Origem", 5),
+    ("10. Requisitos — As 10 Perguntas Analíticas", 7),
+    ("11. Dicionário de Dados das Bases de Origem", 9),
+    ("12. Análise Exploratória das Bases de Origem", 12),
+    ("13. Transformações nas Bases de Origem e Impacto", 17),
+    ("14. Modelo Lógico/Físico do Data Warehouse", 19),
+    ("15. Dicionário de Dados do Data Warehouse", 20),
+    ("16. Anexo — Script SQL (Oracle)", 26), ("Referências", 32),
+])
 page_break()
 
 # ---------------------------------------------------------------- 1. TEMA
@@ -282,7 +295,7 @@ table(
     [
         ("S — Específica", "Construir um DW em Oracle com dados oficiais de imigração, salários e habitação."),
         ("M — Mensurável", "Integrar os três conjuntos de dados em um modelo dimensional capaz de responder às 10 perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte."),
-        ("A — Atingível", "Duas bases no escopo mínimo + uma complementar, já baixadas e filtradas, com modelo viável em Oracle."),
+        ("A — Atingível", "Duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com modelo viável em Oracle."),
         ("R — Relevante", "Apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense."),
         ("T — Temporal", "Até 14 de dezembro de 2026."),
     ],
@@ -291,18 +304,21 @@ table(
 
 # ---------------------------------------------------------------- 9. DESCRIÇÃO DO SISTEMA / DADOS DE ORIGEM
 h1("9. Descrição do Sistema e dos Dados de Origem")
-p("Os arquivos públicos em CSV/ZIP são datasets analíticos de origem, e não sistemas OLTP transacionais clássicos. Para atender à organização dimensional solicitada, eles são tratados como camada operacional de origem. Os arquivos brutos são preservados sem alteração na pasta raw/ com URL, data de extração e checksum; filtros e padronizações ocorrem apenas em staging e no DW.")
+p("Os arquivos públicos em CSV/ZIP são datasets analíticos de origem, e não sistemas OLTP transacionais clássicos. Para atender à organização dimensional solicitada, eles são tratados como camada operacional de origem. Os brutos versionados ficam em raw/; o ZIP de imigração, com cerca de 383 MB, não é versionado devido ao tamanho. Sua obtenção reproduzível, URL, data de extração e checksum são documentados na seção 9.1. Filtros e padronizações ocorrem apenas em staging e no DW.")
 
 h2("9.1 Fontes selecionadas")
 table(
     ["Base", "Órgão / período", "Onde está no repositório", "Uso"],
     [
-        ("Statistics Canada 98-10-0307-01", "Statistics Canada · Censo 2021", "filtered/statcan_98100307_brazil_provinces_territories.csv (ZIP bruto de 383 MB mantido fora do Git)", "Imigrantes por país de nascimento, período de imigração e província/território."),
+        ("Statistics Canada 98-10-0307-01", "Statistics Canada · Censo 2021", "Extração filtered/. ZIP fora do Git; download reproduzível: https://www150.statcan.gc.ca/n1/en/tbl/csv/98100307-eng.zip", "Imigrantes por país de nascimento, período de imigração e província/território."),
         ("Job Bank / ESDC Wages", "ESDC · release 2025; referência 2023–2024; revisão 2025-11-19", "raw/job_bank_wages_2025.csv", "Salários de Software Developers and Programmers (NOC 21232) por região."),
         ("Statistics Canada 98-10-0258-01", "Statistics Canada · Censo 2021", "raw/98100258_extracted/98100258.csv e filtered/statcan_98100258_housing_provinces_territories.csv", "Indicadores habitacionais por posse (total, proprietário, inquilino, governo/First Nation)."),
     ],
     widths=[1.8, 1.6, 1.6, 1.5],
 )
+
+h2("9.1.1 Procedência do ZIP de imigração fora do Git")
+p("O arquivo 98100307-eng.zip não é versionado porque seu tamanho aproximado é 383 MB. Foi extraído em 14 de setembro de 2026 a partir de https://www150.statcan.gc.ca/n1/en/tbl/csv/98100307-eng.zip. Para reproduzir, baixar esse URL, registrar o SHA-256 com o comando shasum -a 256 98100307-eng.zip, descompactar o CSV e aplicar os filtros documentados para gerar filtered/statcan_98100307_brazil_provinces_territories.csv. O valor do checksum deve ser carregado em dim_fonte.ds_checksum junto com a data efetiva do download; ele não é inventado no repositório, pois o ZIP não está presente para conferência.")
 
 h2("9.2 Volumetria das extrações")
 table(
@@ -310,30 +326,75 @@ table(
     [
         ("Job Bank/ESDC Wages", "44.376", "NOC 21232, nível provincial", "9 províncias com salário publicado"),
         ("StatCan 98-10-0307-01", "ZIP 383 MB (tabela completa)", "13 províncias × (Brazil + Total)", "26"),
-        ("StatCan 98-10-0258-01", "2.988", "13 províncias × 9 indicadores × 2021", "117"),
+        ("StatCan 98-10-0258-01", "2.990", "13 províncias × 9 indicadores × 2021", "117"),
     ],
     widths=[1.9, 1.5, 1.9, 1.2],
 )
 
 # ---------------------------------------------------------------- 10. REQUISITOS (10 PERGUNTAS)
 h1("10. Requisitos — As 10 Perguntas Analíticas")
-questions = [
-    "Quais províncias possuem os maiores salários medianos para NOC 21232?",
-    "Qual é a diferença de salário mediano entre duas províncias selecionadas?",
-    "Em quais províncias há maior número de imigrantes nascidos no Brasil?",
-    "Qual é a participação de brasileiros no total de imigrantes de cada província?",
-    "Qual período de imigração concentra mais brasileiros em cada província?",
-    "Quais províncias combinam salário mediano alto e comunidade brasileira numerosa?",
-    "Qual província possui a maior amplitude salarial (high wage − low wage)?",
-    "Quais jurisdições têm salário não publicado, apenas regional ou indisponível para NOC 21232?",
-    "Quais províncias apresentam maior proporção de inquilinos com gasto de 30% ou mais da renda em moradia?",
-    "Quais províncias oferecem melhor equilíbrio entre remuneração, comunidade brasileira e acessibilidade habitacional?",
-]
-for i, q in enumerate(questions, 1):
+p("As perguntas foram definidas priorizando o cruzamento entre fontes: sete das dez só podem ser respondidas combinando duas ou três bases. Esse é o argumento central do projeto — nenhuma das fontes, isoladamente, responde a essas perguntas, e é isso que justifica a construção de um Data Warehouse em vez da consulta avulsa a três arquivos.")
+
+h2("10.1 Perguntas respondidas por uma única base")
+for i, q in enumerate([
+    "Quais províncias pagam os maiores salários medianos para NOC 21232? (salário)",
+    "Onde estão os imigrantes nascidos no Brasil e em que período chegaram? (imigração)",
+    "Onde os inquilinos mais comprometem 30% ou mais da renda com moradia? (habitação)",
+], 1):
     p(f"{i}. {q}")
 
-h2("10.1 Regra do indicador combinado da pergunta 10")
-p("A pergunta 10 será respondida somente entre as jurisdições com os três indicadores disponíveis, isto é, com salário mediano provincial publicado, população brasileira no Censo 2021 e percentual de inquilinos com moradia inacessível no Censo 2021. Não há imputação de salário para PEI, Yukon, Northwest Territories ou Nunavut; essas jurisdições recebem resultado N/A e não entram no ranking.")
+h2("10.2 Perguntas que cruzam duas bases")
+for i, q in enumerate([
+    "Quais províncias combinam salário mediano alto e comunidade brasileira numerosa? (salário + imigração)",
+    "A imigração brasileira do período 2011–2021 concentrou-se nas províncias de maior salário mediano? (salário + imigração)",
+    "Em quais províncias o salário mediano é alto e a proporção de inquilinos com moradia inacessível é baixa? (salário + habitação)",
+    "Em quais províncias a comunidade brasileira é numerosa e a moradia é menos acessível? (imigração + habitação)",
+], 4):
+    p(f"{i}. {q}")
+
+h2("10.3 Perguntas que integram as três bases")
+for i, q in enumerate([
+    "As províncias com maior presença brasileira apresentam salários e condições de moradia diferentes das províncias com menor presença brasileira?",
+    "Qual província oferece o melhor equilíbrio entre remuneração, comunidade brasileira e acessibilidade habitacional?",
+    "Nas jurisdições sem salário provincial publicado para NOC 21232, o que a comunidade brasileira e a acessibilidade habitacional revelam?",
+], 8):
+    p(f"{i}. {q}")
+
+h2("10.4 Cobertura das perguntas por fonte")
+table(
+    ["Pergunta", "Bases utilizadas", "Fatos consultados"],
+    [
+        ("1", "Job Bank", "fato_salario"),
+        ("2", "StatCan 98-10-0307-01", "fato_imigracao"),
+        ("3", "StatCan 98-10-0258-01", "fato_habitacao"),
+        ("4", "Job Bank + StatCan 0307", "fato_salario, fato_imigracao"),
+        ("5", "Job Bank + StatCan 0307", "fato_salario, fato_imigracao"),
+        ("6", "Job Bank + StatCan 0258", "fato_salario, fato_habitacao"),
+        ("7", "StatCan 0307 + StatCan 0258", "fato_imigracao, fato_habitacao"),
+        ("8", "Job Bank + StatCan 0307 + StatCan 0258", "os três fatos"),
+        ("9", "Job Bank + StatCan 0307 + StatCan 0258", "os três fatos"),
+        ("10", "Job Bank + StatCan 0307 + StatCan 0258", "os três fatos"),
+    ],
+    widths=[0.9, 3.0, 2.7],
+    font_size=9,
+)
+p("O cruzamento das perguntas 4 a 10 só é possível porque dim_provincia é uma dimensão conformada, compartilhada pelos três fatos: é ela que permite alinhar as medidas das três fontes na mesma jurisdição.")
+
+h2("10.5 Regra de agrupamento da pergunta 8")
+p("A pergunta 8 compara dois grupos de jurisdições, e por isso exige um critério "
+  "explícito de corte. Consideram-se apenas as jurisdições com salário provincial "
+  "publicado para NOC 21232, únicas em que as três medidas existem. Dentro desse "
+  "conjunto, é de maior presença brasileira a jurisdição cuja população nascida no "
+  "Brasil no Censo 2021 esteja na mediana ou acima dela, e de menor presença a que "
+  "esteja abaixo. A comparação é feita entre as medianas de salário e de percentual "
+  "de inquilinos com moradia inacessível de cada grupo.")
+p("Observação metodológica: o corte produz grupos de cinco e quatro jurisdições. "
+  "O resultado deve ser lido como comparação descritiva entre os dois conjuntos, sem "
+  "inferência estatística — o número de jurisdições é pequeno demais para testar "
+  "significância, e a população brasileira é fortemente assimétrica entre elas.")
+
+h2("10.6 Regra do indicador combinado da pergunta 9")
+p("A pergunta 9 será respondida somente entre as jurisdições com os três indicadores disponíveis, isto é, com salário mediano provincial publicado, população brasileira no Censo 2021 e percentual de inquilinos com moradia inacessível no Censo 2021. Não há imputação de salário para PEI, Yukon, Northwest Territories ou Nunavut; essas jurisdições recebem resultado N/A e não entram no ranking. Elas são o objeto da pergunta 10, que as analisa pelas duas bases restantes.")
 p("Para cada conjunto elegível, os indicadores são normalizados no intervalo de 0 a 1. Salário e comunidade brasileira usam min-max crescente; inacessibilidade habitacional usa min-max invertido, pois menor percentual é melhor. A pontuação é: Índice = 0,40 × Salário_norm + 0,30 × Comunidade_norm + 0,30 × Acessibilidade_norm. Empates são desfeitos pela maior mediana salarial.")
 table(
     ["Componente", "Cálculo", "Peso"],
@@ -386,7 +447,7 @@ table(
         ("Place of birth (290)", "Texto", "Brazil ou Total – Place of birth."),
         ("Coordinate", "Texto", "Código de hierarquia geográfica do Censo."),
         ("Immigrant status…: Total[1] / Non-immigrants[2] / Immigrants[3]", "Inteiro", "População total, não imigrantes e total de imigrantes."),
-        ("…: Before 1980[4] … 2011 to 2021[8]", "Inteiro", "Imigrantes por período de chegada (partições de Immigrants[3])."),
+        ("…: Before 1980[4] … 2011 to 2021[8]", "Inteiro", "Imigrantes por período de chegada (partições de Immigrants[3]; a soma não fecha exatamente por causa do arredondamento de base 5 do Censo)."),
         ("…: 2011 to 2015[9] / 2016 to 2021[10]", "Inteiro", "Subdivisões do período 2011–2021."),
         ("…: Non-permanent residents[11]", "Inteiro", "Residentes não permanentes."),
         ("Symbol", "Texto", "Símbolo de qualidade/supressão (vazio na extração)."),
@@ -417,7 +478,7 @@ page_break()
 h1("12. Análise Exploratória das Bases de Origem")
 
 h2("12.1 Salários — Job Bank/ESDC")
-p("O arquivo bruto tem 44.376 registros e 516 ocupações NOC distintas; NOC 21232 aparece em 86 registros. Cerca de 45% das células salariais do arquivo completo estão vazias (Low 20.301; Median 20.012; High 20.288), explicadas por Wage_Comment_E. No recorte usado (Reference_Period = 2023-2024, Annual_Wage_Flag = 0), apenas 9 províncias publicam salário provincial de NOC 21232.")
+p("O arquivo bruto tem 44.376 registros e 516 ocupações NOC distintas; NOC 21232 aparece em 86 registros. Cerca de 45% das células salariais do arquivo completo estão vazias (Low 20.301; Median 20.012; High 20.288), explicadas por Wage_Comment_E. No recorte usado (Reference_Period = 2023-2024, Annual_Wage_Flag = 0), 9 jurisdições têm salário provincial publicado; PEI possui dado apenas regional (ER1110) e Yukon, Northwest Territories e Nunavut não possuem salário publicado.")
 table(
     ["Província", "Low", "Median", "High", "Amplitude"],
     [
@@ -497,22 +558,22 @@ table(
     ["Transformação", "Antes → Depois", "Justificativa / Impacto"],
     [
         ("Filtro Job Bank: NOC_CNP = NOC_21232", "44.376 → 86 registros", "Manter apenas a ocupação do escopo (Software developers and programmers)."),
-        ("Filtro Job Bank: nível provincial (ER de 2 dígitos)", "86 → 9 registros usados", "O fato salarial tem grão provincial; regiões econômicas e agregado nacional ficam fora do fato."),
+        ("Classificação da cobertura salarial", "86 → 13 jurisdições classificadas", "O DW preserva 9 salários provinciais, 1 caso apenas regional (PEI/ER1110) e 3 indisponíveis (territórios), sem usar regional como se fosse provincial."),
         ("Filtro StatCan imigração: Age/Gender totais e Place of birth em {Brazil, Total – Place of birth}", "ZIP bruto externo (quantidade total não registrada) → 26 registros", "Garante numerador (Brazil) e denominador (Total) comparáveis, sem quebra por idade/gênero. Risco: não permite análises por idade/gênero; a contagem do bruto deve ser registrada se o ZIP for rebaixado."),
-        ("Filtro StatCan habitação: 13 províncias/territórios e Census year = 2021", "2.988 → 117 registros", "Remove CMAs/CAs e o Censo 2016; mantém o grão provincial do fato."),
+        ("Filtro StatCan habitação: 13 províncias/territórios e Census year = 2021", "2.990 → 117 registros", "Remove CMAs/CAs e o Censo 2016; mantém o grão provincial do fato."),
         ("Normalização geográfica", "nome inglês da província como chave de cruzamento", "Job Bank usa prov/ER_Code e StatCan usa DGUID; o nome em inglês é a chave comum. Quebec (inglês) ≠ Québec (francês, não usado). Risco: mudança de grafia pode impedir a junção; o ETL deve registrar linhas sem correspondência."),
-        ("Tratamento de ausências salariais", "células vazias → N/A/NULL", "Nenhum valor é estimado; PEI só tem ER1110 e territórios não têm salário publicado no release."),
+        ("Tratamento de cobertura salarial", "provincial / regional / indisponível", "O status é registrado em fato_salario; valores ficam NULL quando indisponíveis e o código/nome da região é preservado quando houver somente dado regional."),
         ("DGUID canônico", "1 DGUID por jurisdição", "Evita duplicidade geográfica (ex.: Yukon)."),
-        ("Percentuais", "não armazenados como medida", "Participação brasileira e percentuais são calculados na apresentação para evitar soma de fatos não aditivos."),
+        ("Percentuais", "participação derivada; habitação armazenada", "Participação brasileira é calculada na apresentação; percentuais oficiais de habitação são armazenados como medidas não aditivas."),
     ],
     widths=[1.9, 1.6, 3.0],
 )
-p("Impacto geral: o Job Bank cai de 44.376 para 9 registros provinciais efetivamente usados no fato_salario; a habitação cai de 2.988 para 117 registros; a imigração usa 26 registros. Nenhuma linha é excluída dos brutos — apenas filtrada nas camadas seguintes. A redução geográfica introduz viés de cobertura: resultados provinciais não representam regiões econômicas, CMAs/CAs ou valores salariais indisponíveis.")
+p("Impacto geral: o Job Bank é reduzido de 44.376 registros a 13 situações de cobertura para NOC 21232: 9 provinciais, 1 apenas regional e 3 indisponíveis. A habitação cai de 2.990 para 117 registros; a imigração usa 26 registros. Nenhuma linha é excluída dos brutos — apenas filtrada nas camadas seguintes. A redução geográfica introduz viés de cobertura: resultados provinciais não representam CMAs/CAs; salários apenas regionais são identificados e não comparados como provinciais.")
 page_break()
 
 # ---------------------------------------------------------------- 14. MODELO DIMENSIONAL
 h1("14. Modelo Lógico/Físico do Data Warehouse")
-p("O modelo é uma constelação de fatos composta por três Star Schemas integrados por dimensões conformadas. A separação evita repetir salários em cada período de imigração e impede somas incorretas.")
+p("O modelo é uma constelação de fatos composta por três Star Schemas integrados por dimensões conformadas. A separação evita repetir salários em cada período de imigração e impede somas incorretas. A fato salarial registra a cobertura do Job Bank para cada jurisdição, distinguindo salário provincial publicado, dado somente regional e indisponibilidade.")
 
 h2("14.1 Diagrama")
 picture("modelo_constelacao.png")
@@ -525,6 +586,7 @@ table(
         ("dim_provincia", "cd_dguid", "nm_provincia, sg_provincia_jobbank, nm_pais"),
         ("dim_ocupacao", "cd_noc", "nm_ocupacao_en, nm_ocupacao_fr"),
         ("dim_tempo_salario", "cd_periodo_referencia", "nr_ano_inicio, nr_ano_fim, ds_periodo"),
+        ("dim_disponibilidade_salario", "cd_disponibilidade", "ds_disponibilidade, fl_comparavel_provincial"),
         ("dim_tempo_censo", "nr_ano_censo", "dt_referencia"),
         ("dim_pais_nascimento", "cd_pais_nascimento", "nm_pais_nascimento"),
         ("dim_periodo_imigracao", "cd_periodo_imigracao", "ds_periodo_imigracao, nr_ordem"),
@@ -539,13 +601,14 @@ h2("14.3 Fatos")
 table(
     ["Fato", "Grão", "Medidas"],
     [
-        ("fato_salario", "Província + ocupação + período salarial", "vl_salario_minimo, vl_salario_mediano, vl_salario_maximo, vl_salario_medio, vl_quartil1, vl_quartil3, vl_amplitude_salarial, fl_salario_anual"),
+        ("fato_salario", "Jurisdição + ocupação + período salarial", "salários, flag anual, região de origem e disponibilidade"),
         ("fato_imigracao", "Província + país de nascimento + período de imigração + Censo", "qt_imigrantes (aditiva)"),
         ("fato_habitacao", "Província + posse + indicador habitacional + Censo", "vl_medida (contagem ou percentual)"),
     ],
     widths=[1.5, 2.4, 2.6],
 )
 p("A participação brasileira (%) não é armazenada: é calculada na camada de apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais fornecidos oficialmente pelo Statistics Canada são armazenados em fato_habitacao.vl_medida, identificados por dim_indicador_habitacao.tp_medida = 'PERCENTUAL', e tratados como medidas não aditivas.")
+p("Para a pergunta 8, cada uma das 13 jurisdições recebe uma linha em fato_salario. O ETL atribui PROVINCIAL_PUBLICADO às 9 com salário provincial; APENAS_REGIONAL a PEI, preservando ER1110 e seu nome; e INDISPONIVEL a Yukon, Northwest Territories e Nunavut, mantendo os valores salariais NULL. Rankings e o indicador combinado usam somente fl_comparavel_provincial = 1.")
 
 # ---------------------------------------------------------------- 15. DICIONÁRIO DW
 h1("15. Dicionário de Dados do Data Warehouse")
@@ -570,6 +633,12 @@ dw_tables = {
         ("cd_periodo_referencia", "VARCHAR2(20)", "AK, NN", "2023-2024"),
         ("nr_ano_inicio / nr_ano_fim", "NUMBER(4)", "—", "2023 / 2024"),
         ("ds_periodo", "VARCHAR2(50)", "—", "Descrição legível"),
+    ],
+    "dim_disponibilidade_salario": [
+        ("sk_disponibilidade_salario", "NUMBER(10)", "PK", "Surrogate key"),
+        ("cd_disponibilidade", "VARCHAR2(24)", "AK, NN, CK", "PROVINCIAL_PUBLICADO / APENAS_REGIONAL / INDISPONIVEL"),
+        ("ds_disponibilidade", "VARCHAR2(120)", "NN", "Descrição exibida"),
+        ("fl_comparavel_provincial", "NUMBER(1)", "NN, CK", "1 somente para salário provincial publicado"),
     ],
     "dim_tempo_censo": [
         ("sk_tempo_censo", "NUMBER(10)", "PK", "Surrogate key"),
@@ -608,11 +677,12 @@ dw_tables = {
     ],
     "fato_salario": [
         ("sk_fato_salario", "NUMBER(15)", "PK", "Surrogate key"),
-        ("sk_provincia / sk_ocupacao / sk_tempo_salario / sk_fonte", "NUMBER(10)", "FK, NN", "Chaves das dimensões"),
+        ("sk_provincia / sk_ocupacao / sk_tempo_salario / sk_disponibilidade_salario / sk_fonte", "NUMBER(10)", "FK, NN", "Chaves das dimensões"),
         ("vl_salario_minimo / mediano / maximo / medio", "NUMBER(10,2)", "—", "Salários (CAD/hora)"),
         ("vl_quartil1 / vl_quartil3", "NUMBER(10,2)", "—", "Quartis"),
         ("vl_amplitude_salarial", "NUMBER(10,2)", "—", "high − low (derivada)"),
         ("fl_salario_anual", "NUMBER(1)", "CK", "0 = hora; 1 = anual"),
+        ("cd_regiao_origem / nm_regiao_origem", "VARCHAR2(10) / VARCHAR2(120)", "—", "ER do Job Bank; preenchido apenas quando APENAS_REGIONAL"),
     ],
     "fato_imigracao": [
         ("sk_fato_imigracao", "NUMBER(15)", "PK", "Surrogate key"),
@@ -635,7 +705,7 @@ p("Os nomes abaixo correspondem literalmente ao script Oracle e permitem conferi
 table(
     ["Fato", "Constraints FK no script Oracle"],
     [
-        ("fato_salario", "FK_FATO_SAL_DIM_PROVINCIA; FK_FATO_SAL_DIM_OCUPACAO; FK_FATO_SAL_DIM_TEMPO_SAL; FK_FATO_SAL_DIM_FONTE"),
+        ("fato_salario", "FK_FATO_SAL_DIM_PROVINCIA; FK_FATO_SAL_DIM_OCUPACAO; FK_FATO_SAL_DIM_TEMPO_SAL; FK_FATO_SAL_DIM_DISP; FK_FATO_SAL_DIM_FONTE"),
         ("fato_imigracao", "FK_FATO_IMIG_DIM_PROVINCIA; FK_FATO_IMIG_DIM_PAIS; FK_FATO_IMIG_DIM_PERIODO; FK_FATO_IMIG_DIM_TEMPO_CENSO; FK_FATO_IMIG_DIM_FONTE"),
         ("fato_habitacao", "FK_FATO_HAB_DIM_PROVINCIA; FK_FATO_HAB_DIM_TENENCIA; FK_FATO_HAB_DIM_INDICADOR; FK_FATO_HAB_DIM_TEMPO_CENSO; FK_FATO_HAB_DIM_FONTE"),
     ],

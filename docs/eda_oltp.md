@@ -20,7 +20,7 @@ Requisitos: apenas a biblioteca padrão do Python 3 (sem dependências externas)
 | `filtered/statcan_98100258_housing_provinces_territories.csv` | Extração de origem do Statistics Canada (Censo 2021, habitação) |
 | `canada_provinces_brazil_software_developer_wages.csv` | Junção staging das duas fontes principais (validação do cruzamento) |
 
-Observação: o ZIP bruto do Statistics Canada de imigração (383 MB) não está versionado; a EDA de imigração usa a extração `filtered/` que preserva os nomes originais das colunas. O ZIP de habitação (60 KB) está preservado em `raw/98100258-eng.zip`.
+Observação: o ZIP bruto do Statistics Canada de imigração (cerca de 383 MB) não está versionado; a EDA de imigração usa a extração `filtered/` que preserva os nomes originais das colunas. Para reproduzir o bruto, baixar `https://www150.statcan.gc.ca/n1/en/tbl/csv/98100307-eng.zip`, executar `shasum -a 256 98100307-eng.zip` e registrar o resultado em `dim_fonte.ds_checksum`. O ZIP de habitação (60 KB) está preservado em `raw/98100258-eng.zip`.
 
 ## 3. Resultados
 
@@ -187,10 +187,10 @@ Leitura: **ON e BC** têm os maiores percentuais de inquilinos comprometendo ≥
 4. **Perfil temporal:** a chegada de brasileiros é predominantemente recente (2011–2021 = 27.740).
 5. **Habitação:** ON e BC concentram os maiores percentuais de inquilinos com gasto ≥ 30% da renda (38,4% e 37,8%); Quebec, apesar da 2ª maior comunidade brasileira, tem os menores percentuais de inquilinos em core housing need (11,9%) e inacessibilidade (25,2%).
 6. **Cruzamento inicial:** BC combina a maior mediana salarial com a 3ª maior comunidade brasileira, mas tem alto custo de moradia para inquilinos; ON tem a maior comunidade e a 2ª maior mediana, também com moradia cara. Para a pergunta 10, o ranking será calculado somente para jurisdições com os três indicadores disponíveis: 40% salário mediano normalizado, 30% comunidade brasileira normalizada e 30% acessibilidade normalizada de forma inversa. Valores salariais N/A não recebem imputação nem entram no ranking.
-7. **Impacto das transformações:** os filtros aplicados (Age/Gender totais, `Brazil`/`Total – Place of birth`, `NOC_CNP = NOC_21232`, nível provincial, `Census year = 2021`) reduziram 44.376 registros do Job Bank para 9 registros provinciais usados na análise e 2.988 registros de habitação para 117; nenhum valor foi estimado — ausências permanecem como `N/A`/`NULL`.
+7. **Impacto das transformações:** os filtros aplicados (Age/Gender totais, `Brazil`/`Total – Place of birth`, `NOC_CNP = NOC_21232`, nível provincial, `Census year = 2021`) reduziram 44.376 registros do Job Bank a 13 jurisdições de cobertura para NOC 21232 (9 com salário provincial publicado, 1 apenas regional e 3 indisponíveis) e 2.990 registros de habitação para 117; nenhum valor foi estimado — ausências permanecem como `N/A`/`NULL`.
 
 ## 5. Limitações e próximos passos
 
-- **ZIP bruto do StatCan de imigração (383 MB):** para a versão final, registrar checksum e, se possível, executar a EDA sobre a tabela completa extraída do ZIP.
+- **ZIP bruto do StatCan de imigração (cerca de 383 MB):** o procedimento reproduzível e a data de extração estão documentados; quando o ZIP for baixado novamente, seu SHA-256 deve ser calculado e registrado antes da carga.
 - **Gráficos:** os números acima podem ser transformados em gráficos no Python (matplotlib), no Excel ou no Orange para os slides.
 - **Habitação:** os indicadores de percentual já vêm calculados; as contagens (`Affordability: unaffordable housing`) permitem validar os percentuais no DW.

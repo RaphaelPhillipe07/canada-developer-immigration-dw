@@ -1,0 +1,96 @@
+<!-- ============================================================
+     EDA E IMPACTO — GUARDADOS PARA UMA PRÓXIMA ENTREGA
+     Retirados de presentation/index.html em 14/09/2026.
+
+       1. EDA · retrato das fontes  — caracterização das 3 fontes: completude
+          (~45% das células salariais vazias), arredondamento de base 5 do
+          Censo, contagem vs. percentual na habitação.
+       2. Transformações e impacto  — o que foi filtrado, com o antes→depois,
+          e o custo de cada recorte (viés de cobertura, perda de Age/Gender,
+          fragilidade do cruzamento por nome, ausências mantidas).
+
+     Cobriam os requisitos 3 (Análise Exploratória) e 4 (justificar e analisar
+     o impacto das alterações). Os dois seguem cobertos no TRABALHO ESCRITO
+     (§12 e §13) — saíram só da apresentação.
+
+     COMO RESTAURAR
+     Colar os <section> abaixo no index.html, entre "Bases · visão geral" e
+     "EDA · distribuições". O CSS continua em css/theme.css (.eda3, .oltp,
+     .stat, .bcol, .bkv, .batt, .base-grid).
+
+     Os números vieram de conferência com csv.reader em raw/ e filtered/.
+     ============================================================ -->
+
+      <section class="slide" data-title="EDA · retrato das fontes">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">Antes de modelar, o retrato das fontes. Nada aqui responde às 10 perguntas — são as <strong>características dos dados</strong> que definem o que o modelo precisa tratar. 🔍</div>
+          </div>
+
+          <div class="eda3">
+            <div class="bcol step">
+              <h4>JOB BANK · SALÁRIOS</h4>
+              <div class="stat"><b>45%</b><span>das células salariais do arquivo estão vazias</span></div>
+              <div class="bkv"><span>VOLUME</span><span>44.376 registros · 516 ocupações NOC</span></div>
+              <div class="bkv"><span>NOC 21232</span><span>aparece em 86 registros</span></div>
+              <div class="bkv"><span>VAZIOS</span><span>low 20.301 · median 20.012 · high 20.288</span></div>
+              <div class="bkv"><span>PERÍODOS</span><span>2021, 2023-2024, 2024 e NA convivem</span></div>
+              <p class="batt">→ a ausência é <b>estrutural</b>, não um defeito do download. Por isso vira dimensão, não <code>NULL</code> solto.</p>
+            </div>
+
+            <div class="bcol step">
+              <h4>STATCAN 0307 · IMIGRAÇÃO</h4>
+              <div class="stat"><b>±5</b><span>o Censo arredonda toda contagem</span></div>
+              <div class="bkv"><span>EXTRAÇÃO</span><span>26 registros (13 × Brazil/Total)</span></div>
+              <div class="bkv"><span>PARTIÇÃO</span><span>os 5 períodos somam o total — mas só em 8 das 26 linhas fecham exato</span></div>
+              <div class="bkv"><span>DIFERENÇA</span><span>no máximo 10, sempre múltiplo de 5</span></div>
+              <div class="bkv"><span>SUPRESSÃO</span><span>coluna <code>Symbol</code> vazia no recorte</span></div>
+              <p class="batt">→ arredondamento aleatório de confidencialidade. <b>Não se corrige a diferença</b>, e o total não pode ser derivado da soma.</p>
+            </div>
+
+            <div class="bcol step">
+              <h4>STATCAN 0258 · HABITAÇÃO</h4>
+              <div class="stat"><b>4 de 9</b><span>indicadores já vêm como percentual</span></div>
+              <div class="bkv"><span>EXTRAÇÃO</span><span>117 registros (13 × 9 indicadores)</span></div>
+              <div class="bkv"><span>ESTRUTURA</span><span>9 indicadores × 4 tipos de posse</span></div>
+              <div class="bkv"><span>MISTURA</span><span>o bruto traz Censo 2016 <i>e</i> 2021</span></div>
+              <div class="bkv"><span>GRANULARIDADE</span><span>bruto inclui CMAs/CAs além das províncias</span></div>
+              <p class="batt">→ contagem e percentual no mesmo campo exigem <code>tp_medida</code> para separar o que é <b>aditivo</b> do que não é.</p>
+            </div>
+          </div>
+        </div>
+        <div class="corner-num">05</div>
+      </section>
+
+      <section class="slide" data-title="Transformações e impacto">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🫎</div>
+            <div class="bubble"><strong>Nenhuma linha foi apagada.</strong> Os arquivos brutos ficam intactos; todo recorte acontece na carga — reversível e auditável. E <strong>nada é estimado</strong>. 🛠️</div>
+          </div>
+
+          <div class="base-grid">
+            <div class="bcol step">
+              <h4>O QUE FIZEMOS</h4>
+              <div class="bkv"><span>JOB BANK</span><span>filtro <code>NOC_CNP = NOC_21232</code><br><i>44.376 → 86 registros</i></span></div>
+              <div class="bkv"><span>JOB BANK</span><span>nível provincial (<code>ER</code> de 2 dígitos)<br><i>86 → 13 jurisdições no fato</i></span></div>
+              <div class="bkv"><span>IMIGRAÇÃO</span><span>Age/Gender totais + <code>Brazil</code> e <code>Total</code><br><i>→ 26 registros</i></span></div>
+              <div class="bkv"><span>HABITAÇÃO</span><span>13 províncias + <code>Census year = 2021</code><br><i>2.990 → 117 registros</i></span></div>
+              <div class="bkv"><span>GEOGRAFIA</span><span>StatCan usa DGUID, Job Bank usa <code>prov</code>/<code>ER_Code</code> — cruzamento pelo nome da província em inglês</span></div>
+            </div>
+
+            <div class="bcol step">
+              <h4>O QUE ISSO CUSTA</h4>
+              <div class="bkv"><span>COBERTURA</span><span>resultados provinciais <b>não</b> representam regiões econômicas nem CMAs/CAs</span></div>
+              <div class="bkv"><span>RECORTE</span><span>fixar Age e Gender em <i>Total</i> impede análise por idade ou gênero</span></div>
+              <div class="bkv"><span>CHAVE</span><span>cruzar por nome quebra se a grafia mudar — o ETL registra linhas sem correspondência</span></div>
+              <div class="bkv"><span>AUSÊNCIAS</span><span>células vazias viram <code>NULL</code>; PEI só tem <code>ER1110</code> e 3 territórios não publicam — <b>nenhum valor regional preencheu a lacuna</b></span></div>
+              <p class="batt">✅ Percentuais não são gravados como medida somável: a participação brasileira é calculada na apresentação.</p>
+            </div>
+          </div>
+
+          <p class="goal-foot step">🗄️ Cada origem guarda <b>URL, data de extração e checksum SHA-256</b> em <code>dim_fonte</code> — dá para provar de qual versão do arquivo cada número veio.</p>
+        </div>
+        <div class="corner-num">06</div>
+      </section>

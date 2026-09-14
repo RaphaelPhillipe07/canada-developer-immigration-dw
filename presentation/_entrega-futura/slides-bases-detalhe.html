@@ -1,0 +1,176 @@
+<!-- ============================================================
+     SLIDES DE DETALHE DAS BASES — GUARDADOS PARA UMA PRÓXIMA ENTREGA
+     Retirados de presentation/index.html em 14/09/2026.
+
+     São os 3 slides que abriam uma base por vez, cada um com:
+       · o órgão fornecedor por extenso
+       · a origem do download (domínio, dataset/tabela, release, tamanho)
+       · todos os campos do arquivo, como chips em mono
+       · o recorte aplicado e a volumetria bruto -> extração -> fato
+       · uma observação crítica da fonte
+
+       1. Base 1 · Imigração   — StatCan 98-10-0307-01, Censo 2021
+       2. Base 2 · Salários    — Job Bank/ESDC, NOC 21232, release 2025
+       3. Base 3 · Habitação   — StatCan 98-10-0258-01, Censo 2021
+
+     O slide "Bases · visão geral" CONTINUA no deck: ele resume as três em
+     cartões (2 órgãos -> 3 conjuntos -> 3 tabelas fato). Estes três eram o
+     aprofundamento fonte a fonte.
+
+     COMO RESTAURAR
+     Colar os <section> abaixo de volta no index.html, logo depois do slide
+     "Bases · visão geral". O CSS continua em css/theme.css (classes
+     .base-head, .base-org, .base-tab, .base-url, .base-grid, .bcol, .flds,
+     .fld, .bkv e .batt) — nada foi removido de lá. A numeração e o índice
+     são gerados em tempo de execução por js/engine.js.
+
+     FONTE DO CONTEÚDO
+     Os campos e recortes vieram de docs/dicionario_oltp.md; a volumetria foi
+     conferida com csv.reader nos arquivos de raw/ e filtered/. Se os números
+     mudarem, conferir lá antes de recolar.
+     ============================================================ -->
+
+      <section class="slide" data-title="Base 1 · Imigração">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">De onde vem a <strong>comunidade brasileira</strong>: o estoque de imigrantes do Censo 2021, por <strong>país de nascimento</strong> e <strong>período de chegada</strong>. 👥</div>
+          </div>
+
+          <div class="base-head step">
+            <span class="base-org">STATISTICS CANADA · AGÊNCIA OFICIAL DE ESTATÍSTICA DO CANADÁ</span>
+            <span class="base-tab">98-10-0307-01 · Imigração</span>
+            <span class="base-url">www150.statcan.gc.ca · Censo 2021 · 98100307-eng.zip (~383 MB)</span>
+          </div>
+
+          <div class="base-grid">
+            <div class="bcol step">
+              <h4>O QUE A BASE TRAZ</h4>
+              <p>Quantos imigrantes vivem em cada província, separados por onde nasceram e por quando chegaram ao Canadá. Os períodos são <b>partições</b> do total de imigrantes — somados, reconstroem <code>Immigrants[3]</code>.</p>
+              <div class="flds">
+                  <span class="fld">REF_DATE</span>
+                  <span class="fld">GEO</span>
+                  <span class="fld">DGUID</span>
+                  <span class="fld">Age (8D)</span>
+                  <span class="fld">Gender (3)</span>
+                  <span class="fld">Place of birth (290)</span>
+                  <span class="fld">Total[1]</span>
+                  <span class="fld">Non-immigrants[2]</span>
+                  <span class="fld">Immigrants[3]</span>
+                  <span class="fld">Before 1980[4]</span>
+                  <span class="fld">1980–1990[5]</span>
+                  <span class="fld">1991–2000[6]</span>
+                  <span class="fld">2001–2010[7]</span>
+                  <span class="fld">2011–2021[8]</span>
+                  <span class="fld">Non-permanent residents[11]</span>
+                  <span class="fld">Symbol</span>
+              </div>
+            </div>
+            <div class="bcol step">
+              <h4>O QUE USAMOS</h4>
+                  <div class="bkv"><span>GEOGRAFIA</span><span>13 províncias e territórios</span></div>
+                  <div class="bkv"><span>PAÍS</span><span><code>Brazil</code> e <code>Total – Place of birth</code></span></div>
+                  <div class="bkv"><span>RECORTES</span><span><code>Age = Total</code> · <code>Gender = Total</code></span></div>
+                  <div class="bkv"><span>EXTRAÇÃO</span><span><b>26 registros</b> (13 × 2)</span></div>
+                  <div class="bkv"><span>VAI PARA</span><span><code>fato_imigracao</code> · 130 linhas</span></div>
+              <p class="batt">🔑 <b>Brazil</b> é o numerador e <b>Total – Place of birth</b> o denominador — por isso os dois recortes são carregados. O <b>DGUID</b> é a chave geográfica canônica do StatCan.</p>
+            </div>
+          </div>
+        </div>
+        <div class="corner-num">05</div>
+      </section>
+
+      <section class="slide" data-title="Base 2 · Salários">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">De onde vem o <strong>salário</strong>: a tabela oficial de remuneração por ocupação do Job Bank, o portal de empregos do governo canadense. 💼</div>
+          </div>
+
+          <div class="base-head step">
+            <span class="base-org">JOB BANK / ESDC · EMPLOYMENT AND SOCIAL DEVELOPMENT CANADA</span>
+            <span class="base-tab">Wages · Salários NOC 21232</span>
+            <span class="base-url">open.canada.ca · dataset adad580f · release 2025 · rev. 2025-11-19</span>
+          </div>
+
+          <div class="base-grid">
+            <div class="bcol step">
+              <h4>O QUE A BASE TRAZ</h4>
+              <p>Salários publicados para cada ocupação <b>NOC</b> em três níveis geográficos: nacional (<code>NAT</code>/<code>ER00</code>), provincial e de região econômica. CSV UTF-8 com BOM, <b>44.376 registros</b> e <b>22 colunas</b>, com vários períodos de referência convivendo no mesmo arquivo.</p>
+              <div class="flds">
+                  <span class="fld">NOC_CNP</span>
+                  <span class="fld">NOC_Title_eng</span>
+                  <span class="fld">NOC_Title_fra</span>
+                  <span class="fld">prov</span>
+                  <span class="fld">ER_Code</span>
+                  <span class="fld">ER_Name</span>
+                  <span class="fld">Low_Wage</span>
+                  <span class="fld">Median_Wage</span>
+                  <span class="fld">High_Wage</span>
+                  <span class="fld">Average_Wage</span>
+                  <span class="fld">Quartile1</span>
+                  <span class="fld">Quartile3</span>
+                  <span class="fld">Reference_Period</span>
+                  <span class="fld">Annual_Wage_Flag</span>
+                  <span class="fld">Wage_Comment_E</span>
+                  <span class="fld">Source2025_NHQ</span>
+                  <span class="fld">Revision_Date</span>
+              </div>
+            </div>
+            <div class="bcol step">
+              <h4>O QUE USAMOS</h4>
+                  <div class="bkv"><span>OCUPAÇÃO</span><span><code>NOC_21232</code> · Software developers</span></div>
+                  <div class="bkv"><span>PERÍODO</span><span><code>Reference_Period = 2023-2024</code></span></div>
+                  <div class="bkv"><span>UNIDADE</span><span><code>Annual_Wage_Flag = 0</code> (CAD/hora)</span></div>
+                  <div class="bkv"><span>EXTRAÇÃO</span><span>44.376 → <b>86 registros</b> de NOC 21232</span></div>
+                  <div class="bkv"><span>VAI PARA</span><span><code>fato_salario</code> · 13 linhas</span></div>
+              <p class="batt">⚠️ Cerca de <b>45%</b> das células salariais do arquivo completo estão vazias — o motivo vem escrito em <code>Wage_Comment_E</code>. Só <b>9</b> das 13 jurisdições publicam salário provincial para NOC 21232.</p>
+            </div>
+          </div>
+        </div>
+        <div class="corner-num">06</div>
+      </section>
+
+      <section class="slide" data-title="Base 3 · Habitação">
+        <div class="ob-stage top">
+          <div class="ob-speak">
+            <div class="ob-duo sm mascot">🦫</div>
+            <div class="bubble">De onde vem a <strong>moradia</strong>: indicadores habitacionais do Censo 2021 quebrados por <strong>posse</strong> — quem é proprietário e quem aluga. 🏠</div>
+          </div>
+
+          <div class="base-head step">
+            <span class="base-org">STATISTICS CANADA · AGÊNCIA OFICIAL DE ESTATÍSTICA DO CANADÁ</span>
+            <span class="base-tab">98-10-0258-01 · Habitação</span>
+            <span class="base-url">www150.statcan.gc.ca · Censo 2021 · 98100258-eng.zip (60 KB)</span>
+          </div>
+
+          <div class="base-grid">
+            <div class="bcol step">
+              <h4>O QUE A BASE TRAZ</h4>
+              <p><b>9 indicadores</b> habitacionais × <b>4 tipos de posse</b> (<i>tenure</i>). Cinco indicadores são contagens de domicílios; quatro já chegam como <b>percentual derivado</b> (0–100) calculado pelo próprio StatCan.</p>
+              <div class="flds">
+                  <span class="fld">REF_DATE</span>
+                  <span class="fld">GEO</span>
+                  <span class="fld">DGUID</span>
+                  <span class="fld">Census year (2)</span>
+                  <span class="fld">Housing indicators (9)</span>
+                  <span class="fld">Total - Tenure[1]</span>
+                  <span class="fld">Owner[2]</span>
+                  <span class="fld">Renter[3]</span>
+                  <span class="fld">Dwelling provided by local gov./First Nation[4]</span>
+                  <span class="fld">Symbol</span>
+              </div>
+            </div>
+            <div class="bcol step">
+              <h4>O QUE USAMOS</h4>
+                  <div class="bkv"><span>GEOGRAFIA</span><span>13 províncias — sem CMAs/CAs</span></div>
+                  <div class="bkv"><span>CENSO</span><span><code>Census year = 2021</code> (descarta 2016)</span></div>
+                  <div class="bkv"><span>INDICADOR-CHAVE</span><span><code>Affordability: unaffordable housing</code></span></div>
+                  <div class="bkv"><span>EXTRAÇÃO</span><span>2.990 → <b>117 registros</b> (13 × 9)</span></div>
+                  <div class="bkv"><span>VAI PARA</span><span><code>fato_habitacao</code> · 468 linhas</span></div>
+              <p class="batt">🔑 <i>Unaffordable housing</i> significa gasto de <b>30% ou mais da renda</b> com moradia. <code>Renter[3]</code> é a medida que interessa para quem chega — imigrante recém-chegado aluga.</p>
+            </div>
+          </div>
+        </div>
+        <div class="corner-num">07</div>
+      </section>

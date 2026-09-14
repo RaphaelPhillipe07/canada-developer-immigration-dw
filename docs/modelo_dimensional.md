@@ -13,6 +13,7 @@ erDiagram
     dim_provincia ||--o{ fato_salario : "sk_provincia"
     dim_ocupacao ||--o{ fato_salario : "sk_ocupacao"
     dim_tempo_salario ||--o{ fato_salario : "sk_tempo_salario"
+    dim_disponibilidade_salario ||--o{ fato_salario : "sk_disponibilidade_salario"
     dim_fonte ||--o{ fato_salario : "sk_fonte"
 
     dim_provincia ||--o{ fato_imigracao : "sk_provincia"
@@ -32,7 +33,8 @@ Representação textual (visão geral):
 
 ```
 dim_provincia ──┬── fato_salario ── dim_ocupacao
-                 │        └────────── dim_tempo_salario
+                 │        ├────────── dim_tempo_salario
+                 │        └────────── dim_disponibilidade_salario
                  ├── fato_imigracao ── dim_pais_nascimento
                  │        ├─────────── dim_periodo_imigracao
                  │        └─────────── dim_tempo_censo
@@ -48,6 +50,7 @@ dim_provincia ──┬── fato_salario ── dim_ocupacao
 | `dim_provincia` | `sk_provincia` | `cd_dguid` (StatCan) | `nm_provincia`, `sg_provincia_jobbank`, `nm_pais` |
 | `dim_ocupacao` | `sk_ocupacao` | `cd_noc` | `nm_ocupacao_en`, `nm_ocupacao_fr` |
 | `dim_tempo_salario` | `sk_tempo_salario` | `cd_periodo_referencia` | `nr_ano_inicio`, `nr_ano_fim`, `ds_periodo` |
+| `dim_disponibilidade_salario` | `sk_disponibilidade_salario` | `cd_disponibilidade` | `ds_disponibilidade`, `fl_comparavel_provincial` |
 | `dim_tempo_censo` | `sk_tempo_censo` | `nr_ano_censo` | `dt_referencia` |
 | `dim_pais_nascimento` | `sk_pais_nascimento` | `cd_pais_nascimento` | `nm_pais_nascimento` |
 | `dim_periodo_imigracao` | `sk_periodo_imigracao` | `cd_periodo_imigracao` | `ds_periodo_imigracao`, `nr_ordem` |
@@ -65,7 +68,7 @@ Observações:
 
 | Fato | Grão | Medidas | Aditividade |
 |---|---|---|---|
-| `fato_salario` | Província + ocupação + período salarial | `vl_salario_minimo`, `vl_salario_mediano`, `vl_salario_maximo`, `vl_salario_medio`, `vl_quartil1`, `vl_quartil3`, `vl_amplitude_salarial` (derivada), `fl_salario_anual` | Medidas de valor: aditivas entre linhas de granularidade maior? Não somar `mediano`; usar em dashboards como valor pontual. `vl_amplitude_salarial` é derivada (`max - min`). |
+| `fato_salario` | Jurisdição + ocupação + período salarial | Valores salariais, `fl_salario_anual`, `cd_regiao_origem`, `nm_regiao_origem` | O status vem de `dim_disponibilidade_salario`: `PROVINCIAL_PUBLICADO`, `APENAS_REGIONAL` ou `INDISPONIVEL`. Salários provinciais são comparáveis; regionais não entram em ranking provincial; indisponíveis mantêm valores `NULL`. |
 | `fato_imigracao` | Província + país de nascimento + período de imigração + Censo | `qt_imigrantes` (contagem) | `qt_imigrantes` é aditiva. A **participação brasileira (%) não é armazenada** — é calculada no BI como `qt_imigrantes(Brazil) / qt_imigrantes(Total – Place of birth)`. |
 | `fato_habitacao` | Província + posse (tenure) + indicador habitacional + Censo | `vl_medida` (contagem ou percentual, conforme `dim_indicador_habitacao.tp_medida`) | Contagens são aditivas; percentuais são não aditivos — usar como valor pontual por província. |
 
@@ -73,7 +76,7 @@ Observações:
 
 | Origem (dataset público) | Destino (DW) | Regra |
 |---|---|---|
-| Job Bank `prov` + `ER_Name` | `dim_provincia.sg_provincia_jobbank`, `nm_provincia` | Normalizar pelo nome em inglês; `NAT`/regiões econômicas não entram no fato provincial |
+| Job Bank `prov` + `ER_Code` + `ER_Name` | `dim_provincia`, `dim_disponibilidade_salario`, `fato_salario.cd_regiao_origem`, `fato_salario.nm_regiao_origem` | Classificar 13 jurisdições: 9 `PROVINCIAL_PUBLICADO`, PEI `APENAS_REGIONAL` (ER1110) e 3 territórios `INDISPONIVEL`; não transformar regional em provincial |
 | Job Bank `NOC_CNP`, `NOC_Title_eng` | `dim_ocupacao` | Filtrar `NOC_CNP = NOC_21232` |
 | Job Bank `Low/Median/High_Wage`, `Reference_Period`, `Annual_Wage_Flag` | `fato_salario` | `Reference_Period = 2023-2024`; flag `0` = por hora; nunca estimar vazios |
 | StatCan `DGUID`, `GEO` | `dim_provincia` | DGUID canônico; eliminar duplicidade de Yukon |
@@ -86,4 +89,4 @@ Observações:
 2. **Dimensões conformadas** — `dim_provincia` e `dim_tempo_censo` são reutilizadas entre fatos.
 3. **Surrogate keys em todas as dimensões** — as chaves naturais (`DGUID`, `NOC_CNP`, códigos StatCan) ficam como `AK` (alternate keys) para o ETL fazer o *lookup*.
 4. **Tratamento de percentuais** — a participação brasileira não é armazenada e é calculada na camada de apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais fornecidos oficialmente pelo Statistics Canada são armazenados em `fato_habitacao.vl_medida`, identificados por `dim_indicador_habitacao.tp_medida = 'PERCENTUAL'`, e tratados como medidas não aditivas.
-5. **Ausências preservadas** — onde não há salário provincial publicado, a linha não é inserida em `fato_salario`; consultas partem de `dim_provincia` com `LEFT JOIN` e exibem `N/A`. Nenhum valor é estimado e jurisdições sem salário não entram no indicador combinado.
+5. **Cobertura salarial explícita** — `fato_salario` recebe uma linha para cada uma das 13 jurisdições no recorte NOC 21232. `dim_disponibilidade_salario` diferencia `PROVINCIAL_PUBLICADO`, `APENAS_REGIONAL` e `INDISPONIVEL`; dados regionais não são comparados como provinciais e valores indisponíveis permanecem `NULL`. O indicador combinado filtra `fl_comparavel_provincial = 1`.

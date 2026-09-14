@@ -10,15 +10,32 @@ Construir um Data Warehouse em Oracle que integre **duas fontes institucionais**
 
 - **S** — Construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
 - **M** — Integrar os três conjuntos de dados em um modelo dimensional capaz de responder às 10 perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte.
-- **A** — Duas fontes institucionais e três conjuntos de dados já baixados e filtrados, com modelo viável em Oracle.
+- **A** — Duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com modelo viável em Oracle.
 - **R** — Apoiar a decisão de devs imigrantes sobre a melhor província.
 - **T** — Até 14 de dezembro de 2026.
+
+## As 10 perguntas analíticas
+
+Definidas priorizando o **cruzamento entre fontes**: sete das dez só podem ser respondidas combinando duas ou três bases — é o que justifica o Data Warehouse. O cruzamento das perguntas 4 a 10 depende de `dim_provincia` ser dimensão conformada entre os três fatos.
+
+| # | Pergunta | Bases |
+|---|---|---|
+| 1 | Quais províncias pagam os maiores salários medianos para NOC 21232? | salário |
+| 2 | Onde estão os imigrantes nascidos no Brasil e em que período chegaram? | imigração |
+| 3 | Onde os inquilinos mais comprometem ≥ 30% da renda com moradia? | habitação |
+| 4 | Quais províncias combinam salário mediano alto e comunidade brasileira numerosa? | salário + imigração |
+| 5 | A imigração brasileira de 2011–2021 concentrou-se nas províncias de maior salário mediano? | salário + imigração |
+| 6 | Em quais províncias o salário é alto e a proporção de inquilinos com moradia inacessível é baixa? | salário + habitação |
+| 7 | Em quais províncias a comunidade brasileira é numerosa e a moradia é menos acessível? | imigração + habitação |
+| 8 | As províncias com maior presença brasileira apresentam salários e condições de moradia diferentes das de menor presença? | as três |
+| 9 | Qual província oferece o melhor equilíbrio entre remuneração, comunidade e acessibilidade habitacional? | as três |
+| 10 | Nas jurisdições sem salário provincial publicado, o que comunidade e moradia revelam? | as três |
 
 ## Bases de dados
 
 | Base | Órgão / período | Onde está |
 |---|---|---|
-| Statistics Canada 98-10-0307-01 (imigração) | Census 2021 | `filtered/statcan_98100307_brazil_provinces_territories.csv` (ZIP bruto de 383 MB fica fora do Git) |
+| Statistics Canada 98-10-0307-01 (imigração) | Census 2021 | extração `filtered/statcan_98100307_brazil_provinces_territories.csv`; ZIP bruto de 383 MB fora do Git |
 | Job Bank / ESDC Wages (NOC 21232) | Release 2025 · referência 2023–2024 | `raw/job_bank_wages_2025.csv` + `filtered/job_bank_wages_2025_noc_21232.csv` |
 | Statistics Canada 98-10-0258-01 (habitação) | Census 2021 | `raw/98100258_extracted/98100258.csv` + `filtered/statcan_98100258_housing_provinces_territories.csv` |
 
@@ -29,7 +46,7 @@ São duas fontes institucionais: Statistics Canada fornece os datasets de imigra
 ```
 ├── planning/
 │   └── project_plan.html           # plano das 4 entregas
-├── presentation/                   # slides HTML (Entrega 1 · 15 slides · tema Canadá)
+├── presentation/                   # slides HTML (Entrega 1 · 13 slides · tema Canadá)
 │   ├── index.html
 │   ├── css/theme.css
 │   ├── js/engine.js, intro.js
@@ -43,11 +60,11 @@ São duas fontes institucionais: Statistics Canada fornece os datasets de imigra
 │   └── figuras/                    # cópias avulsas dos gráficos
 ├── sql/
 │   └── script_oracle.sql           # tablespaces, sequences, staging, dimensões, fatos e índices
-├── scripts/
+├── tools/apoio_nao_avaliado/       # scripts de reprodução, fora da avaliação
 │   ├── eda_oltp.py                 # análise exploratória
-│   ├── gerar_graficos.py           # gera os PNGs em presentation/images
+│   ├── gerar_diagrama_modelo.py    # gera o diagrama do DW
 │   └── gerar_docx.py               # gera o trabalho escrito DOCX
-├── raw/                            # arquivos brutos preservados
+├── raw/                            # brutos versionados (não inclui o ZIP de imigração)
 ├── filtered/                       # extrações e filtros
 ├── resumo_do_projeto.txt           # resumo da meta e bases
 └── canada_provinces_brazil_software_developer_wages.csv  # junção staging
@@ -76,7 +93,7 @@ cd presentation && python -m http.server 8765
 
 - `raw/job_bank_wages_2025.csv` — Job Bank/ESDC, dataset `adad580f-76b0-4502-bd05-20c125de9116`, revisão 2025-11-19.
 - `raw/98100258_extracted/98100258.csv` — Statistics Canada, tabela 98-10-0258-01 (habitação), extraído do ZIP oficial.
-- Tabela 98-10-0307-01 — Statistics Canada (imigração): o ZIP bruto de 383 MB é mantido fora do Git; no repositório fica a extração em `filtered/`.
+- Tabela 98-10-0307-01 — Statistics Canada (imigração): o ZIP bruto de cerca de 383 MB não é versionado no Git. Download reproduzível: `https://www150.statcan.gc.ca/n1/en/tbl/csv/98100307-eng.zip` (extração: 14 set. 2026). Após baixar, executar `shasum -a 256 98100307-eng.zip`, registrar o resultado em `dim_fonte.ds_checksum`, descompactar e aplicar os filtros documentados para gerar a extração em `filtered/`.
 
 ## Transformações (raw → filtered)
 

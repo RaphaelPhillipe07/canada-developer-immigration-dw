@@ -6,11 +6,11 @@ Até 14 de dezembro de 2026, desenvolver e documentar um Data Warehouse em Oracl
 
 *S (Específica):* construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
 *M (Mensurável):* integrar os três conjuntos de dados em um modelo dimensional capaz de responder às dez perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte.
-*A (Atingível):* duas fontes institucionais e três conjuntos de dados já baixados e filtrados, com ETL previsto em Pentaho Data Integration.
+*A (Atingível):* duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com ETL previsto em Pentaho Data Integration.
 *R (Relevante):* apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense.
 *T (Temporal):* até 14 de dezembro de 2026.
 
-*MÉTRICAS (respondem às dez perguntas do plano):*
+*MÉTRICAS (medidas disponíveis no Data Warehouse):*
 
 * Quantidade de imigrantes brasileiros por província;
 * Percentual de brasileiros entre os imigrantes por província (calculado: brasileiros / total de imigrantes; não armazenar como medida aditiva);
@@ -22,6 +22,31 @@ Até 14 de dezembro de 2026, desenvolver e documentar um Data Warehouse em Oracl
 * Disponibilidade de publicação salarial por jurisdição (província, região econômica ou N/A);
 * Proporção de inquilinos com gasto de 30% ou mais da renda em moradia;
 * Indicador de equilíbrio entre remuneração, comunidade brasileira e acessibilidade habitacional.
+
+*AS DEZ PERGUNTAS ANALÍTICAS:*
+
+Definidas priorizando o cruzamento entre fontes: sete das dez só podem ser respondidas
+combinando duas ou três bases. É o que justifica o Data Warehouse — nenhuma das fontes
+responde sozinha.
+
+_Uma base:_
+1. Quais províncias pagam os maiores salários medianos para NOC 21232? (salário)
+2. Onde estão os imigrantes nascidos no Brasil e em que período chegaram? (imigração)
+3. Onde os inquilinos mais comprometem 30% ou mais da renda com moradia? (habitação)
+
+_Duas bases:_
+4. Quais províncias combinam salário mediano alto e comunidade brasileira numerosa? (salário + imigração)
+5. A imigração brasileira de 2011–2021 concentrou-se nas províncias de maior salário mediano? (salário + imigração)
+6. Em quais províncias o salário mediano é alto e a proporção de inquilinos com moradia inacessível é baixa? (salário + habitação)
+7. Em quais províncias a comunidade brasileira é numerosa e a moradia é menos acessível? (imigração + habitação)
+
+_Três bases:_
+8. As províncias com maior presença brasileira apresentam salários e condições de moradia diferentes das de menor presença?
+9. Qual província oferece o melhor equilíbrio entre remuneração, comunidade brasileira e acessibilidade habitacional?
+10. Nas jurisdições sem salário provincial publicado, o que a comunidade brasileira e a acessibilidade habitacional revelam?
+
+O cruzamento das perguntas 4 a 10 só é possível porque dim_provincia é dimensão conformada,
+compartilhada pelos três fatos.
 
 *BASES DE DADOS:*
 

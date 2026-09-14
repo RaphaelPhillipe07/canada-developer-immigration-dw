@@ -3,16 +3,16 @@
    Paleta inspirada no Canadá: vermelho maple, branco e azul-marinho.
    ============================================================ */
 :root{
-  --feather:#D52B1E; --mask:#FF8A80; --green-dk:#9E1B14; --tree:#A6192E;
-  --eel:#1F2937; --jeans:#0B3D66; --whale:#0A2E4D; --cardinal:#C0392B;
-  --bee:#F5C518; --fox:#E67E22; --beetle:#6E1423;
-  --snow:#FFFFFF; --polar:#F7F7F7; --swan:#E5E5E5; --hare:#AFAFAF; --wolf:#777777;
-  --night:#131F24;
-  --r-lg:24px; --r-md:16px;
+  --feather:#c92832; --mask:#f5d8da; --green-dk:#8c1720; --tree:#a71f2a;
+  --eel:#132036; --jeans:#27466c; --whale:#112c4e; --cardinal:#a51e28;
+  --bee:#d8ab43; --fox:#b76432; --beetle:#54213b;
+  --snow:#ffffff; --polar:#f5f6f7; --swan:#d9dfe6; --hare:#8a96a5; --wolf:#59687a;
+  --night:#0d1b2a;
+  --r-lg:18px; --r-md:12px;
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 html,body{ height:100%; background:#0d1418;
-  font-family:'Nunito',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--eel); overflow:hidden; }
+  font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; color:var(--eel); overflow:hidden; }
 
 /* ---------- Palco / escala ---------- */
 #pres{ position:fixed; inset:0; }
@@ -658,3 +658,322 @@ table.map td:first-child{ font-weight:900; }
 
 /* foco visível no botão — acessibilidade da própria apresentação */
 .duo-btn:focus-visible{ outline:4px solid var(--jeans); outline-offset:3px; }
+
+/* ============================================================
+   DIREÇÃO VISUAL 2026 — Canadá + engenharia de dados
+   Esta camada substitui o visual de aplicativo por uma linguagem
+   editorial/técnica, preservando a estrutura e a navegação do deck.
+   ============================================================ */
+#scaler{ background:#f7f8f8; box-shadow:0 28px 90px rgba(5,19,37,.42); }
+.slide{ background:#f7f8f8; padding:106px 76px 108px; isolation:isolate; }
+.slide:not(.intro):not(.trail-slide)::before{
+  content:""; position:absolute; inset:0; z-index:-1; opacity:.72; pointer-events:none;
+  background-image:linear-gradient(rgba(39,70,108,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(39,70,108,.055) 1px,transparent 1px);
+  background-size:38px 38px; mask-image:linear-gradient(to bottom,black 0%,black 80%,transparent 100%);
+}
+.slide:not(.intro):not(.trail-slide)::after{
+  content:"CANADA / DEV DATA"; position:absolute; right:76px; top:76px; z-index:0;
+  font:500 10px/1 'DM Mono',monospace; letter-spacing:.16em; color:var(--jeans);
+  padding-left:13px; border-left:3px solid var(--feather);
+}
+h1.title,h2.title,.ts-title,.scene-canada .ca-title,.splash-wordmark-text,.splash-title{
+  font-family:'Space Grotesk','Manrope',sans-serif;
+}
+.ob-chrome{ height:68px; padding:0 76px; border-bottom:1px solid rgba(39,70,108,.12); background:rgba(247,248,248,.94); }
+.ob-chrome::before{ content:"CA · DEV / DATA WAREHOUSE"; width:224px; flex:none; font:500 10px/1 'DM Mono',monospace; color:var(--jeans); letter-spacing:.13em; }
+.ob-bar{ height:5px; border-radius:0; background:#e1e5e9; }
+.ob-fill{ background:var(--feather); border-radius:0; }
+.ob-fill::after{ display:none; }
+.ob-cta{ padding:14px 76px 18px; border-top:1px solid rgba(39,70,108,.12); background:rgba(247,248,248,.96); }
+.duo-btn{ min-width:196px; border-radius:6px; box-shadow:none; font-size:13px; font-family:'DM Mono',monospace; letter-spacing:.08em; padding:13px 20px; }
+.duo-btn:hover{ box-shadow:none; transform:translateY(-2px); }
+.duo-btn:active{ box-shadow:none; transform:translateY(0); }
+.foot-back{ border:0; padding:10px 0; border-radius:0; color:var(--jeans); font:500 12px 'DM Mono',monospace; }
+.foot-count{ font:500 11px 'DM Mono',monospace; color:var(--wolf); }
+.toc-toggle{ top:16px; right:24px; width:34px; height:34px; border-radius:4px; box-shadow:none; background:var(--whale); color:#fff; font-size:15px; }
+.toc-panel{ width:360px; background:#f7f8f8; box-shadow:-16px 0 45px rgba(5,19,37,.24); }
+.toc-panel h4{ font-family:'DM Mono',monospace; color:var(--jeans); }
+.toc-item{ border-left:2px solid transparent; border-radius:0; }
+.toc-item.current{ background:#eef1f4; border-left-color:var(--feather); color:var(--whale); }
+.ob-stage{ gap:18px; position:relative; z-index:1; }
+.ob-speak{ gap:16px; align-items:center; }
+.ob-duo.sm.mascot{ width:70px; height:70px; background:var(--whale); border-radius:4px; font-size:38px; }
+.bubble{ max-width:940px; margin-bottom:8px; padding:13px 18px; border:1px solid #cfd7e0; border-left:4px solid var(--feather); border-radius:4px; box-shadow:none; background:rgba(255,255,255,.8); font-size:18px; line-height:1.42; }
+.bubble::before,.bubble::after{ display:none; }
+.bubble strong{ color:var(--cardinal); }
+.lead{ font-size:18px; }
+.tag{ border-radius:4px; padding:5px 9px; font-family:'DM Mono',monospace; font-weight:500; }
+.tag.wcag{ background:#e9eff5; color:var(--whale); }
+.grid{ gap:14px; }
+.card{ position:relative; padding:17px 18px 18px; border:1px solid #d3dbe4; border-radius:5px; border-bottom:4px solid var(--jeans); box-shadow:0 10px 20px rgba(17,44,78,.07); background:rgba(255,255,255,.9); overflow:hidden; }
+.card::before{ content:""; position:absolute; top:0; left:0; width:34px; height:3px; background:var(--feather); }
+.card .ico{ font-size:24px; margin-bottom:8px; }
+.card h3{ font-family:'Space Grotesk',sans-serif; font-size:18px; color:var(--whale); }
+.card p{ color:var(--wolf); font-size:13.5px; line-height:1.45; }
+.card.green,.card.blue,.card.red,.card.yellow,.card.purple{ border-color:#d3dbe4; border-bottom-color:var(--jeans); }
+.card.yellow{ border-bottom-color:var(--bee); }.card.red{border-bottom-color:var(--feather);}.card.purple{border-bottom-color:var(--beetle);}
+.q-grid{ gap:9px 14px; }
+.q-grid .q{ border:1px solid #d3dbe4; border-radius:4px; padding:10px 12px; background:rgba(255,255,255,.87); font-size:14px; box-shadow:0 5px 13px rgba(17,44,78,.045); }
+.q-grid .q b{ font-family:'DM Mono',monospace; color:var(--feather); }
+.chart-box{ position:relative; border:1px solid #cfd7e0; border-radius:5px; padding:12px; box-shadow:0 16px 28px rgba(17,44,78,.08); background:#fff; }
+.chart-box::before{ content:"FIGURE / OFFICIAL DATA"; position:absolute; top:8px; left:12px; z-index:1; font:500 9px 'DM Mono',monospace; letter-spacing:.08em; color:var(--jeans); }
+.chart-box img{ border-radius:2px; }
+.kv{ border-left:2px solid var(--feather); padding-left:18px; }
+.kv .k{ font-family:'DM Mono',monospace; font-weight:500; font-size:12px; color:var(--jeans); letter-spacing:.04em; text-transform:uppercase; }
+.kv .v{ color:var(--eel); font-size:15px; }
+.dw{ gap:12px; }
+.dw-fact{ border:1px solid #ccd6e0; border-top:4px solid var(--feather); border-bottom-width:1px; border-radius:5px; padding:16px; background:rgba(255,255,255,.9); box-shadow:0 12px 22px rgba(17,44,78,.07); }
+.dw-fact h3{ font-family:'DM Mono',monospace; color:var(--whale); font-size:16px; }
+.dw-fact .dim{ font-family:'DM Mono',monospace; color:var(--wolf); font-size:12px; }
+.dw-fact .shared{ border-radius:3px; background:#f5ead1; color:#755d1b; font-family:'DM Mono',monospace; }
+ul.duo-list li{ border:1px solid #d3dbe4; border-radius:4px; background:rgba(255,255,255,.84); font-size:15px; }
+ul.duo-list li .bullet{ border-radius:3px; background:var(--whale); font-family:'DM Mono',monospace; }
+
+/* Abertura: mapa abstrato, folha de maple e terminal. */
+.scene-canada{ position:relative; overflow:hidden; background:radial-gradient(circle at 80% 18%,#f4dbdd 0,transparent 24%),linear-gradient(135deg,#f6f6f4,#e9edf0); }
+.scene-canada::before{ content:""; position:absolute; inset:-10%; opacity:.5; background-image:linear-gradient(rgba(39,70,108,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(39,70,108,.12) 1px,transparent 1px); background-size:54px 54px; transform:skewY(-7deg); }
+.scene-canada::after{ content:"01  ON  ·  02  QC  ·  03  BC  ·  04  AB\A$  SELECT * FROM oportunidade_canada;"; white-space:pre; position:absolute; right:86px; bottom:60px; font:500 13px/1.9 'DM Mono',monospace; color:rgba(17,44,78,.6); }
+.scene-canada .ca-leaf{ z-index:1; font-size:104px; filter:drop-shadow(0 14px 20px rgba(169,31,42,.22)); }
+.scene-canada .ca-title{ z-index:1; font-size:48px; letter-spacing:-.05em; color:var(--whale); }
+.scene-canada .ca-sub{ z-index:1; max-width:650px; color:var(--wolf); font-size:18px; }
+.scene-canada .ca-hint{ z-index:1; color:var(--feather); font-family:'DM Mono',monospace; font-size:11px; }
+.scene-loader{ background:var(--night); }
+.scene-loader::before{ content:"ETL PIPELINE / VALIDATING SOURCES"; position:absolute; top:72px; left:76px; color:#c9d6e5; font:500 11px 'DM Mono',monospace; letter-spacing:.12em; }
+.scene-loader .dl-text,.scene-loader .dl-tip{ color:#e9eff5; }.scene-loader .dl-tip{ font-size:16px; }.scene-loader .dl-bar{ background:#304255; height:6px; border-radius:0; }.scene-loader .dl-bar i{ background:var(--feather); box-shadow:none; border-radius:0; }
+.scene-cover{ background:radial-gradient(circle at 82% 18%,#f3dcde 0,transparent 22%),#f7f8f8; }
+.scene-cover::before{ content:""; position:absolute; right:-130px; top:-130px; width:520px; height:520px; border:1px solid rgba(39,70,108,.19); border-radius:46% 54% 57% 43%; transform:rotate(26deg); box-shadow:0 0 0 36px rgba(39,70,108,.035),0 0 0 72px rgba(39,70,108,.025); }
+.scene-cover::after{ content:"CANADA\A DATA WAREHOUSE\A 2026.1"; white-space:pre; position:absolute; left:72px; bottom:58px; color:var(--jeans); font:500 10px/1.75 'DM Mono',monospace; letter-spacing:.13em; }
+.scene-cover .hero-duo.mascot{ width:180px; height:180px; font-size:112px; }.scene-cover .splash-wordmark-text{ font-size:32px; color:var(--whale); letter-spacing:-.045em; filter:none; }.scene-cover .splash-canada{ font:500 11px 'DM Mono',monospace; color:var(--feather); }.scene-cover .splash-tag{ color:var(--jeans); font-size:15px; }.scene-cover .splash-title{ color:var(--whale); font-size:36px; max-width:760px; }.scene-cover .splash-sub{ font-size:13px; }.scene-cover .hero-cta{ border-radius:5px; padding:14px 30px; font:500 13px 'DM Mono',monospace; box-shadow:none; }
+
+/* Sumário como rota de investigação, não trilha de aplicativo. */
+.slide.trail-slide{ padding:58px 76px; background:linear-gradient(120deg,#f7f8f8 0 68%,#eef1f4 68%); }
+.slide.trail-slide::before{ content:"CANADÁ\A 13 províncias e territórios\A 2 órgãos · 3 conjuntos\A 1 decisão orientada por dados"; white-space:pre; position:absolute; left:76px; top:180px; font:500 12px/2.1 'DM Mono',monospace; color:var(--jeans); letter-spacing:.04em; }
+.ts-head{ text-align:left; margin-left:390px; }.ts-eyebrow{ color:var(--feather); font-family:'DM Mono',monospace; font-weight:500; }.ts-title{ color:var(--whale); font-size:38px; letter-spacing:-.05em; }.ts-char.mascot{ left:92px; top:365px; background:var(--whale); border-radius:5px; box-shadow:0 18px 30px rgba(17,44,78,.2); }.trail2{ margin:25px 0 0 390px; gap:8px; }.trail2 li{ padding-left:0; gap:14px; }.tn2{ width:34px; height:34px; border-radius:3px; background:var(--whale); box-shadow:none; }.tn2 .ic{ font-size:16px; }.tn2.gold{ background:var(--feather); box-shadow:none; }.tn2.cur{ animation:none; }.tn2.cur::after{ inset:-5px; border-radius:3px; border:1px solid var(--feather); animation:none; }.tn2-label{ border:0; border-radius:0; border-bottom:1px solid #ccd6e0; background:transparent; padding:8px 0; width:370px; font-family:'Space Grotesk',sans-serif; font-size:16px; color:var(--whale); }
+
+@media (prefers-reduced-motion: reduce){ .scene-canada .ca-leaf{ animation:none; } }
+
+/* ============================================================
+   COMPONENTES DOS SLIDES CENTRAIS
+   Objetivo · Meta SMART · Bases · 10 perguntas · Schema.
+   Linguagem: rótulo em DM Mono, fio fino, acento vermelho.
+   ============================================================ */
+
+/* --- Caixa de enunciado (objetivo geral / meta SMART) --- */
+.goal-box{ position:relative; background:#fff; border:1px solid #d3dbe4; border-left:4px solid var(--feather);
+  border-radius:5px; padding:16px 20px 18px; box-shadow:0 12px 24px rgba(17,44,78,.07); }
+.goal-box.accent{ border-left-color:var(--bee); }
+.goal-label{ display:block; font:500 10px/1 'DM Mono',monospace; letter-spacing:.15em; color:var(--jeans); margin-bottom:9px; }
+.goal-text{ font-size:17.5px; line-height:1.48; color:var(--eel); font-weight:500; }
+.goal-text strong{ color:var(--cardinal); font-weight:700; }
+.goal-foot{ font-size:13px; line-height:1.45; color:var(--wolf); }
+.goal-foot b{ color:var(--whale); }
+.goal-foot code,.note code,.grain code{ font-family:'DM Mono',monospace; font-size:.92em; background:#eef2f6; padding:1px 5px; border-radius:3px; color:var(--whale); }
+
+/* --- Meta SMART: cinco colunas --- */
+.smart{ display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.smart-col{ background:rgba(255,255,255,.9); border:1px solid #d3dbe4; border-bottom:4px solid var(--jeans);
+  border-radius:5px; padding:13px 14px 15px; box-shadow:0 10px 20px rgba(17,44,78,.06); }
+.smart-l{ display:block; font:600 30px/1 'Space Grotesk',sans-serif; color:var(--feather); margin-bottom:6px; }
+.smart-col b{ display:block; font-size:14px; color:var(--whale); margin-bottom:4px; }
+.smart-col p{ font-size:12.5px; line-height:1.42; color:var(--wolf); }
+
+/* --- Bases: cadeia órgão → dataset → fato --- */
+.flow{ display:flex; align-items:center; gap:12px; }
+.pill{ font:500 11px/1 'DM Mono',monospace; letter-spacing:.09em; color:var(--whale);
+  background:#eef2f6; border:1px solid #cfd7e0; border-radius:999px; padding:7px 14px; }
+.pill.red{ background:var(--feather); border-color:var(--feather); color:#fff; }
+.flow-arrow{ color:var(--hare); font-size:15px; }
+.card.src h3{ margin-top:2px; }
+.src-org{ display:block; font:500 9.5px/1 'DM Mono',monospace; letter-spacing:.13em; color:var(--feather); margin-bottom:5px; }
+.vol{ display:flex; align-items:center; gap:7px; margin-top:11px; padding-top:10px; border-top:1px dashed #cfd7e0;
+  font:500 11px 'DM Mono',monospace; color:var(--wolf); flex-wrap:wrap; }
+.vol i{ color:var(--hare); font-style:normal; }
+.vol b{ color:var(--feather); }
+
+/* --- 10 perguntas agrupadas por fato --- */
+.qcols{ display:grid; grid-template-columns:1.12fr 1fr 1fr; gap:14px; align-items:start; }
+.qcol{ display:flex; flex-direction:column; gap:7px; }
+.qcol-h{ font:500 10.5px/1 'DM Mono',monospace; letter-spacing:.08em; color:#fff;
+  background:var(--whale); border-radius:3px; padding:6px 10px; align-self:flex-start; }
+.qcol-h.sal{ background:var(--feather); }
+.qcol-h.imi{ background:var(--jeans); }
+.qcol-h.hab{ background:var(--beetle); }
+.qcol-h.cross{ background:#f4ecd8; color:#7a5f18; border:1px solid #e0cf9f; font-weight:500; }
+.qcol-h.cross b{ font-weight:600; color:#5d470f; }
+.qcols .q,.qcross .q{ display:flex; gap:9px; align-items:flex-start;
+  border:1px solid #d3dbe4; border-radius:4px; padding:9px 11px; background:rgba(255,255,255,.88);
+  font-size:13px; line-height:1.38; color:var(--eel); box-shadow:0 5px 13px rgba(17,44,78,.045); }
+.qcols .q b,.qcross .q b{ font-family:'DM Mono',monospace; color:var(--feather); flex:none; }
+.qcross{ display:flex; flex-direction:column; gap:8px; border-top:1px dashed #cfd7e0; padding-top:12px; }
+.qcross-items{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* --- Diagrama da constelação --- */
+.const-svg{ display:block; width:100%; height:342px; }
+
+/* --- Grão / medidas / aditividade --- */
+.grain{ border:1px solid #d3dbe4; border-radius:5px; overflow:hidden; background:rgba(255,255,255,.9);
+  box-shadow:0 12px 24px rgba(17,44,78,.07); }
+.grain-row{ display:grid; grid-template-columns:168px 1fr 292px; gap:14px; align-items:center;
+  padding:11px 16px; border-top:1px solid #e6ebf0; font-size:12.8px; line-height:1.4; color:var(--eel); }
+.grain-row:first-child{ border-top:0; }
+.grain-head{ background:#eef2f6; font:500 9.5px 'DM Mono',monospace; letter-spacing:.13em; color:var(--jeans); padding:8px 16px; }
+.gf{ font-family:'DM Mono',monospace; font-size:13px; color:var(--feather); }
+.grain .good{ color:#1d6b43; } .grain .bad{ color:var(--cardinal); } .grain .warn{ color:#8a6412; }
+
+/* --- Nota de destaque --- */
+.note{ border:1px solid #e0cf9f; border-left:4px solid var(--bee); border-radius:5px;
+  background:#fdf8ec; padding:13px 17px 15px; }
+.note-h{ display:block; font:500 11px/1 'DM Mono',monospace; letter-spacing:.09em; color:#7a5f18; margin-bottom:7px; }
+.note p{ font-size:13px; line-height:1.5; color:#4a4133; }
+.note b{ color:var(--whale); }
+
+/* --- Catálogo das tabelas do DW --- */
+.tcat{ display:grid; grid-template-columns:1.32fr 1fr; gap:16px; align-items:start; }
+.tbox{ border:1px solid #d3dbe4; border-radius:5px; overflow:hidden;
+  background:rgba(255,255,255,.92); box-shadow:0 12px 24px rgba(17,44,78,.07); }
+.tbox-h{ display:flex; justify-content:space-between; gap:12px; background:#eef2f6;
+  font:500 9.5px 'DM Mono',monospace; letter-spacing:.12em; color:var(--jeans); padding:8px 14px; }
+.tbox-h.solo{ display:block; border:1px solid #d3dbe4; border-radius:5px; margin-bottom:10px; }
+.trow{ display:grid; grid-template-columns:1.32fr 1.2fr 42px; gap:10px; align-items:center;
+  padding:5px 14px; border-top:1px solid #eef1f4; }
+.trow .tn{ font-family:'DM Mono',monospace; font-size:11.5px; color:var(--whale); }
+.trow .tk{ font-family:'DM Mono',monospace; font-size:10.5px; color:var(--wolf); }
+.trow .tc{ font-family:'DM Mono',monospace; font-size:11px; color:var(--feather); text-align:right; }
+.trow-h{ border-top:0; padding-top:7px; padding-bottom:6px; }
+.trow-h span{ font:500 8.5px 'DM Mono',monospace; letter-spacing:.1em; color:var(--hare); }
+.trow-h span:last-child{ text-align:right; }
+.fcol{ display:flex; flex-direction:column; gap:9px; }
+.fbox{ border:1px solid #ccd6e0; border-top:4px solid var(--feather); border-radius:5px;
+  padding:9px 12px 10px; background:rgba(255,255,255,.92); box-shadow:0 10px 20px rgba(17,44,78,.06); }
+.fbox h4{ display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  font:500 13px 'DM Mono',monospace; color:var(--feather); margin-bottom:5px; }
+.fbox .fn{ font-size:10px; color:var(--wolf); }
+.fbox .fk{ font:500 9.5px/1.5 'DM Mono',monospace; color:var(--whale); }
+.fbox .fk i{ display:inline-block; min-width:52px; color:var(--hare); font-style:normal; }
+.fbox .fk.dimcols{ color:var(--hare); margin-top:3px; }
+
+/* --- Slide de base de dados (uma por fonte) --- */
+.base-head{ display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+  border-bottom:2px solid var(--feather); padding-bottom:9px; }
+.base-org{ font:500 9.5px 'DM Mono',monospace; letter-spacing:.12em; color:var(--feather);
+  width:100%; margin-bottom:-4px; }
+.base-tab{ font:600 23px 'Space Grotesk',sans-serif; color:var(--whale); letter-spacing:-.02em; }
+.base-url{ margin-left:auto; font:500 10px 'DM Mono',monospace; color:var(--wolf); }
+.base-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+.bcol{ border:1px solid #d3dbe4; border-radius:5px; background:rgba(255,255,255,.92);
+  padding:13px 15px 15px; box-shadow:0 10px 20px rgba(17,44,78,.06); }
+.bcol h4{ font:500 9.5px 'DM Mono',monospace; letter-spacing:.13em; color:var(--jeans); margin-bottom:9px; }
+.bcol p{ font-size:13px; line-height:1.5; color:var(--eel); }
+.bcol code{ font-family:'DM Mono',monospace; font-size:.9em; background:#eef2f6;
+  padding:1px 4px; border-radius:3px; color:var(--whale); }
+.flds{ display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
+.fld{ font:500 10px 'DM Mono',monospace; background:#eef2f6; border:1px solid #dfe5ec;
+  border-radius:3px; padding:3px 7px; color:var(--whale); }
+.bkv{ display:grid; grid-template-columns:118px 1fr; gap:10px; align-items:baseline;
+  padding:5px 0; border-top:1px solid #eef1f4; font-size:12.5px; color:var(--eel); }
+.bkv:first-of-type{ border-top:0; padding-top:0; }
+.bkv span:first-child{ font:500 8.5px 'DM Mono',monospace; letter-spacing:.09em; color:var(--hare); }
+.batt{ margin-top:11px; padding-top:10px; border-top:1px dashed #cfd7e0;
+  font-size:12.5px; line-height:1.45; color:var(--wolf); }
+.batt b{ color:var(--cardinal); }
+
+/* --- 10 perguntas agrupadas por número de bases cruzadas --- */
+.qleg{ display:flex; gap:20px; font:500 10px 'DM Mono',monospace; color:var(--wolf); letter-spacing:.05em; }
+.qleg span{ display:flex; align-items:center; gap:6px; }
+.qleg i,.qbs i{ width:8px; height:8px; border-radius:2px; display:inline-block; flex:none; }
+.qleg i.sal,.qbs i.sal{ background:var(--feather); }
+.qleg i.imi,.qbs i.imi{ background:var(--jeans); }
+.qleg i.hab,.qbs i.hab{ background:#1f7a6c; }   /* teal: separa de salário (vermelho) a 8px */
+.qtier{ display:grid; grid-template-columns:.88fr 1.12fr; gap:16px; align-items:start; }
+.qt{ display:flex; flex-direction:column; gap:6px; }
+.qt-h{ align-self:flex-start; font:500 9.5px 'DM Mono',monospace; letter-spacing:.11em;
+  border-radius:3px; padding:5px 10px; margin-bottom:1px; }
+.qt-h.one{ background:#eef2f6; color:var(--jeans); border:1px solid #d9e0e8; }
+.qt-h.two{ background:var(--whale); color:#fff; }
+.qt-h.three{ background:var(--feather); color:#fff; }
+.qt .q{ display:grid; grid-template-columns:18px 1fr auto; gap:9px; align-items:center;
+  border:1px solid #d3dbe4; border-radius:4px; padding:8px 11px; background:rgba(255,255,255,.9);
+  box-shadow:0 5px 13px rgba(17,44,78,.045); }
+.qt .q b{ font-family:'DM Mono',monospace; font-size:12px; color:var(--feather); }
+.qt .qx{ font-size:12.8px; line-height:1.36; color:var(--eel); }
+.qt .qx b{ font-family:inherit; font-size:inherit; color:var(--whale); font-weight:700; }
+.qt .qx i{ color:var(--wolf); }
+.qbs{ display:flex; gap:3px; }
+.qt.wide .q{ background:#fff; border-color:#cdd6e0; border-left:3px solid var(--feather); }
+.qtier3{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+
+/* --- Star Schema coluna a coluna (gerado a partir do DDL) --- */
+.tbls{ display:grid; gap:12px; align-items:start; }
+.tbls.c3{ grid-template-columns:repeat(3,1fr); }
+.tbls.flow4{ display:block; columns:4; column-gap:12px; }
+.tbls.flow4 .tbl{ break-inside:avoid; margin:0 0 10px; }
+.tbl{ border:1px solid #cfd7e0; border-radius:5px; background:#fff; overflow:hidden;
+  box-shadow:0 8px 18px rgba(17,44,78,.06); }
+.tbl-h{ display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  background:#eef2f6; padding:6px 9px; font:500 11px 'DM Mono',monospace; color:var(--whale);
+  border-bottom:1px solid #dde4ec; }
+.tbl-n{ font-size:8.5px; color:var(--hare); }
+.tbl.fato .tbl-h{ background:var(--feather); color:#fff; border-bottom-color:var(--feather); }
+.tbl.fato .tbl-n{ color:#f6c9cc; }
+.tbl.conf{ border-color:var(--feather); border-width:1.5px; }
+.col{ display:flex; align-items:baseline; gap:6px; padding:2.5px 9px;
+  font:500 9.5px/1.35 'DM Mono',monospace; border-top:1px solid #f2f5f8; }
+.col:first-of-type{ border-top:0; }
+.col .cn{ color:var(--eel); }
+.col .ct{ margin-left:auto; color:var(--hare); font-size:8.5px; white-space:nowrap; }
+.col .cr{ font-size:7.5px; letter-spacing:.06em; padding:1px 4px; border-radius:2px; flex:none; }
+.col .cr.pk{ background:var(--feather); color:#fff; }
+.col .cr.ak{ background:#f4e3b8; color:#7a5f18; }
+.col .cr.fk{ background:#dde6f0; color:var(--jeans); }
+.col.key .cn{ color:var(--whale); font-weight:600; }
+.col.fk .cn{ color:var(--jeans); }
+
+/* --- Diagramas Star Schema (fato ao centro, dimensões em volta) --- */
+.star-svg{ display:block; width:100%; height:398px; }
+
+/* --- EDA de caracterização e transformações/impacto --- */
+.eda3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:start; }
+.oltp{ border:1px solid #cfd7e0; border-left:4px solid var(--jeans); border-radius:5px;
+  background:rgba(255,255,255,.88); padding:10px 14px 12px; }
+.oltp-h{ display:block; font:500 9.5px/1 'DM Mono',monospace; letter-spacing:.13em;
+  color:var(--jeans); margin-bottom:6px; }
+.oltp p{ font-size:12.5px; line-height:1.45; color:var(--eel); }
+.oltp b{ color:var(--whale); }
+.oltp code,.bkv code,.batt code{ font-family:'DM Mono',monospace; font-size:.9em;
+  background:#eef2f6; padding:1px 4px; border-radius:3px; color:var(--whale); }
+.stat{ display:flex; align-items:baseline; gap:9px; padding:7px 0 9px; margin-bottom:3px;
+  border-bottom:1px solid #e6ebf0; }
+.stat b{ font:600 26px/1 'Space Grotesk',sans-serif; color:var(--feather); flex:none; }
+.stat span{ font-size:11.5px; line-height:1.3; color:var(--wolf); }
+.bkv i{ color:var(--hare); font-style:normal; }
+.batt b{ color:var(--cardinal); }
+
+/* --- Figuras de EDA (uma distribuição por fonte) --- */
+.figs{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:start; }
+.fig{ display:flex; flex-direction:column; gap:8px; }
+.fig .chart-box{ padding:9px; display:flex; align-items:center; justify-content:center;
+  height:248px; }
+/* cada figura ja tem legenda propria: o carimbo do .chart-box sobrepunha o
+   titulo interno do grafico */
+.fig .chart-box::before{ display:none; }
+.fig .chart-box img{ max-width:100%; max-height:100%; width:auto; height:auto;
+  object-fit:contain; display:block; }
+.fig figcaption{ font-size:11.5px; line-height:1.42; color:var(--wolf); }
+.fig figcaption b{ color:var(--whale); }
+
+
+/* --- Capa: identificação acadêmica --- */
+/* o .splash-title herda text-shadow pensado para texto claro sobre fundo
+   colorido; na capa clara isso borra o título. */
+.scene-cover .splash-title{ text-shadow:none; margin-top:14px; }
+.splash-inst{ font:500 9.5px/1.7 'DM Mono',monospace; letter-spacing:.14em;
+  color:var(--jeans); text-align:center; margin-bottom:10px; }
+.splash-equipe{ margin-top:16px; font-family:'Manrope',sans-serif; font-weight:700;
+  font-size:14.5px; color:var(--eel); }
+.scene-cover .splash-sub{ margin-top:3px; font-size:12px; color:var(--wolf); }
+.scene-cover .hero-duo.mascot{ width:120px; height:120px; font-size:74px; }
+.scene-cover .hero-cta{ margin-top:22px; }
+.scene-cover .splash-equipe,.scene-cover .splash-inst{ animation:none; opacity:0; }
+.scene-cover.show .splash-inst{ animation:wowRise .7s ease both .2s; }
+.scene-cover.show .splash-equipe{ animation:wowRise .7s ease both .88s; }
+.scene-cover.show .splash-sub{ animation:wowRise .7s ease both .98s; }
