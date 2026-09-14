@@ -4,14 +4,12 @@ Projeto da disciplina **Tópicos Avançados em Banco de Dados (IFAL)**. Integra 
 
 **Equipe:** Eliezir Moreira Peixoto Neto e Raphael Phillipe da Silva Silverio.
 
-> **Atenção:** as instruções da disciplina indicam trabalho em trio. Como este projeto será entregue em dupla, guardem a autorização do professor para apresentá-la se necessário.
-
 ## Objetivo e Meta SMART
 
 Construir um Data Warehouse em Oracle que integre **duas fontes institucionais** — Statistics Canada e Job Bank/ESDC — por meio de **três conjuntos de dados** e permita responder às 10 perguntas analíticas do plano **sem estimar valores ausentes**.
 
 - **S** — Construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
-- **M** — Apresentar modelo Star Schema, dicionários e script SQL que permitem responder às 10 perguntas.
+- **M** — Integrar os três conjuntos de dados em um modelo dimensional capaz de responder às 10 perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte.
 - **A** — Duas fontes institucionais e três conjuntos de dados já baixados e filtrados, com modelo viável em Oracle.
 - **R** — Apoiar a decisão de devs imigrantes sobre a melhor província.
 - **T** — Até 14 de dezembro de 2026.

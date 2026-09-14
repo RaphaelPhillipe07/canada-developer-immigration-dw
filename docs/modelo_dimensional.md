@@ -85,5 +85,5 @@ Observações:
 1. **Três fatos separados** — um tema distinto por fato, sem misturar granularidades (recomendação da aula: não misturar granularidades na mesma tabela fato).
 2. **Dimensões conformadas** — `dim_provincia` e `dim_tempo_censo` são reutilizadas entre fatos.
 3. **Surrogate keys em todas as dimensões** — as chaves naturais (`DGUID`, `NOC_CNP`, códigos StatCan) ficam como `AK` (alternate keys) para o ETL fazer o *lookup*.
-4. **Percentuais não são armazenados** — participação brasileira e percentuais habitacionais são calculados na camada de apresentação para evitar soma incorreta de fatos não aditivos.
+4. **Tratamento de percentuais** — a participação brasileira não é armazenada e é calculada na camada de apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais fornecidos oficialmente pelo Statistics Canada são armazenados em `fato_habitacao.vl_medida`, identificados por `dim_indicador_habitacao.tp_medida = 'PERCENTUAL'`, e tratados como medidas não aditivas.
 5. **Ausências preservadas** — onde não há salário provincial publicado, a linha não é inserida em `fato_salario`; consultas partem de `dim_provincia` com `LEFT JOIN` e exibem `N/A`. Nenhum valor é estimado e jurisdições sem salário não entram no indicador combinado.

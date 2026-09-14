@@ -5,7 +5,7 @@ Eliezir Moreira Peixoto Neto e Raphael Phillipe da Silva Silverio
 Até 14 de dezembro de 2026, desenvolver e documentar um Data Warehouse em Oracle integrando duas fontes institucionais (Statistics Canada e Job Bank/ESDC) por meio de três conjuntos de dados (imigração, habitação e salários NOC 21232), para comparar, entre as províncias e territórios canadenses, a distribuição de imigrantes brasileiros, a remuneração de desenvolvedores de software e a acessibilidade habitacional, respondendo às dez perguntas analíticas do plano com cargas idempotentes e sem estimar valores ausentes.
 
 *S (Específica):* construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
-*M (Mensurável):* responder às dez perguntas do plano com as métricas abaixo e comprovar a idempotência das cargas por auditoria.
+*M (Mensurável):* integrar os três conjuntos de dados em um modelo dimensional capaz de responder às dez perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte.
 *A (Atingível):* duas fontes institucionais e três conjuntos de dados já baixados e filtrados, com ETL previsto em Pentaho Data Integration.
 *R (Relevante):* apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense.
 *T (Temporal):* até 14 de dezembro de 2026.

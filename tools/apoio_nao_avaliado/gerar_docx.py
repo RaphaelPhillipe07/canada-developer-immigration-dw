@@ -281,7 +281,7 @@ table(
     ["Componente", "Descrição"],
     [
         ("S — Específica", "Construir um DW em Oracle com dados oficiais de imigração, salários e habitação."),
-        ("M — Mensurável", "Apresentar o modelo Star Schema, os dicionários e o script SQL que permitem responder às 10 perguntas do plano."),
+        ("M — Mensurável", "Integrar os três conjuntos de dados em um modelo dimensional capaz de responder às 10 perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte."),
         ("A — Atingível", "Duas bases no escopo mínimo + uma complementar, já baixadas e filtradas, com modelo viável em Oracle."),
         ("R — Relevante", "Apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense."),
         ("T — Temporal", "Até 14 de dezembro de 2026."),
@@ -545,7 +545,7 @@ table(
     ],
     widths=[1.5, 2.4, 2.6],
 )
-p("Participação brasileira (%) e percentuais habitacionais não são armazenados; são calculados na camada de apresentação (fatos não aditivos).")
+p("A participação brasileira (%) não é armazenada: é calculada na camada de apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais fornecidos oficialmente pelo Statistics Canada são armazenados em fato_habitacao.vl_medida, identificados por dim_indicador_habitacao.tp_medida = 'PERCENTUAL', e tratados como medidas não aditivas.")
 
 # ---------------------------------------------------------------- 15. DICIONÁRIO DW
 h1("15. Dicionário de Dados do Data Warehouse")
