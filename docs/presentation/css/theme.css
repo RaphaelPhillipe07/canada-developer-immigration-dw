@@ -977,3 +977,27 @@ ul.duo-list li .bullet{ border-radius:3px; background:var(--whale); font-family:
 .scene-cover.show .splash-inst{ animation:wowRise .7s ease both .2s; }
 .scene-cover.show .splash-equipe{ animation:wowRise .7s ease both .88s; }
 .scene-cover.show .splash-sub{ animation:wowRise .7s ease both .98s; }
+
+/* --- Capa estática ---------------------------------------------------------
+   A capa era a 3ª cena de uma sequência disparada por clique (folha -> loader
+   -> capa) e seus elementos entravam com animação escalonada de até 1,15s.
+   A sequência foi removida; sem ela, os delays só atrasavam a leitura e
+   deixavam a capa em branco no primeiro instante. Tudo renderiza direto. */
+.scene-cover .hero-duo, .scene-cover .splash-wordmark, .scene-cover .splash-inst,
+.scene-cover .splash-tag, .scene-cover .splash-title, .scene-cover .splash-equipe,
+.scene-cover .splash-sub, .scene-cover .hero-cta,
+.scene-cover.show .hero-duo, .scene-cover.show .splash-wordmark,
+.scene-cover.show .splash-inst, .scene-cover.show .splash-tag,
+.scene-cover.show .splash-title, .scene-cover.show .splash-equipe,
+.scene-cover.show .splash-sub, .scene-cover.show .hero-cta{
+  animation:none; opacity:1; transform:none;
+}
+
+/* --- Nota de cobertura (o que existe e o que falta em cada fonte) --- */
+.cob{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:2px; }
+.cob-i{ display:flex; align-items:flex-start; gap:11px; border:1px solid #d3dbe4;
+  border-left:3px solid var(--feather); border-radius:4px; padding:9px 12px;
+  background:rgba(255,255,255,.88); }
+.cob-n{ font:600 17px/1.15 'Space Grotesk',sans-serif; color:var(--feather); flex:none; padding-top:1px; }
+.cob-i p{ font-size:11.5px; line-height:1.4; color:var(--wolf); }
+.cob-i b{ color:var(--whale); }
