@@ -75,12 +75,19 @@ São duas fontes institucionais: Statistics Canada fornece os datasets de imigra
 ```bash
 # Scripts de apoio não avaliáveis
 python tools/apoio_nao_avaliado/eda_oltp.py
-python tools/apoio_nao_avaliado/gerar_docx.py
 
-# Abrir os slides
-cd presentation && python -m http.server 8765
-# acesse http://127.0.0.1:8765/index.html
+# Gerar o trabalho escrito: DOCX -> PDF -> cópia servida pelo GitHub Pages
+python tools/apoio_nao_avaliado/gerar_docx.py
+soffice --headless --convert-to pdf --outdir output/pdf docs/dw_canada.docx
+cp output/pdf/dw_canada.pdf docs/dw_canada.pdf
+
+# Abrir a página inicial (PDF + slides) localmente
+cd docs && python -m http.server 8765
+# acesse http://127.0.0.1:8765/
 ```
+
+> `docs/dw_canada.pdf` é a cópia publicada pelo GitHub Pages; `output/pdf/dw_canada.pdf`
+> é a saída da conversão. Regerar um sem copiar para o outro deixa a página desatualizada.
 
 ## Status das entregas
 

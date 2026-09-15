@@ -2,32 +2,106 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Data Warehouse de Oportunidades para Desenvolvedores Imigrantes no Canadá · IFAL</title>
-  <link rel="canonical" href="presentation/">
-  <meta http-equiv="refresh" content="0; url=presentation/">
-  <meta name="description" content="Apresentação do projeto de Data Warehouse — Tópicos Avançados em Banco de Dados, IFAL.">
+  <meta name="description" content="Entrega 1 do projeto de Data Warehouse — Tópicos Avançados em Banco de Dados, IFAL. Trabalho escrito em PDF e apresentação em slides.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{ color-scheme:light; }
-    body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-      background:#f7f8f8; color:#112c4e;
-      font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
-    main{ text-align:center; padding:32px 24px; max-width:560px; }
-    .leaf{ font-size:56px; line-height:1; }
-    h1{ margin:18px 0 6px; font-size:21px; letter-spacing:-.02em; }
-    p{ margin:0 0 22px; font-size:14px; line-height:1.5; color:#59687a; }
-    a{ display:inline-block; background:#c92832; color:#fff; text-decoration:none;
-      padding:13px 26px; border-radius:5px; font-size:13px; letter-spacing:.06em;
-      font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
-    a:hover{ filter:brightness(1.08); }
+    :root{
+      color-scheme:light;
+      --feather:#c92832; --whale:#112c4e; --eel:#132036; --jeans:#27466c;
+      --wolf:#59687a; --hare:#8a96a5; --swan:#d9dfe6; --polar:#f5f6f7; --snow:#fff;
+    }
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    body{
+      min-height:100vh; background:var(--polar); color:var(--eel);
+      font-family:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      display:flex; align-items:center; justify-content:center;
+      padding:40px 16px calc(40px + env(safe-area-inset-bottom,0px));
+    }
+    main{ width:100%; max-width:760px; }
+
+    /* ---------- cabeçalho ---------- */
+    header{ text-align:center; margin-bottom:34px; }
+    .leaf{ font-size:46px; line-height:1; }
+    .eyebrow{
+      display:inline-block; margin:14px 0 10px; padding:5px 12px; border-radius:999px;
+      background:rgba(201,40,50,.1); color:var(--feather);
+      font-family:'DM Mono',ui-monospace,Menlo,monospace; font-size:11px;
+      letter-spacing:.12em; text-transform:uppercase;
+    }
+    h1{ font-size:24px; line-height:1.25; letter-spacing:-.02em; color:var(--whale); }
+    header p{ margin-top:10px; font-size:14px; line-height:1.55; color:var(--wolf); }
+
+    /* ---------- opções ---------- */
+    .options{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+    @media (max-width:600px){ .options{ grid-template-columns:1fr; } }
+
+    .card{
+      display:flex; flex-direction:column; gap:10px;
+      background:var(--snow); text-decoration:none; color:inherit;
+      border:2px solid var(--swan); border-bottom-width:5px; border-radius:16px;
+      padding:24px 22px 22px;
+      transition:transform .1s ease, border-color .14s ease, box-shadow .14s ease;
+    }
+    .card:hover{ border-color:var(--feather); box-shadow:0 10px 26px rgba(17,44,78,.09); }
+    .card:active{ transform:translateY(3px); border-bottom-width:2px; margin-bottom:3px; }
+    .card:focus-visible{ outline:3px solid var(--jeans); outline-offset:3px; }
+
+    .icon{ font-size:30px; line-height:1; }
+    .kind{
+      font-family:'DM Mono',ui-monospace,Menlo,monospace; font-size:11px;
+      letter-spacing:.11em; text-transform:uppercase; color:var(--hare);
+    }
+    .card h2{ font-size:18px; letter-spacing:-.01em; color:var(--whale); }
+    .card p{ font-size:13.5px; line-height:1.55; color:var(--wolf); flex:1; }
+    .meta{
+      display:flex; align-items:center; gap:7px; margin-top:4px;
+      font-family:'DM Mono',ui-monospace,Menlo,monospace; font-size:11.5px; color:var(--hare);
+    }
+    .go{ margin-top:6px; font-weight:800; font-size:13px; letter-spacing:.06em; color:var(--feather); text-transform:uppercase; }
+
+    footer{ margin-top:30px; text-align:center; font-size:12.5px; line-height:1.7; color:var(--hare); }
+    footer a{ color:var(--jeans); text-decoration:none; border-bottom:1px solid var(--swan); }
+    footer a:hover{ border-bottom-color:var(--jeans); }
   </style>
 </head>
 <body>
   <main>
-    <div class="leaf">🍁</div>
-    <h1>Data Warehouse de Oportunidades para Desenvolvedores Imigrantes no Canadá</h1>
-    <p>Tópicos Avançados em Banco de Dados · IFAL · 2026.1<br>Redirecionando para a apresentação…</p>
-    <a href="presentation/">ABRIR A APRESENTAÇÃO</a>
+    <header>
+      <div class="leaf" aria-hidden="true">🍁</div>
+      <span class="eyebrow">Entrega 1 · 2026.1</span>
+      <h1>Data Warehouse de Oportunidades para Desenvolvedores Imigrantes no Canadá</h1>
+      <p>Tópicos Avançados em Banco de Dados · Sistemas de Informação · IFAL Maceió<br>
+         Eliezir Moreira Peixoto Neto e Raphael Phillipe da Silva Silverio</p>
+    </header>
+
+    <div class="options">
+      <a class="card" href="dw_canada.pdf">
+        <div class="icon" aria-hidden="true">📄</div>
+        <span class="kind">Trabalho escrito</span>
+        <h2>Documento em PDF</h2>
+        <p>Escopo, dicionário de dados das bases de origem e do DW, análise exploratória, modelo dimensional e o script Oracle completo no anexo.</p>
+        <div class="meta"><span>37 páginas</span><span aria-hidden="true">·</span><span>PDF</span></div>
+        <span class="go">Abrir o PDF →</span>
+      </a>
+
+      <a class="card" href="presentation/">
+        <div class="icon" aria-hidden="true">🖥️</div>
+        <span class="kind">Apresentação</span>
+        <h2>Slides interativos</h2>
+        <p>Deck usado na defesa da entrega: objetivo, meta SMART, bases de dados, análise exploratória, as 10 perguntas e o Star Schema.</p>
+        <div class="meta"><span>9 slides</span><span aria-hidden="true">·</span><span>Navegue com ← →</span></div>
+        <span class="go">Abrir os slides →</span>
+      </a>
+    </div>
+
+    <footer>
+      Fontes: Statistics Canada (Censo 2021) e Job Bank/ESDC (NOC 21232).<br>
+      <a href="https://github.com/RaphaelPhillipe07/canada-developer-immigration-dw">Repositório no GitHub</a>
+    </footer>
   </main>
 </body>
 </html>
