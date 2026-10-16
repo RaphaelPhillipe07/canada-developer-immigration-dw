@@ -22,8 +22,34 @@ CREATE TABLESPACE TS_DW_INDICES
     SEGMENT SPACE MANAGEMENT AUTO;
 
 -- ==============================
+-- OWNER / SCHEMA
+-- ==============================
+-- PRÉ-REQUISITO: executar por usuário com privilégio DBA.
+-- Cria o owner/schema do DW e concede os privilégios mínimos e quota.
+-- Ajuste a senha e o tablespace temporário conforme o ambiente.
+CREATE USER DW_CANADA IDENTIFIED BY "DwCanada#2026"
+    DEFAULT TABLESPACE TS_DW_DADOS
+    TEMPORARY TABLESPACE TEMP
+    QUOTA UNLIMITED ON TS_DW_DADOS
+    QUOTA UNLIMITED ON TS_DW_INDICES;
+
+GRANT CREATE SESSION  TO DW_CANADA;
+GRANT CREATE TABLE    TO DW_CANADA;
+GRANT CREATE SEQUENCE TO DW_CANADA;
+GRANT CREATE TRIGGER  TO DW_CANADA;
+GRANT CREATE INDEX    TO DW_CANADA;
+GRANT CREATE VIEW     TO DW_CANADA;
+
+-- A partir daqui, executar conectado como DW_CANADA (owner do schema),
+-- para que todos os objetos sejam criados dentro do schema DW_CANADA.
+ALTER SESSION SET CURRENT_SCHEMA = DW_CANADA;
+
+-- ==============================
 -- SEQUENCES
 -- ==============================
+-- As sequences de dimensão são consumidas pelos gatilhos BEFORE INSERT
+-- (ver seção GATILHOS) e podem ser chamadas explicitamente (ver DEMONSTRAÇÃO).
+-- As fatos usam PK composta pelas FKs e NÃO possuem sequence própria.
 
 CREATE SEQUENCE SEQ_DIM_PROVINCIA           START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_OCUPACAO            START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
@@ -35,9 +61,6 @@ CREATE SEQUENCE SEQ_DIM_PERIODO_IMIGRACAO   START WITH 1 INCREMENT BY 1 NOCACHE 
 CREATE SEQUENCE SEQ_DIM_TENENCIA            START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_INDICADOR_HABITACAO START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE SEQ_DIM_FONTE               START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_FATO_SALARIO            START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_FATO_IMIGRACAO          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_FATO_HABITACAO          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
 -- ==============================
 -- STAGING
@@ -246,7 +269,6 @@ CREATE TABLE dim_fonte (
 -- ==============================
 
 CREATE TABLE fato_salario (
-    sk_fato_salario       NUMBER(15)    CONSTRAINT NN_FATO_SALARIO_SK NOT NULL,
     sk_provincia          NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_PROVINCIA NOT NULL,
     sk_ocupacao           NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_OCUPACAO NOT NULL,
     sk_tempo_salario      NUMBER(10)    CONSTRAINT NN_FATO_SALARIO_SK_TEMPO NOT NULL,
@@ -262,9 +284,7 @@ CREATE TABLE fato_salario (
     fl_salario_anual      NUMBER(1),
     cd_regiao_origem      VARCHAR2(10),
     nm_regiao_origem      VARCHAR2(120),
-    CONSTRAINT PK_FATO_SALARIO PRIMARY KEY (sk_fato_salario)
-        USING INDEX TABLESPACE TS_DW_INDICES,
-    CONSTRAINT AK_FATO_SALARIO UNIQUE (sk_provincia, sk_ocupacao, sk_tempo_salario)
+    CONSTRAINT PK_FATO_SALARIO PRIMARY KEY (sk_provincia, sk_ocupacao, sk_tempo_salario)
         USING INDEX TABLESPACE TS_DW_INDICES,
     CONSTRAINT FK_FATO_SAL_DIM_PROVINCIA FOREIGN KEY (sk_provincia)
         REFERENCES dim_provincia (sk_provincia),
@@ -280,16 +300,13 @@ CREATE TABLE fato_salario (
 ) TABLESPACE TS_DW_DADOS;
 
 CREATE TABLE fato_imigracao (
-    sk_fato_imigracao    NUMBER(15) CONSTRAINT NN_FATO_IMIGRACAO_SK NOT NULL,
     sk_provincia         NUMBER(10) CONSTRAINT NN_FATO_IMIGRACAO_SK_PROVINCIA NOT NULL,
     sk_pais_nascimento   NUMBER(10) CONSTRAINT NN_FATO_IMIGRACAO_SK_PAIS NOT NULL,
     sk_periodo_imigracao NUMBER(10) CONSTRAINT NN_FATO_IMIGRACAO_SK_PERIODO NOT NULL,
     sk_tempo_censo       NUMBER(10) CONSTRAINT NN_FATO_IMIGRACAO_SK_TEMPO NOT NULL,
     sk_fonte             NUMBER(10) CONSTRAINT NN_FATO_IMIGRACAO_SK_FONTE NOT NULL,
     qt_imigrantes        NUMBER(12),
-    CONSTRAINT PK_FATO_IMIGRACAO PRIMARY KEY (sk_fato_imigracao)
-        USING INDEX TABLESPACE TS_DW_INDICES,
-    CONSTRAINT AK_FATO_IMIGRACAO UNIQUE (sk_provincia, sk_pais_nascimento, sk_periodo_imigracao, sk_tempo_censo)
+    CONSTRAINT PK_FATO_IMIGRACAO PRIMARY KEY (sk_provincia, sk_pais_nascimento, sk_periodo_imigracao, sk_tempo_censo)
         USING INDEX TABLESPACE TS_DW_INDICES,
     CONSTRAINT FK_FATO_IMIG_DIM_PROVINCIA FOREIGN KEY (sk_provincia)
         REFERENCES dim_provincia (sk_provincia),
@@ -305,16 +322,13 @@ CREATE TABLE fato_imigracao (
 ) TABLESPACE TS_DW_DADOS;
 
 CREATE TABLE fato_habitacao (
-    sk_fato_habitacao      NUMBER(15) CONSTRAINT NN_FATO_HABITACAO_SK NOT NULL,
     sk_provincia           NUMBER(10) CONSTRAINT NN_FATO_HABITACAO_SK_PROVINCIA NOT NULL,
     sk_tenencia            NUMBER(10) CONSTRAINT NN_FATO_HABITACAO_SK_TENENCIA NOT NULL,
     sk_indicador_habitacao NUMBER(10) CONSTRAINT NN_FATO_HABITACAO_SK_INDICADOR NOT NULL,
     sk_tempo_censo         NUMBER(10) CONSTRAINT NN_FATO_HABITACAO_SK_TEMPO NOT NULL,
     sk_fonte               NUMBER(10) CONSTRAINT NN_FATO_HABITACAO_SK_FONTE NOT NULL,
     vl_medida              NUMBER(15,2),
-    CONSTRAINT PK_FATO_HABITACAO PRIMARY KEY (sk_fato_habitacao)
-        USING INDEX TABLESPACE TS_DW_INDICES,
-    CONSTRAINT AK_FATO_HABITACAO UNIQUE (sk_provincia, sk_tenencia, sk_indicador_habitacao, sk_tempo_censo)
+    CONSTRAINT PK_FATO_HABITACAO PRIMARY KEY (sk_provincia, sk_tenencia, sk_indicador_habitacao, sk_tempo_censo)
         USING INDEX TABLESPACE TS_DW_INDICES,
     CONSTRAINT FK_FATO_HAB_DIM_PROVINCIA FOREIGN KEY (sk_provincia)
         REFERENCES dim_provincia (sk_provincia),
@@ -445,29 +459,40 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE TRIGGER TRG_FATO_SALARIO
-BEFORE INSERT ON fato_salario
-FOR EACH ROW
-WHEN (NEW.sk_fato_salario IS NULL)
-BEGIN
-    :NEW.sk_fato_salario := SEQ_FATO_SALARIO.NEXTVAL;
-END;
-/
+-- ==============================
+-- DEMONSTRAÇÃO DO USO DAS SEQUENCES
+-- ==============================
+-- As sequences SEQ_DIM_* são consumidas pelos gatilhos BEFORE INSERT
+-- (TRG_DIM_*) quando a carga não informa a chave substituta. Exemplo:
+-- o INSERT abaixo NÃO informa sk_provincia; o gatilho atribui
+-- SEQ_DIM_PROVINCIA.NEXTVAL automaticamente.
 
-CREATE OR REPLACE TRIGGER TRG_FATO_IMIGRACAO
-BEFORE INSERT ON fato_imigracao
-FOR EACH ROW
-WHEN (NEW.sk_fato_imigracao IS NULL)
-BEGIN
-    :NEW.sk_fato_imigracao := SEQ_FATO_IMIGRACAO.NEXTVAL;
-END;
-/
+INSERT INTO dim_provincia (cd_dguid, nm_provincia, sg_provincia_jobbank, nm_pais)
+VALUES ('2021A000235', 'Ontario', 'ON', 'Canada');
 
-CREATE OR REPLACE TRIGGER TRG_FATO_HABITACAO
-BEFORE INSERT ON fato_habitacao
-FOR EACH ROW
-WHEN (NEW.sk_fato_habitacao IS NULL)
-BEGIN
-    :NEW.sk_fato_habitacao := SEQ_FATO_HABITACAO.NEXTVAL;
-END;
-/
+-- Uso explícito da sequence (chamada direta a NEXTVAL).
+INSERT INTO dim_fonte (sk_fonte, cd_fonte, nm_fonte, ds_url, dt_extracao, ds_checksum)
+VALUES (SEQ_DIM_FONTE.NEXTVAL, 'JOB_BANK_2025', 'Job Bank/ESDC Wages',
+        'https://open.canada.ca/data/en/dataset/adad580f-76b0-4502-bd05-20c125de9116',
+        DATE '2026-09-14', NULL);
+
+COMMIT;
+
+-- Conferência: as chaves substitutas foram geradas pelas sequences.
+SELECT sk_provincia, cd_dguid, nm_provincia FROM dim_provincia;
+SELECT sk_fonte, cd_fonte, dt_extracao FROM dim_fonte;
+
+-- Carga de um fato com PK composta (sem sequence e sem chave substituta):
+-- as FKs que definem o grão identificam a linha.
+INSERT INTO fato_salario (
+    sk_provincia, sk_ocupacao, sk_tempo_salario, sk_disponibilidade_salario, sk_fonte,
+    vl_salario_minimo, vl_salario_mediano, vl_salario_maximo)
+VALUES (
+    (SELECT sk_provincia FROM dim_provincia WHERE cd_dguid = '2021A000235'),
+    (SELECT sk_ocupacao FROM dim_ocupacao WHERE cd_noc = 'NOC_21232'),
+    (SELECT sk_tempo_salario FROM dim_tempo_salario WHERE cd_periodo_referencia = '2023-2024'),
+    (SELECT sk_disponibilidade_salario FROM dim_disponibilidade_salario WHERE cd_disponibilidade = 'PROVINCIAL_PUBLICADO'),
+    (SELECT sk_fonte FROM dim_fonte WHERE cd_fonte = 'JOB_BANK_2025'),
+    30.29, 48.08, 77.40);
+
+COMMIT;

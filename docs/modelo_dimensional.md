@@ -72,6 +72,16 @@ Observações:
 | `fato_imigracao` | Província + país de nascimento + período de imigração + Censo | `qt_imigrantes` (contagem) | `qt_imigrantes` é aditiva. A **participação brasileira (%) não é armazenada** — é calculada no BI como `qt_imigrantes(Brazil) / qt_imigrantes(Total – Place of birth)`. |
 | `fato_habitacao` | Província + posse (tenure) + indicador habitacional + Censo | `vl_medida` (contagem ou percentual, conforme `dim_indicador_habitacao.tp_medida`) | Contagens são aditivas; percentuais são não aditivos — usar como valor pontual por província. |
 
+**Chaves primárias das fatos (correção):** cada fato usa **PK composta pelas FKs das dimensões que definem o grão** — e não uma chave substituta individual. As combinações são exatamente as que já estavam declaradas como `UNIQUE`:
+
+| Fato | PK composta (FKs do grão) | FKs de contexto (não fazem parte do grão) |
+|---|---|---|
+| `fato_salario` | `(sk_provincia, sk_ocupacao, sk_tempo_salario)` | `sk_disponibilidade_salario` (derivada da província), `sk_fonte` (constante da origem) |
+| `fato_imigracao` | `(sk_provincia, sk_pais_nascimento, sk_periodo_imigracao, sk_tempo_censo)` | `sk_fonte` (constante da origem) |
+| `fato_habitacao` | `(sk_provincia, sk_tenencia, sk_indicador_habitacao, sk_tempo_censo)` | `sk_fonte` (constante da origem) |
+
+A PK composta garante a unicidade do fato e a integridade referencial sem depender de uma surrogate key própria da fato; `sk_fonte` e `sk_disponibilidade_salario` permanecem como FKs de contexto, pois são funcionalmente dependentes do grão.
+
 ## 4. Mapeamento origem → destino (resumo)
 
 | Origem (dataset público) | Destino (DW) | Regra |
@@ -88,5 +98,8 @@ Observações:
 1. **Três fatos separados** — um tema distinto por fato, sem misturar granularidades (recomendação da aula: não misturar granularidades na mesma tabela fato).
 2. **Dimensões conformadas** — `dim_provincia` e `dim_tempo_censo` são reutilizadas entre fatos.
 3. **Surrogate keys em todas as dimensões** — as chaves naturais (`DGUID`, `NOC_CNP`, códigos StatCan) ficam como `AK` (alternate keys) para o ETL fazer o *lookup*.
-4. **Tratamento de percentuais** — a participação brasileira não é armazenada e é calculada na camada de apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais fornecidos oficialmente pelo Statistics Canada são armazenados em `fato_habitacao.vl_medida`, identificados por `dim_indicador_habitacao.tp_medida = 'PERCENTUAL'`, e tratados como medidas não aditivas.
+4. **Tratamento de percentuais (estratégia escolhida: armazenar percentuais publicados como não aditivos)** — há dois conceitos distintos de percentual no projeto, e a estratégia é única e documentada para cada um:
+   - **Participação brasileira (% derivada):** **não é armazenada** como coluna. É calculada na camada de apresentação como `qt_imigrantes(Brazil) / qt_imigrantes(Total – Place of birth)`, a partir dos numeradores e denominadores (contagens) já presentes em `fato_imigracao`.
+   - **Percentuais habitacionais (% publicados pelo Statistics Canada):** a estratégia escolhida é **armazenar os percentuais publicados** em `fato_habitacao.vl_medida`, identificando-os como **não aditivos** por `dim_indicador_habitacao.tp_medida = 'PERCENTUAL'` (as contagens correspondentes, com `tp_medida = 'CONTAGEM'`, também são armazenadas para validação). **Não** se recalcula o percentual a partir de numerador/denominador porque o Censo aplica arredondamento aleatório de base 5 a cada célula — o percentual recalculado divergiria do publicado.
 5. **Cobertura salarial explícita** — `fato_salario` recebe uma linha para cada uma das 13 jurisdições no recorte NOC 21232. `dim_disponibilidade_salario` diferencia `PROVINCIAL_PUBLICADO`, `APENAS_REGIONAL` e `INDISPONIVEL`; dados regionais não são comparados como provinciais e valores indisponíveis permanecem `NULL`. O indicador combinado filtra `fl_comparavel_provincial = 1`.
+6. **PK composta nas fatos** — as três fatos usam **PK composta pelas FKs que definem o grão** (ver seção 3), não uma surrogate key própria da fato. Isso torna a unicidade do fato explícita e elimina a chave substituta redundante das fatos.

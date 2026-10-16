@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Gera uma figura PNG do modelo dimensional para o relatório."""
+"""Gera uma figura PNG do modelo lógico/físico para o relatório."""
 
+import os
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -10,11 +11,31 @@ OUT = ROOT / "docs" / "figuras" / "modelo_constelacao.png"
 W, H = 1800, 1250
 img = Image.new("RGB", (W, H), "white")
 d = ImageDraw.Draw(img)
-font_path = "/System/Library/Fonts/Supplemental/Arial.ttf"
-bold_path = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+
+
+def _find(*candidates):
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return None
+
+
+font_path = _find(
+    r"C:\Windows\Fonts\arial.ttf",
+    "/System/Library/Fonts/Supplemental/Arial.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+)
+bold_path = _find(
+    r"C:\Windows\Fonts\arialbd.ttf",
+    "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+)
+
 
 def font(size, bold=False):
-    return ImageFont.truetype(bold_path if bold else font_path, size)
+    if font_path is None:
+        return ImageFont.load_default()
+    return ImageFont.truetype(bold_path or font_path, size)
 
 def centered(text, x, y, f, fill="#14213d"):
     box = d.textbbox((0, 0), text, font=f)
@@ -28,13 +49,13 @@ def box(x, y, w, h, title, lines, fact=False):
     title_size = 27 if len(title) <= 18 else 20
     centered(title, x + w / 2, y + 18, font(title_size, True), text)
     for i, line in enumerate(lines):
-        d.text((x + 20, y + 62 + i * 27), line, font=font(18, fact), fill=text)
+        d.text((x + 20, y + 62 + i * 27), line, font=font(16, fact), fill=text)
 
 def link(a, b):
     d.line((a, b), fill="#52616b", width=4)
 
-centered("Constelação de fatos: três Star Schemas com dimensões conformadas", W / 2, 32, font(35, True))
-centered("PK = chave primária · FK = chave estrangeira · cada ligação representa cardinalidade 1:N", W / 2, 82, font(20))
+centered("Modelo lógico/físico — constelação de fatos: três Star Schemas com dimensões conformadas", W / 2, 32, font(32, True))
+centered("PK composta nas fatos · FK = chave estrangeira · MED = medida · cada ligação representa cardinalidade 1:N", W / 2, 82, font(19))
 
 # coordinates
 facts = {"sal": (735, 245), "imig": (735, 555), "hab": (735, 865)}
@@ -61,9 +82,9 @@ box(1390, 515, 270, 120, "dim_tenencia", ["PK  sk_tenencia", "AK  cd_tenencia"])
 box(1390, 805, 270, 120, "dim_indicador_habitacao", ["PK  sk_indicador_habitacao", "AK  cd_indicador_habitacao"])
 box(765, 1080, 270, 120, "dim_tempo_censo", ["PK  sk_tempo_censo", "AK  nr_ano_censo"])
 
-box(735, 245, 330, 130, "fato_salario", ["PK  sk_fato_salario", "FK  provincia · ocupacao", "FK  tempo · disponibilidade · fonte"], True)
-box(735, 555, 330, 130, "fato_imigracao", ["PK  sk_fato_imigracao", "FK  provincia · pais · periodo", "FK  tempo_censo · fonte"], True)
-box(735, 865, 330, 130, "fato_habitacao", ["PK  sk_fato_habitacao", "FK  provincia · tenencia · indicador", "FK  tempo_censo · fonte"], True)
+box(735, 245, 330, 130, "fato_salario", ["PK  provincia · ocupacao · tempo", "FK  disponibilidade · fonte", "MED  low · median · high · quartis"], True)
+box(735, 555, 330, 130, "fato_imigracao", ["PK  provincia · pais · periodo · censo", "FK  fonte", "MED  qt_imigrantes"], True)
+box(735, 865, 330, 130, "fato_habitacao", ["PK  provincia · tenencia · indic · censo", "FK  fonte", "MED  vl_medida (cont/perc)"], True)
 
 OUT.parent.mkdir(parents=True, exist_ok=True)
 img.save(OUT, "PNG")

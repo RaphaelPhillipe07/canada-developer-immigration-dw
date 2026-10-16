@@ -319,7 +319,9 @@ p("Profissionais de desenvolvimento de software que pretendem imigrar para o Can
 
 # ---------------------------------------------------------------- 2 OBJETIVOS
 h1("2 Objetivos")
-p("Construir um Data Warehouse em Oracle que integre dados oficiais do Statistics Canada e do Job Bank/ESDC para comparar, entre as províncias e territórios canadenses, a distribuição de imigrantes brasileiros, a remuneração de desenvolvedores de software (NOC 21232) e a acessibilidade habitacional.")
+p("Desenvolver um Data Warehouse em Oracle que integre dados oficiais do Statistics Canada e do Job Bank/ESDC para comparar remuneração de desenvolvedores de software, distribuição de imigrantes nascidos no Brasil e indicadores habitacionais nas províncias e territórios canadenses, apoiando a seleção de destinos compatíveis com as prioridades dos usuários.")
+
+p("Hipótese que orienta a análise: as províncias com maiores salários para desenvolvedores de software não necessariamente apresentam o melhor equilíbrio entre remuneração, presença de comunidade brasileira e condições habitacionais.")
 
 p("Para alcançar esse objetivo geral, o trabalho persegue os seguintes objetivos específicos:")
 bullet("Modelar uma constelação de fatos composta por três Star Schemas integrados por dimensões conformadas e surrogate keys.")
@@ -331,17 +333,21 @@ bullet("Definir as 10 perguntas analíticas que o Data Warehouse deverá respond
 
 h2("2.1 META SMART E PERGUNTAS ESTRATÉGICAS")
 h3("2.1.1 Meta SMART")
+p("A meta SMART é consolidada em um único enunciado, voltado ao benefício do usuário final — e não às entregas do projeto:")
+p("Reduzir em 50%, até dezembro de 2026, o tempo médio necessário para comparar destinos canadenses — considerando remuneração, comunidade brasileira e condições habitacionais — por meio de um Data Warehouse em Oracle que integra dados oficiais do Statistics Canada e do Job Bank/ESDC.", bold=True)
 table(
     ["Componente", "Descrição"],
     [
-        ("S — Específica", "Construir um DW em Oracle com dados oficiais de imigração, salários e habitação."),
-        ("M — Mensurável", "Integrar os três conjuntos de dados em um modelo dimensional capaz de responder às 10 perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte."),
-        ("A — Atingível", "Duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com modelo viável em Oracle."),
-        ("R — Relevante", "Apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense."),
-        ("T — Temporal", "Até 14 de dezembro de 2026."),
+        ("S — Específica", "Comparar as 13 províncias e territórios canadenses por remuneração (NOC 21232), comunidade brasileira e acessibilidade habitacional."),
+        ("M — Mensurável", "Redução de 50% no tempo médio de comparação de destinos, medido contra a linha de base do processo manual (os mesmos indicadores hoje levantados em três arquivos separados)."),
+        ("A — Atingível", "Duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com modelo dimensional viável em Oracle."),
+        ("R — Relevante", "Beneficia diretamente desenvolvedores de software imigrantes que precisam escolher uma província compatível com suas prioridades."),
+        ("T — Temporal", "Até dezembro de 2026."),
     ],
     widths=[1.6, 4.9],
 )
+p("Construir o DW, apresentar o modelo e responder às dez perguntas são entregas e critérios de conclusão do projeto — não a meta em si. O benefício mensurável esperado para quem utiliza o sistema é a redução de 50% no tempo de comparação de destinos.")
+p("Referências temporais distintas: imigração e habitação são do Censo 2021; salários têm referência 2023–2024. O cruzamento compara indicadores de períodos diferentes, portanto não afirma simultaneidade nem causalidade. Limitações: (i) comunidade e moradia refletem 2021, enquanto o salário reflete 2023–2024, de modo que mudanças ocorridas nesse intervalo não são capturadas; (ii) o equilíbrio calculado é um indicador transversal, não uma série temporal.")
 
 h3("2.1.2 Perguntas estratégicas a serem respondidas pelo DW")
 p("As perguntas foram definidas priorizando o cruzamento entre fontes: sete das dez só podem ser respondidas combinando duas ou três bases. Esse é o argumento central do projeto — nenhuma das fontes, isoladamente, responde a essas perguntas, e é isso que justifica a construção de um Data Warehouse em vez da consulta avulsa a três arquivos.")
@@ -424,22 +430,25 @@ table(
 )
 
 h2("3.3 PRÉ-PROCESSAMENTO (ETL) E IMPACTO DAS TRANSFORMAÇÕES")
-p("Os arquivos brutos são preservados sem alteração física. Toda transformação ocorre em staging/DW; portanto, uma linha fora do recorte não é apagada, apenas deixa de ser carregada no fato correspondente.")
+p("Os arquivos brutos são preservados sem alteração física. Toda transformação ocorre em staging/DW; portanto, uma linha fora do recorte não é apagada — apenas deixa de ser carregada no fato correspondente. Cada alteração é analisada pelo antes/depois e pela limitação que introduz.")
 table(
-    ["Transformação", "Antes → Depois", "Justificativa / Impacto"],
+    ["Transformação", "Antes → Depois", "Impacto / limitação que a exclusão introduz"],
     [
-        ("Filtro Job Bank: NOC_CNP = NOC_21232", "44.376 → 86 registros", "Manter apenas a ocupação do escopo (Software developers and programmers)."),
-        ("Classificação da cobertura salarial", "86 → 13 jurisdições classificadas", "O DW preserva 9 salários provinciais, 1 caso apenas regional (PEI/ER1110) e 3 indisponíveis (territórios), sem usar regional como se fosse provincial."),
-        ("Filtro StatCan imigração: Age/Gender totais e Place of birth em {Brazil, Total – Place of birth}", "ZIP bruto externo (quantidade total não registrada) → 26 registros", "Garante numerador (Brazil) e denominador (Total) comparáveis, sem quebra por idade/gênero. Risco: não permite análises por idade/gênero; a contagem do bruto deve ser registrada se o ZIP for rebaixado."),
-        ("Filtro StatCan habitação: 13 províncias/territórios e Census year = 2021", "2.990 → 117 registros", "Remove CMAs/CAs e o Censo 2016; mantém o grão provincial do fato."),
-        ("Normalização geográfica", "nome inglês da província como chave de cruzamento", "Job Bank usa prov/ER_Code e StatCan usa DGUID; o nome em inglês é a chave comum. Quebec (inglês) ≠ Québec (francês, não usado). Risco: mudança de grafia pode impedir a junção; o ETL deve registrar linhas sem correspondência."),
-        ("Tratamento de cobertura salarial", "provincial / regional / indisponível", "O status é registrado em fato_salario; valores ficam NULL quando indisponíveis e o código/nome da região é preservado quando houver somente dado regional."),
-        ("DGUID canônico", "1 DGUID por jurisdição", "Evita duplicidade geográfica (ex.: Yukon)."),
-        ("Percentuais", "participação derivada; habitação armazenada", "Participação brasileira é calculada na apresentação; percentuais oficiais de habitação são armazenados como medidas não aditivas."),
+        ("Job Bank: NOC_CNP = NOC_21232", "44.376 → 86 registros", "Mantém apenas a ocupação do escopo; as outras 515 ocupações saem da análise."),
+        ("Job Bank: Reference_Period = 2023-2024", "86 → 32 registros", "Elimina os recortes 2024 (25) e NA (29); deixa de ser possível comparar releases de salário entre períodos."),
+        ("Job Bank: nível provincial (ER + 2 dígitos)", "32 → 9 provinciais publicados", "Dos 86 registros de NOC 21232, 1 é nacional (ER00), 9 são provinciais e 76 são regionais (ER + 4 dígitos). Excluir o nível regional impede comparações entre cidades ou regiões econômicas — o DW compara províncias/territórios, não CMAs/CAs."),
+        ("Job Bank: territórios e PEI", "PEI regional (ER1110) + 3 territórios", "PEI é preservado como APENAS_REGIONAL (ER1110, nunca promovido a provincial); Yukon, NWT e Nunavut ficam INDISPONIVEL. Nenhum valor regional é usado como se fosse provincial."),
+        ("StatCan imigração: Age/Gender = totais e Place of birth ∈ {Brazil, Total – Place of birth}", "tabela completa → 26 registros", "Usar totais de idade e gênero impede segmentações por esses atributos (ex.: brasileiros por faixa etária ou sexo). Aceito porque o escopo é comparar províncias."),
+        ("StatCan habitação: 13 províncias/territórios", "2.990 → 117 registros", "Remove CMAs/CAs e demais geografias, mantendo o grão provincial do fato."),
+        ("StatCan habitação: Census year = 2021", "(2016 + 2021) → 2021", "Excluir o Censo 2016 elimina a possibilidade de analisar a evolução habitacional entre censos; a comparação passa a ser transversal (um censo)."),
+        ("Normalização geográfica", "nome em inglês como chave de cruzamento", "Job Bank usa prov/ER_Code e StatCan usa DGUID; o nome em inglês é a chave comum (Quebec ≠ Québec). O ETL deve registrar linhas sem correspondência."),
+        ("Percentuais", "participação derivada; habitação armazenada", "Participação brasileira é calculada na apresentação; percentuais oficiais de habitação são armazenados como medidas não aditivas (ver 6.1.3)."),
     ],
-    widths=[1.9, 1.6, 3.0],
+    widths=[1.7, 1.5, 3.3],
+    font_size=9,
 )
-p("Impacto geral: o Job Bank é reduzido de 44.376 registros a 13 situações de cobertura para NOC 21232: 9 provinciais, 1 apenas regional e 3 indisponíveis. A habitação cai de 2.990 para 117 registros; a imigração usa 26 registros. Nenhuma linha é excluída dos brutos — apenas filtrada nas camadas seguintes. A redução geográfica introduz viés de cobertura: resultados provinciais não representam CMAs/CAs; salários apenas regionais são identificados e não comparados como provinciais.")
+p("Caminho salarial completo: dos 86 registros de NOC 21232, 1 é nacional (ER00), 9 são provinciais (ER + 2 dígitos, todos com salário publicado no período 2023-2024) e 76 são regionais (ER + 4 dígitos). O filtro por período (2023-2024) mantém 32 registros (1 nacional + 9 provinciais + 22 regionais); o filtro por nível geográfico mantém as 9 provinciais; PEI (ER1110) fica como APENAS_REGIONAL e os 3 territórios como INDISPONIVEL — 13 situações de cobertura em fato_salario.")
+p("Impacto geral: nenhuma linha é excluída dos brutos — apenas filtrada nas camadas seguintes. A redução geográfica introduz viés de cobertura: resultados provinciais não representam CMAs/CAs; salários apenas regionais são identificados e não comparados como provinciais.")
 picture("fig_salario_vs_brasileiros.png")
 page_break()
 
@@ -516,6 +525,23 @@ table(
 p("Para core housing need (inquilinos), destacam-se Nunavut (37,3%), Ontário (24,9%) e Colúmbia Britânica (24,7%); Quebec tem o menor percentual entre inquilinos (11,9%).")
 picture("fig_moradia_inquilinos.png")
 
+h2("4.4 VERIFICAÇÕES DE QUALIDADE DOS DADOS")
+p("Além da leitura das distribuições, a EDA aplica verificações objetivas de qualidade em cada base: duplicidades pela chave natural, nulos por campo, consistência entre valores e faixas esperadas.")
+table(
+    ["Verificação", "Job Bank (44.376)", "Imigração (26)", "Habitação (117)"],
+    [
+        ("Duplicidades pela chave natural", "0 (NOC + região + período + flag anual)", "0 (DGUID + idade + gênero + país)", "0 (DGUID + ano + indicador)"),
+        ("Nulos em campos identificadores", "0", "0", "0"),
+        ("Nulos em medidas", "Low 20.301 · Median 20.012 · High 20.288 · Média 30.540 · Q1 30.670 · Q3 30.667 · benefício 41.736", "0", "0"),
+        ("Consistência entre valores", "low ≤ median ≤ high: 24.059 OK · 1 violação", "soma dos períodos == Immigrants[3] em 8/26 (dif. máx. 10)", "—"),
+        ("Valores fora do intervalo", "salário/hora > 300: 0 · % benefício fora de [0,100]: 0", "contagens negativas: 0", "percentuais fora de [0,100]: 0 · contagens negativas: 0"),
+        ("Estatística descritiva complementar", "mediana salarial: mín 40,87 · máx 52,40 · média 45,96 · desvio 3,71", "—", "inquilinos em moradia inacessível: mín 5,2 · máx 38,4 · média 28,7 · desvio 9,4"),
+    ],
+    widths=[1.7, 1.7, 1.6, 1.5],
+    font_size=8,
+)
+p("Observações: (i) a única violação de low ≤ median ≤ high ocorre em NOC_31101 (PEI, ER1110, referência anual, fonte CIHI 2023-24), fora do recorte NOC 21232 — no recorte a consistência é total (9/9); o valor é preservado como vem da fonte, sem correção. (ii) Os nulos salariais do Job Bank (≈45% em low/median/high) são explicados por Wage_Comment_E e não são imputados. (iii) Na imigração, a soma dos períodos fecha com Immigrants[3] em apenas 8/26 linhas porque o Censo 2021 arredonda cada célula em base 5; o DW carrega as duas medidas como vêm da fonte e não recalcula o total.")
+
 page_break()
 
 
@@ -523,65 +549,85 @@ page_break()
 h1("5 Dicionário de Dados")
 
 h2("5.1 BASE JOB BANK / ESDC")
-p("CSV UTF-8 com BOM, 22 colunas e 44.376 registros. Domínio de prov: NAT, NL, PEI, NS, NB, QC, ON, MB, SK, AB, BC, YK, NWT, NU. ER_Code: ER00 = Canadá; ER + 2 dígitos = província/território; ER + 4 dígitos = região econômica.")
+p("CSV UTF-8 com BOM, 22 colunas e 44.376 registros. Domínio de prov: NAT, NL, PEI, NS, NB, QC, ON, MB, SK, AB, BC, YK, NWT, NU. ER_Code: ER00 = Canadá; ER + 2 dígitos = província/território; ER + 4 dígitos = região econômica. Cada coluna é listada individualmente, com nome completo, tipo, descrição e exemplo.")
 table(
-    ["Campo", "Tipo", "Descrição / Domínio"],
+    ["Campo", "Tipo", "Descrição / Domínio", "Exemplo"],
     [
-        ("NOC_CNP", "Texto", "Código NOC da ocupação (ex.: NOC_21232)."),
-        ("NOC_Title_eng / NOC_Title_fra", "Texto", "Título da ocupação em inglês/francês."),
-        ("prov", "Texto", "Código da província/território ou NAT (nacional)."),
-        ("ER_Code_Code_RE / ER_Name / Nom_RE", "Texto", "Código e nome da região econômica (inglês/francês)."),
-        ("Low_Wage_Salaire_Minium", "Numérico", "Salário mínimo; vazio quando não publicado."),
-        ("Median_Wage_Salaire_Median", "Numérico", "Salário mediano; vazio quando não publicado."),
-        ("High_Wage_Salaire_Maximal", "Numérico", "Salário máximo; vazio quando não publicado."),
-        ("Average_Wage_Salaire_Moyen", "Numérico", "Salário médio."),
-        ("Quartile1_Wage_Salaire_Quartile1 / Quartile3", "Numérico", "1º e 3º quartis salariais."),
-        ("Source2025_NHQ", "Texto", "Fonte do dado (LFS 2023-24…, SAE 2024…, Census 2021…, N/A)."),
-        ("Data_Source_E / Data_Source_F", "Texto", "Descrição da fonte (inglês/francês)."),
-        ("Reference_Period", "Texto", "2021, 2023-2024, 2024 ou NA."),
-        ("Revision_Date_Date_revision", "Data", "Data de revisão (YYYY-MM-DD)."),
-        ("Annual_Wage_Flag_Salaire_annuel", "Inteiro", "0 = por hora; 1 = anual."),
-        ("Wage_Comment_E / Wage_Comment_F", "Texto", "Motivo de publicação/ausência do salário."),
-        ("EmployeesWithNonWageBenefit_Pct", "Numérico", "% de empregados com benefícios não salariais."),
+        ("NOC_CNP", "Texto", "Código NOC da ocupação (516 códigos distintos no arquivo).", "NOC_21232"),
+        ("NOC_Title_eng", "Texto", "Título da ocupação em inglês.", "Software developers and programmers"),
+        ("NOC_Title_fra", "Texto", "Título da ocupação em francês.", "Développeurs/développeuses et programmeurs/programmeuses de logiciels"),
+        ("prov", "Texto", "Código da província/território ou NAT (nacional).", "ON"),
+        ("ER_Code_Code_RE", "Texto", "Código da região econômica (ER00 = Canadá; ER + 2 dígitos = província; ER + 4 dígitos = região econômica).", "ER1010"),
+        ("ER_Name", "Texto", "Nome da região econômica em inglês.", "Avalon Peninsula"),
+        ("Nom_RE", "Texto", "Nome da região econômica em francês.", "Avalon Peninsula"),
+        ("Low_Wage_Salaire_Minium", "Numérico (texto)", "Salário mínimo em CAD/hora (ou anual, conforme flag); vazio quando não publicado.", "30,77"),
+        ("Median_Wage_Salaire_Median", "Numérico (texto)", "Salário mediano em CAD/hora (ou anual); vazio quando não publicado.", "43,75"),
+        ("High_Wage_Salaire_Maximal", "Numérico (texto)", "Salário máximo em CAD/hora (ou anual); vazio quando não publicado.", "74,52"),
+        ("Average_Wage_Salaire_Moyen", "Numérico (texto)", "Salário médio; vazio quando não publicado.", "46,26"),
+        ("Quartile1_Wage_Salaire_Quartile1", "Numérico (texto)", "1º quartil salarial; vazio quando não publicado.", "35,71"),
+        ("Quartile3_Wage_Salaire_Quartile3", "Numérico (texto)", "3º quartil salarial; vazio quando não publicado.", "54,49"),
+        ("Source2025_NHQ", "Texto", "Fonte/levantamento do dado (LFS 2023-24…, SAE 2024…, Census 2021…, N/A).", "LFS 2023-24 PR NOC5"),
+        ("Data_Source_E", "Texto", "Descrição da fonte em inglês.", "Labour Force Survey"),
+        ("Data_Source_F", "Texto", "Descrição da fonte em francês.", "Enquête sur la population active"),
+        ("Reference_Period", "Texto", "Período de referência dos salários (2021, 2023-2024, 2024 ou NA).", "2023-2024"),
+        ("Revision_Date_Date_revision", "Data (texto)", "Data de revisão do dado (YYYY-MM-DD).", "2025-11-19"),
+        ("Annual_Wage_Flag_Salaire_annuel", "Inteiro (texto)", "0 = por hora; 1 = anual.", "0"),
+        ("Wage_Comment_E", "Texto", "Motivo de publicação/ausência do salário (inglês).", "Due to data limitations…"),
+        ("Wage_Comment_F", "Texto", "Motivo de publicação/ausência do salário (francês).", "En raison des limites…"),
+        ("EmployeesWithNonWageBenefit_Pct", "Numérico (texto)", "% de empregados com benefícios não salariais (0–100 ou vazio).", "94,8"),
     ],
-    widths=[2.3, 0.9, 3.3],
+    widths=[2.3, 1.0, 2.4, 1.6],
+    font_size=9,
 )
 
 h2("5.2 BASE STATISTICS CANADA — IMIGRAÇÃO (98-10-0307-01)")
-p("Extração filtered/statcan_98100307_brazil_provinces_territories.csv: 26 registros (13 províncias × Brazil e Total – Place of birth), com Age (8D) = Total - Age e Gender (3) = Total - Gender. Cada medida é seguida de uma coluna Symbol (qualidade/supressão).")
+p("Extração filtered/statcan_98100307_brazil_provinces_territories.csv: 26 registros (13 províncias × Brazil e Total – Place of birth), com Age (8D) = Total - Age e Gender (3) = Total - Gender. As colunas de medida compartilham o nome completo 'Immigrant status and period of immigration (11):' seguido do rótulo e do índice [1] a [11] (ex.: 'Immigrant status and period of immigration (11):Immigrants[3]'); na tabela abaixo cada coluna é listada individualmente com esse prefixo abreviado como 'Immigrant status…:'. Cada medida é seguida por uma coluna Symbol homônima.")
 table(
-    ["Campo", "Tipo", "Descrição / Domínio"],
+    ["Campo", "Tipo", "Descrição / Domínio", "Exemplo"],
     [
-        ("REF_DATE", "Inteiro", "Ano do Censo (2021)."),
-        ("GEO / DGUID", "Texto", "Nome em inglês e DGUID da província/território (ex.: 2021A000235)."),
-        ("Age (8D) / Gender (3)", "Texto", "Recortes usados: Total - Age e Total - Gender."),
-        ("Place of birth (290)", "Texto", "Brazil ou Total – Place of birth."),
-        ("Coordinate", "Texto", "Código de hierarquia geográfica do Censo."),
-        ("Immigrant status…: Total[1] / Non-immigrants[2] / Immigrants[3]", "Inteiro", "População total, não imigrantes e total de imigrantes."),
-        ("…: Before 1980[4] … 2011 to 2021[8]", "Inteiro", "Imigrantes por período de chegada (partições de Immigrants[3]; a soma não fecha exatamente por causa do arredondamento de base 5 do Censo)."),
-        ("…: 2011 to 2015[9] / 2016 to 2021[10]", "Inteiro", "Subdivisões do período 2011–2021."),
-        ("…: Non-permanent residents[11]", "Inteiro", "Residentes não permanentes."),
-        ("Symbol", "Texto", "Símbolo de qualidade/supressão (vazio na extração)."),
+        ("REF_DATE", "Inteiro", "Ano de referência do Censo.", "2021"),
+        ("GEO", "Texto", "Nome da província/território em inglês (13 jurisdições).", "Ontario"),
+        ("DGUID", "Texto", "Identificador geográfico único do Censo.", "2021A000235"),
+        ("Age (8D)", "Texto", "Faixa etária (recorte usado: Total - Age).", "Total - Age"),
+        ("Gender (3)", "Texto", "Gênero (recorte usado: Total - Gender).", "Total - Gender"),
+        ("Place of birth (290)", "Texto", "País de nascimento (Brazil ou Total – Place of birth).", "Brazil"),
+        ("Coordinate", "Texto", "Código de hierarquia geográfica do Censo.", "2.1.1.64"),
+        ("Immigrant status…: Total[1]", "Inteiro", "População total.", "502.100"),
+        ("Immigrant status…: Non-immigrants[2]", "Inteiro", "Não imigrantes.", "482.610"),
+        ("Immigrant status…: Immigrants[3]", "Inteiro", "Total de imigrantes.", "14.250"),
+        ("Immigrant status…: Before 1980[4]", "Inteiro", "Imigrantes chegados antes de 1980.", "90"),
+        ("Immigrant status…: 1980 to 1990[5]", "Inteiro", "Chegados entre 1980 e 1990.", "75"),
+        ("Immigrant status…: 1991 to 2000[6]", "Inteiro", "Chegados entre 1991 e 2000.", "120"),
+        ("Immigrant status…: 2001 to 2010[7]", "Inteiro", "Chegados entre 2001 e 2010.", "250"),
+        ("Immigrant status…: 2011 to 2021[8]", "Inteiro", "Chegados entre 2011 e 2021.", "305"),
+        ("Immigrant status…: 2011 to 2015[9]", "Inteiro", "Subdivisão do período 2011–2021.", "120"),
+        ("Immigrant status…: 2016 to 2021[10]", "Inteiro", "Subdivisão do período 2011–2021.", "185"),
+        ("Immigrant status…: Non-permanent residents[11]", "Inteiro", "Residentes não permanentes.", "5"),
+        ("Symbol (×11)", "Texto", "Uma coluna Symbol após cada uma das 11 medidas; símbolo de qualidade/supressão (vazio na extração).", "—"),
     ],
-    widths=[2.6, 0.8, 3.1],
+    widths=[2.6, 0.8, 2.7, 1.0],
+    font_size=9,
 )
 
 h2("5.3 BASE STATISTICS CANADA — HABITAÇÃO (98-10-0258-01)")
-p("Extração filtered/statcan_98100258_housing_provinces_territories.csv: 117 registros (13 províncias × 9 indicadores × Censo 2021).")
+p("Extração filtered/statcan_98100258_housing_provinces_territories.csv: 117 registros (13 províncias × 9 indicadores × Censo 2021). Cada coluna é listada individualmente.")
 table(
-    ["Campo", "Tipo", "Descrição / Domínio"],
+    ["Campo", "Tipo", "Descrição / Domínio", "Exemplo"],
     [
-        ("REF_DATE / Census year (2)", "Inteiro/Texto", "2021 (recorte usado)."),
-        ("GEO / DGUID", "Texto", "Província/território e DGUID."),
-        ("Housing indicators (9)", "Texto", "Total, Adequacy, Affordability, Core housing need, Suitability e versões Percent of households…."),
-        ("Coordinate", "Texto", "Código de hierarquia do Censo."),
-        ("Tenure (4):Total - Tenure[1]", "Inteiro", "Total de domicílios."),
-        ("Tenure (4):Owner[2]", "Inteiro", "Domicílios de proprietários."),
-        ("Tenure (4):Renter[3]", "Inteiro", "Domicílios de inquilinos."),
-        ("Tenure (4):Dwelling provided by…[4]", "Inteiro", "Moradias fornecidas pelo governo local/First Nation/Indian band."),
-        ("Symbol", "Texto", "Símbolo de qualidade/supressão."),
+        ("REF_DATE", "Inteiro", "Ano de referência.", "2021"),
+        ("GEO", "Texto", "Nome da geografia em inglês (13 províncias/territórios no recorte).", "Ontario"),
+        ("DGUID", "Texto", "Identificador geográfico único do Censo.", "2021A000235"),
+        ("Census year (2)", "Texto", "Ano do Censo (recorte: 2021).", "2021"),
+        ("Housing indicators (9)", "Texto", "Indicador habitacional (9 valores; ver lista completa no dicionário de origem).", "Affordability: unaffordable housing"),
+        ("Coordinate", "Texto", "Código de hierarquia do Censo.", "54.1.6"),
+        ("Tenure (4):Total - Tenure[1]", "Inteiro", "Total de domicílios.", "1.312.095"),
+        ("Tenure (4):Owner[2]", "Inteiro", "Domicílios de proprietários.", "656.545"),
+        ("Tenure (4):Renter[3]", "Inteiro", "Domicílios de inquilinos.", "655.555"),
+        ("Tenure (4):Dwelling provided by…[4]", "Inteiro", "Moradias fornecidas pelo governo local/First Nation/Indian band.", "0"),
+        ("Symbol (×4)", "Texto", "Uma coluna Symbol após cada medida de Tenure; símbolo de qualidade/supressão.", "—"),
     ],
-    widths=[2.3, 0.8, 3.4],
+    widths=[2.4, 0.8, 2.8, 1.2],
+    font_size=9,
 )
 page_break()
 
@@ -611,21 +657,22 @@ _desc = {
 
 
 def _papel(col, pk, ak, fks):
-    if col == pk:
-        return "PK"
+    roles = []
+    if col in pk:
+        roles.append("PK")
     if col in fks:
-        return "FK → %s" % fks[col]
+        roles.append("FK → %s" % fks[col])
     if col in ak:
-        return "AK"
-    return ""
+        roles.append("AK")
+    return " · ".join(roles)
 
 
 def _dicionario(prefixo):
     linhas = []
     for m in re.finditer(r"CREATE TABLE (%s\w+) \((.*?)\n\) TABLESPACE" % prefixo, _ddl, re.S):
         nome, corpo_t = m.group(1), m.group(2)
-        pk = re.search(r"PRIMARY KEY \((\w+)\)", corpo_t)
-        pk = pk.group(1) if pk else ""
+        pk = re.search(r"PRIMARY KEY \(([^)]+)\)", corpo_t)
+        pk = {a.strip() for a in pk.group(1).split(",")} if pk else set()
         ak = re.search(r"CONSTRAINT AK_\w+ UNIQUE \(([^)]+)\)", corpo_t)
         ak = {a.strip() for a in ak.group(1).split(",")} if ak else set()
         fks = dict(re.findall(r"FOREIGN KEY \((\w+)\)\s*\n?\s*REFERENCES (\w+)", corpo_t))
@@ -659,17 +706,19 @@ table(
     widths=[1.5, 5.1],
     font_size=8,
 )
+p("Esclarecimento sobre dim_fonte: sk_fonte identifica o conjunto de dados extraído (a extração usada no fato), não um arquivo físico individual. O grão de dim_fonte é um registro por conjunto de dados de origem (cd_fonte = JOB_BANK_2025, STATCAN_0307 ou STATCAN_0258); a versão específica de cada arquivo baixado é rastreada por dt_extracao (data) e ds_checksum (SHA-256).")
+p("Chaves primárias das fatos: as três fatos usam PK composta pelas FKs que definem o grão — não uma chave substituta individual (ver 6.1.3).")
 page_break()
 
 
 # ---------------------------------------------------------------- 6 MODELAGEM
 h1("6 Modelagem do Data Warehouse")
 h2("6.1 MODELO LÓGICO/FÍSICO DO DATA WAREHOUSE")
-p("O modelo é uma constelação de fatos composta por três Star Schemas integrados por dimensões conformadas. A separação evita repetir salários em cada período de imigração e impede somas incorretas. A fato salarial registra a cobertura do Job Bank para cada jurisdição, distinguindo salário provincial publicado, dado somente regional e indisponibilidade. Fisicamente, o modelo é implantado em Oracle com tablespaces separados para dados e índices (TS_DW_DADOS e TS_DW_INDICES), sequences e gatilhos BEFORE INSERT para controle automatizado das chaves substitutas.")
+p("O modelo é uma constelação de fatos composta por três Star Schemas integrados por dimensões conformadas. A separação evita repetir salários em cada período de imigração e impede somas incorretas. A fato salarial registra a cobertura do Job Bank para cada jurisdição, distinguindo salário provincial publicado, dado somente regional e indisponibilidade. Fisicamente, o modelo é implantado em Oracle com tablespaces separados para dados e índices (TS_DW_DADOS e TS_DW_INDICES), sequences e gatilhos BEFORE INSERT que atribuem as chaves substitutas das dimensões. As fatos usam chave primária composta pelas FKs que definem o grão (não possuem chave substituta própria).")
 
 h3("6.1.1 Diagrama")
 picture("modelo_constelacao.png")
-p("Figura 6 — Constelação de fatos com chaves primárias, chaves estrangeiras e cardinalidades 1:N. A dimensão de província é conformada; as dimensões de fonte e tempo do Censo também são reutilizadas entre fatos.", size=10, align=WD_ALIGN_PARAGRAPH.CENTER)
+p("Figura 6 — Modelo lógico/físico: constelação de fatos com chaves primárias (compostas nas fatos), chaves estrangeiras e cardinalidades 1:N. A dimensão de província é conformada; as dimensões de fonte e tempo do Censo também são reutilizadas entre fatos.", size=10, align=WD_ALIGN_PARAGRAPH.CENTER)
 
 h3("6.1.2 Dimensões")
 table(
@@ -691,15 +740,17 @@ table(
 
 h3("6.1.3 Fatos")
 table(
-    ["Fato", "Grão", "Medidas"],
+    ["Fato", "Grão", "PK composta (FKs do grão)", "Medidas"],
     [
-        ("fato_salario", "Jurisdição + ocupação + período salarial", "salários, flag anual, região de origem e disponibilidade"),
-        ("fato_imigracao", "Província + país de nascimento + período de imigração + Censo", "qt_imigrantes (aditiva)"),
-        ("fato_habitacao", "Província + posse + indicador habitacional + Censo", "vl_medida (contagem ou percentual)"),
+        ("fato_salario", "Jurisdição + ocupação + período salarial", "sk_provincia + sk_ocupacao + sk_tempo_salario", "salários, flag anual, região de origem e disponibilidade"),
+        ("fato_imigracao", "Província + país de nascimento + período de imigração + Censo", "sk_provincia + sk_pais_nascimento + sk_periodo_imigracao + sk_tempo_censo", "qt_imigrantes (aditiva)"),
+        ("fato_habitacao", "Província + posse + indicador habitacional + Censo", "sk_provincia + sk_tenencia + sk_indicador_habitacao + sk_tempo_censo", "vl_medida (contagem ou percentual)"),
     ],
-    widths=[1.5, 2.4, 2.6],
+    widths=[1.4, 2.2, 2.0, 1.7],
+    font_size=9,
 )
-p("A participação brasileira (%) não é armazenada: é calculada na camada de apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais fornecidos oficialmente pelo Statistics Canada são armazenados em fato_habitacao.vl_medida, identificados por dim_indicador_habitacao.tp_medida = 'PERCENTUAL', e tratados como medidas não aditivas.")
+p("Chaves primárias das fatos: as três fatos usam PK composta pelas FKs das dimensões que definem o grão — não uma chave substituta individual. sk_fonte (e sk_disponibilidade_salario, em fato_salario) permanecem como FKs de contexto, pois são funcionalmente dependentes do grão.")
+p("Estratégia de percentuais (escolhida e documentada): a participação brasileira (%) é um percentual derivado e NÃO é armazenado — é calculado na apresentação a partir das contagens de brasileiros e do total de imigrantes. Os percentuais habitacionais publicados pelo Statistics Canada SÃO armazenados em fato_habitacao.vl_medida, identificados como não aditivos por dim_indicador_habitacao.tp_medida = 'PERCENTUAL'; as contagens correspondentes (tp_medida = 'CONTAGEM') também são armazenadas para validação. Não se recalcula o percentual a partir de numerador/denominador porque o Censo aplica arredondamento de base 5, que faria o valor recalculado divergir do publicado.")
 p("Cada uma das 13 jurisdições recebe uma linha em fato_salario. O ETL atribui PROVINCIAL_PUBLICADO às 9 com salário provincial; APENAS_REGIONAL a PEI, preservando ER1110 e seu nome; e INDISPONIVEL a Yukon, Northwest Territories e Nunavut, mantendo os valores salariais NULL. Comparações e rankings entre jurisdições usam somente fl_comparavel_provincial = 1.")
 
 
