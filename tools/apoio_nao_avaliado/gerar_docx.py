@@ -298,9 +298,26 @@ add_toc([
     ('        6.1.1 Diagrama', 26),
     ('        6.1.2 Dimensões', 26),
     ('        6.1.3 Fatos', 27),
-    ('7 ANEXOS', 28),
-    ('    7.1 SCRIPT DDL (ORACLE SQL)', 28),
-    ('REFERÊNCIAS', 37),
+    ('7 DEMONSTRAÇÃO DAS CARGAS (VÍDEO)', 28),
+    ('    7.1 TABELAS VAZIAS ANTES DA CARGA', 28),
+    ('    7.2 LOG DE EXECUÇÃO (LIDOS E GRAVADOS)', 29),
+    ('    7.3 DADOS GRAVADOS E CONFERÊNCIA DE QUANTIDADE', 29),
+    ('    7.4 AUSÊNCIA DE DADOS REPETIDOS', 30),
+    ('    7.5 RECARGA (AGENDAMENTO SIMULADO)', 30),
+    ('8 PLANOS ETL (TRANSFORMATIONS E JOB)', 31),
+    ('    8.1 VISÃO GERAL DO PIPELINE', 31),
+    ('    8.2 STAGING', 31),
+    ('    8.3 DIMENSÕES', 32),
+    ('    8.4 FATOS', 33),
+    ('    8.5 JOB DE ORQUESTRAÇÃO', 34),
+    ('    8.6 IDEMPOTÊNCIA E RECARGA', 34),
+    ('9 ARQUIVOS ETL E ORIENTAÇÕES PARA EXECUÇÃO', 35),
+    ('    9.1 ARQUIVOS ETL', 35),
+    ('    9.2 CONEXÃO E VARIÁVEIS', 35),
+    ('    9.3 EXECUÇÃO (SPOON E KITCHEN)', 36),
+    ('10 ANEXOS', 37),
+    ('    10.1 SCRIPT DDL (ORACLE SQL)', 37),
+    ('REFERÊNCIAS', 44),
 ])
 page_break()
 
@@ -754,9 +771,164 @@ p("Estratégia de percentuais (escolhida e documentada): a participação brasil
 p("Cada uma das 13 jurisdições recebe uma linha em fato_salario. O ETL atribui PROVINCIAL_PUBLICADO às 9 com salário provincial; APENAS_REGIONAL a PEI, preservando ER1110 e seu nome; e INDISPONIVEL a Yukon, Northwest Territories e Nunavut, mantendo os valores salariais NULL. Comparações e rankings entre jurisdições usam somente fl_comparavel_provincial = 1.")
 
 
-# ---------------------------------------------------------------- 7 ANEXOS
-h1("7 Anexos")
-h2("7.1 SCRIPT DDL (ORACLE SQL)")
+# ---------------------------------------------------------------- 7 DEMONSTRAÇÃO DAS CARGAS
+page_break()
+h1("7 Demonstração das Cargas (Parte 1 — Vídeo)")
+p("Esta seção documenta a demonstração prática da Parte 1: a execução passo a passo das cargas ETL e a evidência de que as tabelas ficam vazias antes da carga, são populadas na quantidade esperada, não contêm dados repetidos e permanecem estáveis quando a carga é reexecutada (simulando o agendamento diário/semanal). O roteiro completo de gravação está em docs/roteiro_video_cargas.md; aqui ficam os critérios e resultados que o vídeo comprova.")
+
+h2("7.1 Tabelas vazias antes da carga")
+p("Antes da primeira execução o schema é recriado (DROP USER DW_CANADA CASCADE seguido de sql/script_oracle.sql). A consulta de conferência retorna 0 em todas as 16 tabelas (3 de staging, 10 dimensões e 3 fatos):")
+for line in [
+    "SELECT 'stg_job_bank_wages' tabela, COUNT(*) qtd FROM stg_job_bank_wages",
+    "UNION ALL SELECT 'stg_statcan_imigracao', COUNT(*) FROM stg_statcan_imigracao",
+    "UNION ALL SELECT 'stg_statcan_habitacao', COUNT(*) FROM stg_statcan_habitacao",
+    "UNION ALL SELECT 'dim_provincia', COUNT(*) FROM dim_provincia",
+    "-- ... demais dimensoes ...",
+    "UNION ALL SELECT 'fato_salario', COUNT(*) FROM fato_salario",
+    "UNION ALL SELECT 'fato_imigracao', COUNT(*) FROM fato_imigracao",
+    "UNION ALL SELECT 'fato_habitacao', COUNT(*) FROM fato_habitacao;",
+]:
+    mono(line)
+
+h2("7.2 Log de execução (lidos e gravados)")
+p("No Spoon, o JOB é executado e o log exibe cada transformation com status Finished. Nas métricas por passo (Step Metrics), o passo de leitura mostra Read (registros lidos) e o passo de gravação mostra Written (registros gravados). A conferência é feita contra as contagens esperadas da seção 7.3.")
+
+h2("7.3 Dados gravados e conferência de quantidade")
+table(
+    ["Tabela", "Registros esperados", "Base de cálculo"],
+    [
+        ("stg_job_bank_wages", "44.376", "CSV bruto Job Bank (22 colunas)"),
+        ("stg_statcan_habitacao", "2.990", "CSV bruto habitação (14 colunas)"),
+        ("stg_statcan_imigracao", "conforme extração completa", "tabela 98-10-0307-01"),
+        ("dim_provincia", "13", "13 províncias/territórios"),
+        ("dim_ocupacao", "1", "NOC 21232"),
+        ("dim_tempo_salario", "1", "2023-2024"),
+        ("dim_disponibilidade_salario", "3", "provincial / regional / indisponível"),
+        ("dim_tempo_censo", "1", "Censo 2021"),
+        ("dim_pais_nascimento", "2", "Brazil / Total"),
+        ("dim_periodo_imigracao", "5", "períodos [4]..[8]"),
+        ("dim_tenencia", "4", "total / owner / renter / gov"),
+        ("dim_indicador_habitacao", "9", "9 indicadores"),
+        ("dim_fonte", "3", "Job Bank + 2 StatCan"),
+        ("fato_salario", "13", "13 jurisdições × 1 ocupação × 1 período"),
+        ("fato_imigracao", "130", "13 × 2 países × 5 períodos"),
+        ("fato_habitacao", "468", "13 × 4 posses × 9 indicadores"),
+    ],
+    widths=[2.4, 1.9, 2.9],
+    font_size=9,
+)
+
+h2("7.4 Ausência de dados repetidos")
+p("Nas dimensões, a contagem total deve ser igual à contagem de chaves naturais distintas (a chave natural nunca se repete); nas fatos, nenhum grupo da PK composta pode ter contagem maior que 1:")
+for line in [
+    "SELECT 'dim_provincia' tabela, COUNT(*) total, COUNT(DISTINCT cd_dguid) distintos FROM dim_provincia",
+    "UNION ALL SELECT 'dim_ocupacao', COUNT(*), COUNT(DISTINCT cd_noc) FROM dim_ocupacao",
+    "-- ... demais dimensoes (chave natural no lugar de cd_dguid/cd_noc) ...",
+    "SELECT COUNT(*) grupos_duplicados FROM (",
+    "  SELECT sk_provincia, sk_ocupacao, sk_tempo_salario FROM fato_salario",
+    "  GROUP BY sk_provincia, sk_ocupacao, sk_tempo_salario HAVING COUNT(*) > 1);",
+]:
+    mono(line)
+p("As três fatos usam PK composta pelas FKs do grão, de modo que a própria constraint impede a duplicação; a consulta confirma 0 grupos repetidos.")
+
+h2("7.5 Recarga (agendamento simulado)")
+p("A carga é executada novamente (2ª e 3ª vez) para simular o agendamento. O Insert/Update localiza as linhas existentes pela chave natural (dimensões) ou pela PK composta (fatos) e atualiza em vez de inserir; as contagens permanecem idênticas às da primeira execução e as consultas de 7.4 continuam retornando 0 duplicatas. Em produção, o JOB seria disparado pelo Kitchen em um agendador do sistema operacional.")
+page_break()
+
+# ---------------------------------------------------------------- 8 PLANOS ETL
+h1("8 Planos ETL (Transformations e Job)")
+p("Os planos foram implementados no Pentaho Data Integration. Os arquivos ficam em etl/ (gerados por tools/apoio_nao_avaliado/gerar_etl_pdi.py) e a documentação detalhada está em docs/etl_planos.md.")
+
+h2("8.1 Visão geral do pipeline")
+p("O fluxo segue Extract → Transform → Load: os CSVs brutos são espelhados nas tabelas de staging; as dimensões extraem as chaves naturais do staging; as fatos cruzam staging com as dimensões por meio de lookups das surrogate keys.")
+mono("raw (CSV bruto) --> staging (stg_*) --> dimensoes (dim_*) --> fatos (fato_*)")
+
+h2("8.2 Staging")
+table(
+    ["Plan", "Origem → Destino", "Passos"],
+    [
+        ("TR_STG_JOB_BANK", "raw/job_bank_wages_2025.csv → stg_job_bank_wages", "CsvInput → TableOutput"),
+        ("TR_STG_IMIGRACAO", "extração 98-10-0307-01 → stg_statcan_imigracao", "CsvInput → TableOutput"),
+        ("TR_STG_HABITACAO", "raw/98100258_extracted/98100258.csv → stg_statcan_habitacao", "CsvInput → TableOutput"),
+    ],
+    widths=[1.6, 3.2, 1.7],
+    font_size=9,
+)
+
+h2("8.3 Dimensões")
+p("Todas seguem o mesmo padrão — TableInput (extrai as chaves naturais) → InsertUpdate (lookup pela chave natural; insere se não existe, atualiza se existe). A surrogate key é atribuída pelo gatilho no banco.")
+table(
+    ["Plan", "Chave natural (lookup)", "Fonte / regra"],
+    [
+        ("TR_DIM_PROVINCIA", "cd_dguid", "13 DGUIDs canônicos; sigla do Job Bank por DGUID"),
+        ("TR_DIM_OCUPACAO", "cd_noc", "NOC_21232 do staging de salários"),
+        ("TR_DIM_TEMPO_SALARIO", "cd_periodo_referencia", "2023-2024"),
+        ("TR_DIM_DISPONIBILIDADE_SALARIO", "cd_disponibilidade", "3 categorias fixas"),
+        ("TR_DIM_TEMPO_CENSO", "nr_ano_censo", "2021"),
+        ("TR_DIM_PAIS_NASCIMENTO", "cd_pais_nascimento", "Brazil / Total"),
+        ("TR_DIM_PERIODO_IMIGRACAO", "cd_periodo_imigracao", "5 períodos [4]..[8]"),
+        ("TR_DIM_TENENCIA", "cd_tenencia", "4 posses"),
+        ("TR_DIM_INDICADOR_HABITACAO", "cd_indicador_habitacao", "9 indicadores; tp_medida CONTAGEM/PERCENTUAL"),
+        ("TR_DIM_FONTE", "cd_fonte", "3 fontes institucionais"),
+    ],
+    widths=[2.4, 2.0, 3.2],
+    font_size=9,
+)
+
+h2("8.4 Fatos")
+p("Cada fato segue TableInput (SQL que cruza staging + dimensões) → 5× DBLookup (resolve as surrogate keys) → InsertUpdate (lookup pela PK composta).")
+table(
+    ["Plan", "Grão", "PK de lookup", "Registros"],
+    [
+        ("TR_FATO_SALARIO", "jurisdição + ocupação + período", "sk_provincia + sk_ocupacao + sk_tempo_salario", "13"),
+        ("TR_FATO_IMIGRACAO", "província + país + período + Censo", "sk_provincia + sk_pais_nascimento + sk_periodo_imigracao + sk_tempo_censo", "130"),
+        ("TR_FATO_HABITACAO", "província + posse + indicador + Censo", "sk_provincia + sk_tenencia + sk_indicador_habitacao + sk_tempo_censo", "468"),
+    ],
+    widths=[1.5, 2.4, 2.7, 1.0],
+    font_size=8,
+)
+p("TR_FATO_IMIGRACAO faz UNPIVOT das colunas de período [4]..[8] e TR_FATO_HABITACAO faz UNPIVOT das 4 posses; ambos filtram os 13 DGUIDs por dim_provincia e os totais/ano corretos.")
+
+h2("8.5 Job de orquestração")
+p("O JOB_CARGA_DW.kjb encadeia as 16 transformations em sequência (cada passo aguarda o anterior): staging → dimensões → fatos, terminando em SUCCESS. A ordem garante as dimensões carregadas antes dos lookups das fatos.")
+
+h2("8.6 Idempotência e recarga")
+p("Dimensões localizam pela chave natural e fatos pela PK composta; reexecutar atualiza em vez de duplicar, mantendo as contagens da seção 7.3 estáveis em qualquer número de execuções.")
+page_break()
+
+# ---------------------------------------------------------------- 9 ARQUIVOS ETL E ORIENTAÇÕES
+h1("9 Arquivos ETL e Orientações para Execução")
+
+h2("9.1 Arquivos ETL")
+table(
+    ["Arquivo", "Tipo", "Função"],
+    [
+        ("TR_STG_*.ktr (3)", "Transformation", "staging dos CSVs brutos"),
+        ("TR_DIM_*.ktr (10)", "Transformation", "carga das dimensões"),
+        ("TR_FATO_*.ktr (3)", "Transformation", "carga das fatos"),
+        ("JOB_CARGA_DW.kjb", "Job", "orquestra as 16 cargas"),
+        ("etl/README.md", "documento", "instruções de execução"),
+    ],
+    widths=[1.8, 1.4, 3.3],
+    font_size=9,
+)
+
+h2("9.2 Conexão e variáveis")
+p("Os planos usam a conexão DW_CANADA (Oracle, Native) parametrizada por variáveis definidas em ~/.kettle/kettle.properties: DW_HOST, DW_PORT, DW_SID e DW_USER; a senha é informada uma única vez no Spoon. RAW_DIR aponta para os CSVs brutos e IMIGRACAO_CSV para o CSV extraído do ZIP de imigração.")
+
+h2("9.3 Execução (Spoon e Kitchen)")
+p("No Spoon, abre-se JOB_CARGA_DW.kjb e executa-se (botão ▶); ou executam-se as transformations manualmente na ordem staging → dimensões → fatos. Em produção, o JOB é agendado pelo Kitchen:")
+for line in [
+    "kitchen.sh -file=\"etl/JOB_CARGA_DW.kjb\"",
+    "  -param:RAW_DIR=raw -param:IMIGRACAO_CSV=raw/98100307_extracted/98100307.csv",
+    "  -level=Basic -logfile=\"carga_dw.log\"",
+]:
+    mono(line)
+p("Pré-requisitos: schema DW_CANADA criado por sql/script_oracle.sql, CSVs de origem presentes e Pentaho Data Integration 8/9.")
+
+# ---------------------------------------------------------------- 10 ANEXOS
+h1("10 Anexos")
+h2("10.1 SCRIPT DDL (ORACLE SQL)")
 p("O script abaixo cria tablespaces, sequences, tabelas da camada OLTP de origem, dimensões e fatos do DW com constraints e índices, além dos gatilhos que atribuem as chaves substitutas. Identificadores com até 30 caracteres (compatível com Oracle 11g+). A criação dos tablespaces deve ser executada por usuário DBA; os parâmetros DW_DATAFILE e DW_INDEXFILE devem receber os caminhos de datafiles do ambiente. O dono do DW precisa de CREATE TABLE, CREATE SEQUENCE, CREATE TRIGGER, CREATE INDEX e quota nos tablespaces.")
 sql_path = os.path.join(ROOT, "sql", "script_oracle.sql")
 with open(sql_path, encoding="utf-8") as fh:
