@@ -6,12 +6,34 @@
 <title>Canadá em dados · TABD</title>
 <style>
 :root{color-scheme:light;--ink:#142a3a;--muted:#506375;--line:#d6e1e6;--green:#006c62;--red:#aa392b;--page:#f1f5f5;background:var(--page);color:var(--ink);font-family:"Inter","Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0}button,select{font:inherit;color:inherit;background:white;border:1px solid #aabcc5;border-radius:8px;padding:.55rem .7rem}button{cursor:pointer}button:disabled{opacity:.45;cursor:default}:focus-visible{outline:3px solid #aa392b;outline-offset:3px}header{background:#112f42;color:white;display:flex;justify-content:space-between;align-items:center;padding:.7rem max(4vw,16px);gap:12px}.brand{font-weight:700}.brand span{color:#ffad91;margin-right:.4rem}.brand small{margin-left:.55rem;color:#b7d2dc;font-weight:500}header button{background:transparent;color:white}main{width:min(1320px,94%);margin:0 auto}nav{display:flex;gap:6px;overflow:auto;padding:14px 3px 8px}nav button{white-space:nowrap;font-size:.86rem}nav button[aria-current]{background:var(--green);color:white;border-color:var(--green)}.heading{margin:10px 0 17px}.eyebrow{color:var(--green);font-weight:700;font-size:.79rem;letter-spacing:.08em;text-transform:uppercase;margin:0 0 5px}h1{font-size:clamp(1.55rem,3vw,2.9rem);letter-spacing:-.035em;line-height:1.08;margin:0}#takeaway{max-width:1000px;line-height:1.45;margin:.55rem 0 0;color:var(--muted)}.grid{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;align-items:stretch}.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}h2{font-size:1rem;margin:0 0 8px}.panel-head h2{margin:0}#map{display:block;width:100%;height:clamp(255px,42vh,455px);margin:auto}#map path{stroke:#fff;stroke-width:.85;cursor:pointer;fill-rule:evenodd}#map path.active,#map path:hover,#map path:focus{stroke:#182e41;stroke-width:2.6;paint-order:fill stroke}#map text{font-size:13px;font-weight:800;fill:#142a3a;stroke:white;stroke-width:3;paint-order:stroke;pointer-events:none;text-anchor:middle}#legend{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;color:var(--muted);font-size:.78rem}.swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:4px;border:1px solid #bbc9cf}.scale{width:110px;height:10px;border-radius:6px;background:linear-gradient(90deg,#deeee9,#007b70)}.selection{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.selection label{font-weight:700;margin-right:8px}dl{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:12px 0 0}dl div{background:var(--page);padding:8px;border-radius:8px}dt{font-size:.75rem;color:var(--muted)}dd{margin:4px 0 0;font-weight:700}.row{position:relative;display:grid;grid-template-columns:3rem 1fr auto;width:100%;align-items:center;gap:6px;border:0;border-radius:4px;background:white;padding:3px 5px;font-size:.83rem;text-align:left}.row.active,.row:hover{background:#eef5f4}.track{height:10px;border-radius:3px;background:#edf3f2;display:flex;overflow:hidden}.bar{background:#318478;height:100%}.active .bar{background:var(--red)}.plot{display:block;width:100%;max-height:255px}.plot text{font-size:11px;fill:#334d60}.plot circle{fill:#00786d;stroke:white;stroke-width:2;cursor:pointer}.plot circle.active,.plot circle:focus{fill:#aa392b;stroke:#172d3e}table{border-collapse:collapse;width:100%;font-size:.84rem}th,td{padding:7px 5px;text-align:left;border-bottom:1px solid var(--line)}caption{text-align:left;color:var(--muted);margin-bottom:5px}#source{font-size:.78rem;color:var(--muted);line-height:1.45}#source a{color:var(--green)}footer{display:flex;justify-content:space-between;align-items:center;margin:12px 0 20px}footer button{font-weight:600}#next:not(:disabled){background:#112f42;color:white}#position{font-size:.86rem;color:var(--muted)}.summary{line-height:1.55;padding-left:20px}.periods{font-size:.8rem;color:var(--muted)}@media(max-width:820px){.grid{grid-template-columns:1fr}#map{max-height:330px}}@media(max-width:410px){header small{display:none}dl{grid-template-columns:1fr 1fr}.panel{padding:10px}}@media print{header button,nav,footer{display:none}main{width:100%}}
+
+:root{--ink:#132036;--muted:#536274;--line:#d9dfe6;--green:#a51e28;--red:#a51e28;--page:#f5f6f7;--navy:#112c4e;--maple:#c92832;font-family:Manrope,"Segoe UI",system-ui,sans-serif}
+header{background:var(--navy);border-bottom:4px solid var(--maple)}
+.brand{letter-spacing:.01em}.brand span{display:inline-block;font-size:1.35rem}.brand small{color:#d6e3f4}
+.progress{height:4px;background:#e3e8ee;border-radius:999px}.progress i{display:block;height:100%;border-radius:inherit;background:var(--maple);transition:width .4s ease}
+nav button{border-color:#d9dfe6;min-width:38px}nav button[aria-current]{background:var(--maple);border-color:var(--maple)}
+.heading{border-radius:18px;background:#fff;border:1px solid var(--line);border-left:5px solid var(--maple);padding:clamp(13px,2.1vw,26px);position:relative;overflow:hidden;margin-top:15px}
+.heading h1,.heading p{position:relative;z-index:1}.heading h1{color:var(--navy)}.heading .eyebrow{font-family:"DM Mono",ui-monospace,monospace}
+.opening .heading{min-height:166px;padding-right:min(23vw,300px);background:linear-gradient(115deg,#fff 55%,#fce9eb 100%)}
+.opening .heading::after{content:"🍁";position:absolute;right:6%;top:50%;font-size:clamp(55px,12vw,160px);line-height:1;transform:translateY(-50%) rotate(-12deg);animation:leaf-in .65s ease-out both}
+@keyframes leaf-in{from{opacity:0;transform:translateY(-65%) rotate(-30deg) scale(.84)}to{opacity:1;transform:translateY(-50%) rotate(-12deg) scale(1)}}
+.panel{border-bottom:4px solid #dde4ec;box-shadow:0 3px 12px #112c4e0a}h2{color:var(--navy)}#map path{transition:fill .3s,stroke-width .18s}#map path.active{stroke:var(--red);stroke-width:3.1}.scale{background:linear-gradient(90deg,#f8e9e8,#a51e28)}.bar{background:#3f6488;transform-origin:left;animation:grow .4s ease-out both}.active .bar{background:#c92832}
+.plot circle{fill:#315981}.plot circle.active{fill:#c92832;stroke:#44202c}.plot circle{animation:appear .4s ease-out both}
+.guide{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 13px;margin:0 0 13px;border-radius:12px;background:#eaf0f7;color:#203f62;font-size:.87rem;line-height:1.35}
+.guide p{margin:0}.guide button{white-space:nowrap;border-color:#c6d3e3;padding:.42rem .6rem;font-size:.82rem;font-weight:700}.guide button:hover{background:#fce9eb;border-color:#c92832}.guide[hidden]{display:none}
+#next:not(:disabled){background:var(--maple);border-color:#a51e28;box-shadow:0 3px 0 #81151d}
+#slide.enter .heading,#slide.enter .guide,#slide.enter .panel{animation:slide-in .34s cubic-bezier(.2,.7,.3,1) both}
+#slide.enter .map-panel{animation-delay:.045s}#slide.enter .detail-panel{animation-delay:.085s}
+@keyframes slide-in{from{opacity:0;transform:translateX(var(--shift,12px)) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}@keyframes appear{from{opacity:0}to{opacity:1}}
+@media(max-width:560px){.guide{align-items:flex-start;flex-direction:column}.guide button{white-space:normal}.opening .heading{min-height:unset;padding-right:25%}.opening .heading::after{right:3%;font-size:46px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
-<header><div class="brand"><span aria-hidden="true">✳</span> Canadá em dados <small>IFAL · TABD</small></div><button id="full" type="button">Tela cheia</button></header>
+<header><div class="brand"><span aria-hidden="true">🍁</span> Data Warehouse Canadá <small>IFAL · TABD</small></div><button id="full" type="button">Tela cheia</button></header>
 <main>
-<nav id="steps" aria-label="Slides"></nav>
+<nav id="steps" aria-label="Slides"></nav><div class="progress" aria-hidden="true"><i id="progress"></i></div>
 <section id="slide" aria-label="Slide atual">
-<div class="heading"><p id="chapter" class="eyebrow"></p><h1 id="title" tabindex="-1"></h1><p id="takeaway"></p></div>
+<div class="heading"><p id="chapter" class="eyebrow"></p><h1 id="title" tabindex="-1"></h1><p id="takeaway"></p></div><aside id="guide" class="guide"></aside>
 <div class="grid">
 <section class="panel map-panel" aria-labelledby="mapTitle"><div class="panel-head"><h2 id="mapTitle">Mapa do Canadá</h2><select id="metric" aria-label="Indicador do mapa"><option value="salary">Salário mediano</option><option value="people">Imigrantes nascidos no Brasil</option><option value="housing">Moradia inacessível</option><option value="score">Índice combinado</option><option value="coverage">Cobertura salarial</option></select></div><svg id="map" viewBox="0 0 700 626" aria-label="Províncias e territórios do Canadá"></svg><div id="legend"></div></section>
 <section class="panel detail-panel" aria-labelledby="chartTitle"><h2 id="chartTitle"></h2><div id="chart"></div><div class="selection"><label for="region">Jurisdição</label><select id="region"></select><dl id="details" aria-live="polite"></dl></div></section>
@@ -78,6 +100,20 @@ const slides = [
   ['10','O que sabemos sobre as jurisdições sem salário provincial?', 'Prince Edward Island tem referência apenas regional. Yukon, Northwest Territories e Nunavut também entram na comparação censitária, com salário indisponível.', 'coverage','Comunidade e moradia nas quatro jurisdições','missing','PE'],
   ['Síntese','A melhor escolha depende da prioridade', 'British Columbia lidera em salário, Ontario em tamanho da comunidade e Quebec no índice de pesos iguais. Os dados apoiam uma comparação de destinos e descrevem períodos distintos.', 'score','Resultados e limites','summary','QC'],
 ];
+const guides = [
+  ['','',''],
+  ['Comece por BC e depois compare ON e AB: as duas têm exatamente a mesma mediana.', 'Comparar com Ontario', 'ON'],
+  ['Compare os períodos de chegada de Ontario e Quebec. A barra de 2011–2021 é a mais longa nas duas.', 'Mostrar Quebec', 'QC'],
+  ['Compare Ontario com British Columbia. O percentual usa apenas os inquilinos da tabela censitária.', 'Mostrar British Columbia', 'BC'],
+  ['Leia o quadrante superior direito. Cada linha marca a mediana de um indicador.', 'Destacar British Columbia', 'BC'],
+  ['Compare BC e Ontario. O maior salário e o maior volume de chegadas estão em províncias diferentes.', 'Mostrar British Columbia', 'BC'],
+  ['Leia o quadrante inferior direito. Quanto mais baixo o ponto, menor a proporção de inquilinos com moradia inacessível.', 'Mostrar Saskatchewan', 'SK'],
+  ['Leia o quadrante superior direito. Mostre Ontario, onde os dois indicadores são altos.', 'Comparar com Manitoba', 'MB'],
+  ['Compare as medianas das duas linhas. A coluna de cobertura explica por que há apenas quatro salários no segundo grupo.', '',''],
+  ['Compare Quebec e Ontario. Repare que os três indicadores da região selecionada aparecem abaixo do gráfico.', 'Mostrar Ontario', 'ON'],
+  ['A cor âmbar identifica PEI, com dado somente regional. Compare seus dados censitários com os de Nunavut.', 'Mostrar Nunavut', 'NU'],
+  ['Use o seletor no mapa para revisitar os três indicadores e fechar a apresentação.', '',''],
+];
 const labels = {salary:'Salário mediano (CAD/h)',people:'Imigrantes nascidos no Brasil',housing:'Moradia inacessível (%)',score:'Índice combinado',recent:'Chegadas em 2011–2021'};
 const units = {salary:' CAD/h',housing:'%',score:'/100'};
 const value = (n,key) => n === null ? 'N/D' : fmt(n, key==='salary'?2:['housing','score'].includes(key)?1:0)+(units[key]||'');
@@ -89,7 +125,7 @@ function mapColor(r,key,range) {
   if (key==='coverage') return r.salary !== null ? '#007b70' : r.id==='PE' ? '#e4ab62' : '#d4dde2';
   if(r[key] === null) return '#d4dde2';
   const t=(r[key]-range[0])/(range[1]-range[0]);
-  return 'rgb('+[222-222*t,238-115*t,233-121*t].map(Math.round).join(',')+')';
+  return 'rgb('+[248-83*t,233-203*t,232-192*t].map(Math.round).join(',')+')';
 }
 function renderMap() {
   const key=$('metric').value;
@@ -163,6 +199,11 @@ function selectRegion(id) {
 function renderPage(focus=false) {
   const [number,title,takeaway,metric,chartTitle,,region]=slides[page];
   selected=region;
+  $('slide').classList.toggle('opening',page===0);
+  $('progress').style.width=((page+1)/slides.length*100)+'%';
+  const [tip,action,target]=guides[page];
+  $('guide').hidden=!tip;
+  $('guide').innerHTML=tip?'<p><strong>No painel</strong> · '+tip+'</p>'+(action?'<button type="button" data-guide="'+target+'">'+action+'</button>':''):'';
   $('chapter').textContent=/^\d/.test(number)?'Pergunta '+number:number;
   $('title').textContent=title;
   $('takeaway').textContent=takeaway;
@@ -177,6 +218,11 @@ function renderPage(focus=false) {
 }
 function navigate(index) {
   if(index<0||index>=slides.length||index===page)return;
+  const sectionNode=$('slide');
+  sectionNode.classList.remove('enter');
+  sectionNode.style.setProperty('--shift',index>page?'16px':'-16px');
+  void sectionNode.offsetWidth;
+  sectionNode.classList.add('enter');
   page=index;
   const section=page===0?'inicio':page===slides.length-1?'sintese':'pergunta-'+page;
   history.replaceState(null,'','#'+section);
@@ -194,6 +240,7 @@ for(const id of ['map','chart']){
     e.preventDefault();selectRegion(e.target.dataset.id);
   });
 }
+$('guide').addEventListener('click',e=>{const id=e.target.dataset.guide;if(id)selectRegion(id);});
 $('previous').addEventListener('click',()=>navigate(page-1));
 $('next').addEventListener('click',()=>navigate(page+1));
 document.addEventListener('keydown',e=>{
