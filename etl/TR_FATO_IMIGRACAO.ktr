@@ -89,14 +89,10 @@
   </connection>
   <order>
     <hop><from>Le imigracao</from><to>Lookup provincia</to><enabled>Y</enabled></hop>
-    <hop><from>Le imigracao</from><to>Lookup pais</to><enabled>Y</enabled></hop>
-    <hop><from>Le imigracao</from><to>Lookup periodo</to><enabled>Y</enabled></hop>
-    <hop><from>Le imigracao</from><to>Lookup tempo censo</to><enabled>Y</enabled></hop>
-    <hop><from>Le imigracao</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup provincia</from><to>Grava fato_imigracao</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup pais</from><to>Grava fato_imigracao</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup periodo</from><to>Grava fato_imigracao</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup tempo censo</from><to>Grava fato_imigracao</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup provincia</from><to>Lookup pais</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup pais</from><to>Lookup periodo</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup periodo</from><to>Lookup tempo censo</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup tempo censo</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
     <hop><from>Lookup fonte</from><to>Grava fato_imigracao</to><enabled>Y</enabled></hop>
   </order>
     <step>

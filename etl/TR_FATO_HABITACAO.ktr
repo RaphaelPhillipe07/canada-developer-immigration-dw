@@ -89,14 +89,10 @@
   </connection>
   <order>
     <hop><from>Le habitacao</from><to>Lookup provincia</to><enabled>Y</enabled></hop>
-    <hop><from>Le habitacao</from><to>Lookup tenencia</to><enabled>Y</enabled></hop>
-    <hop><from>Le habitacao</from><to>Lookup indicador</to><enabled>Y</enabled></hop>
-    <hop><from>Le habitacao</from><to>Lookup tempo censo</to><enabled>Y</enabled></hop>
-    <hop><from>Le habitacao</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup provincia</from><to>Grava fato_habitacao</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup tenencia</from><to>Grava fato_habitacao</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup indicador</from><to>Grava fato_habitacao</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup tempo censo</from><to>Grava fato_habitacao</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup provincia</from><to>Lookup tenencia</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup tenencia</from><to>Lookup indicador</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup indicador</from><to>Lookup tempo censo</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup tempo censo</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
     <hop><from>Lookup fonte</from><to>Grava fato_habitacao</to><enabled>Y</enabled></hop>
   </order>
     <step>

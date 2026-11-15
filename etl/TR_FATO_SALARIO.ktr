@@ -89,14 +89,10 @@
   </connection>
   <order>
     <hop><from>Le salarios</from><to>Lookup provincia</to><enabled>Y</enabled></hop>
-    <hop><from>Le salarios</from><to>Lookup ocupacao</to><enabled>Y</enabled></hop>
-    <hop><from>Le salarios</from><to>Lookup tempo</to><enabled>Y</enabled></hop>
-    <hop><from>Le salarios</from><to>Lookup disponibilidade</to><enabled>Y</enabled></hop>
-    <hop><from>Le salarios</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup provincia</from><to>Grava fato_salario</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup ocupacao</from><to>Grava fato_salario</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup tempo</from><to>Grava fato_salario</to><enabled>Y</enabled></hop>
-    <hop><from>Lookup disponibilidade</from><to>Grava fato_salario</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup provincia</from><to>Lookup ocupacao</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup ocupacao</from><to>Lookup tempo</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup tempo</from><to>Lookup disponibilidade</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup disponibilidade</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
     <hop><from>Lookup fonte</from><to>Grava fato_salario</to><enabled>Y</enabled></hop>
   </order>
     <step>
