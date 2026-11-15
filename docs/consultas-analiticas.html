@@ -133,7 +133,7 @@ function periodChart(r) {
   return r.periods.map((n,i)=>'<div class="row" style="grid-template-columns:7.7rem 1fr auto"><span>'+periodNames[i]+'</span><span class="track"><span class="bar" style="width:'+100*n/max+'%;background:'+periodColors[i]+'"></span></span><span>'+fmt(n)+'</span></div>').join('')+'<p class="periods">Total oficial: '+fmt(r.people)+'. O arredondamento censitário pode causar diferenças entre esse total e a soma dos períodos.</p>';
 }
 function renderChart() {
-  const chart=slides[page][4];
+  const chart=slides[page][5];
   const groupStats=(name,g)=>[name,value(median(g.map(r=>r.salary)),'salary'),value(median(g.map(r=>r.housing)),'housing'),g.filter(r=>r.salary!==null).length+'/5'];
   const content = Array.isArray(chart) ? scatter(chart)
     : chart==='periods' ? periodChart(regions.find(r=>r.id===selected))
@@ -152,12 +152,12 @@ function updateSelection() {
     el.setAttribute('aria-pressed',String(el.dataset.id===selected));
   });
   const values=[['Salário mediano',r.salary===null?missingLabel(r):value(r.salary,'salary')],['Imigrantes do Brasil',fmt(r.people)],['Moradia inacessível',value(r.housing,'housing')]];
-  if(slides[page][4]==='score') values.push(['Índice combinado',value(r.score,'score')]);
+  if(slides[page][5]==='score') values.push(['Índice combinado',value(r.score,'score')]);
   $('details').innerHTML=values.map(([k,v])=>'<div><dt>'+k+'</dt><dd>'+v+'</dd></div>').join('');
 }
 function selectRegion(id) {
   selected=id;
-  if(slides[page][4]==='periods') renderChart();
+  if(slides[page][5]==='periods') renderChart();
   updateSelection();
 }
 function renderPage(focus=false) {
