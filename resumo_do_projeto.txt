@@ -1,14 +1,20 @@
 INTEGRANTES DA EQUIPE:
 Eliezir Moreira Peixoto Neto e Raphael Phillipe da Silva Silverio
 
-*META SMART:*
-Até 14 de dezembro de 2026, desenvolver e documentar um Data Warehouse em Oracle integrando duas fontes institucionais (Statistics Canada e Job Bank/ESDC) por meio de três conjuntos de dados (imigração, habitação e salários NOC 21232), para comparar, entre as províncias e territórios canadenses, a distribuição de imigrantes brasileiros, a remuneração de desenvolvedores de software e a acessibilidade habitacional, respondendo às dez perguntas analíticas do plano com cargas idempotentes e sem estimar valores ausentes.
+*OBJETIVO:*
+Desenvolver um Data Warehouse em Oracle que integre dados oficiais do Statistics Canada e do Job Bank/ESDC para comparar remuneração de desenvolvedores de software, distribuição de imigrantes nascidos no Brasil e indicadores habitacionais nas províncias e territórios canadenses, apoiando a seleção de destinos compatíveis com as prioridades dos usuários.
 
-*S (Específica):* construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
-*M (Mensurável):* integrar os três conjuntos de dados em um modelo dimensional capaz de responder às dez perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte.
+*HIPÓTESE:*
+As províncias com maiores salários para desenvolvedores de software não necessariamente apresentam o melhor equilíbrio entre remuneração, presença de comunidade brasileira e condições habitacionais.
+
+*META SMART (única, com benefício mensurável):*
+Reduzir em 50%, até dezembro de 2026, o tempo médio necessário para comparar destinos canadenses — considerando remuneração, comunidade brasileira e condições habitacionais — por meio de um Data Warehouse em Oracle que integra dados oficiais do Statistics Canada e do Job Bank/ESDC.
+
+*S (Específica):* comparar as 13 províncias e territórios canadenses por remuneração (NOC 21232), comunidade brasileira e acessibilidade habitacional.
+*M (Mensurável):* redução de 50% no tempo médio de comparação de destinos, medido contra a linha de base do processo manual (os mesmos indicadores hoje levantados em três arquivos separados).
 *A (Atingível):* duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com ETL previsto em Pentaho Data Integration.
-*R (Relevante):* apoiar a decisão de desenvolvedores de software imigrantes sobre a melhor província canadense.
-*T (Temporal):* até 14 de dezembro de 2026.
+*R (Relevante):* beneficia diretamente desenvolvedores de software imigrantes que precisam escolher uma província compatível com suas prioridades.
+*T (Temporal):* até dezembro de 2026.
 
 *MÉTRICAS (medidas disponíveis no Data Warehouse):*
 

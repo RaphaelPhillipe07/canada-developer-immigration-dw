@@ -6,13 +6,19 @@ Projeto da disciplina **Tópicos Avançados em Banco de Dados (IFAL)**. Integra 
 
 ## Objetivo e Meta SMART
 
-Construir um Data Warehouse em Oracle que integre **duas fontes institucionais** — Statistics Canada e Job Bank/ESDC — por meio de **três conjuntos de dados** e permita responder às 10 perguntas analíticas do plano **sem estimar valores ausentes**.
+**Objetivo:** desenvolver um Data Warehouse em Oracle que integre dados oficiais do Statistics Canada e do Job Bank/ESDC para comparar remuneração de desenvolvedores de software, distribuição de imigrantes nascidos no Brasil e indicadores habitacionais nas províncias e territórios canadenses, apoiando a seleção de destinos compatíveis com as prioridades dos usuários.
 
-- **S** — Construir um DW em Oracle com dados oficiais de imigração, salários e habitação.
-- **M** — Integrar os três conjuntos de dados em um modelo dimensional capaz de responder às 10 perguntas analíticas definidas, contemplando as 13 províncias e territórios canadenses sempre que houver dados disponíveis na fonte.
-- **A** — Duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com modelo viável em Oracle.
-- **R** — Apoiar a decisão de devs imigrantes sobre a melhor província.
-- **T** — Até 14 de dezembro de 2026.
+**Hipótese:** as províncias com maiores salários para desenvolvedores de software não necessariamente apresentam o melhor equilíbrio entre remuneração, presença de comunidade brasileira e condições habitacionais.
+
+**Meta SMART (única):** reduzir em 50%, até dezembro de 2026, o tempo médio necessário para comparar destinos canadenses — considerando remuneração, comunidade brasileira e condições habitacionais — por meio de um Data Warehouse em Oracle que integra dados oficiais do Statistics Canada e do Job Bank/ESDC.
+
+- **S** — Comparar as 13 províncias e territórios canadenses por remuneração (NOC 21232), comunidade brasileira e acessibilidade habitacional.
+- **M** — Redução de 50% no tempo médio de comparação de destinos, medido contra a linha de base do processo manual (os mesmos indicadores hoje levantados em três arquivos separados).
+- **A** — Duas fontes institucionais e três conjuntos de dados, já baixados e filtrados, com modelo dimensional viável em Oracle.
+- **R** — Beneficia diretamente desenvolvedores de software imigrantes que precisam escolher uma província compatível com suas prioridades.
+- **T** — Até dezembro de 2026.
+
+> **Referências temporais distintas:** imigração e habitação são do Censo 2021; salários têm referência 2023–2024. O cruzamento compara indicadores de períodos diferentes, portanto não afirma simultaneidade nem causalidade (ver “Tratamento geográfico e limitações”).
 
 ## As 10 perguntas analíticas
 

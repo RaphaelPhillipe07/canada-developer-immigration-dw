@@ -179,6 +179,40 @@ Top 5 — maior comunidade brasileira:
 
 Leitura: **ON e BC** têm os maiores percentuais de inquilinos comprometendo ≥ 30% da renda (38,4% e 37,8%); **Nunavut** tem o maior core housing need geral (32,9%), mas o menor percentual de inacessibilidade (5,2%).
 
+### 3.6 Verificações de qualidade dos dados
+
+A EDA inclui verificações objetivas de qualidade — não apenas a leitura de distribuições. Resumo por base:
+
+| Verificação | Job Bank (44.376) | Imigração (26) | Habitação (117) |
+|---|---|---|---|
+| Duplicidades pela chave natural | 0 (NOC + ER + período + flag anual) | 0 (DGUID + idade + gênero + país) | 0 (DGUID + ano + indicador) |
+| Nulos em campos identificadores | 0 | 0 | 0 |
+| Nulos em medidas | Low 20.301 · Median 20.012 · High 20.288 · Avg 30.540 · Q1 30.670 · Q3 30.667 · benefício 41.736 | 0 | 0 |
+| Consistência | low ≤ median ≤ high: 24.059 OK · 1 violação | soma dos períodos == Immigrants[3] em 8/26 (dif. máx. 10, múltipla de 5) | — |
+| Valores fora do intervalo | salário/hora > 300: 0; % benefício fora [0,100]: 0 | contagens negativas: 0 | percentuais fora [0,100]: 0; contagens negativas: 0 |
+| Estatística descritiva | mediana salarial: mín 40,87 · máx 52,40 · média 45,96 · desvio 3,71 | — | inquilinos inacessíveis: mín 5,2 · máx 38,4 · média 28,7 · desvio 9,4 |
+
+Observações:
+
+- A única violação de `low ≤ median ≤ high` ocorre em **NOC_31101 (PEI, ER1110, referência anual, fonte CIHI 2023-24)** — **fora do recorte NOC 21232** do projeto. No recorte usado, a consistência é total (9/9 linhas). O valor é preservado como vem da fonte; não é "corrigido".
+- Os nulos salariais do Job Bank (≈45% em low/median/high) são explicados por `Wage_Comment_E` (dado não publicado naquele nível geográfico); não são imputados.
+- Na imigração, a soma dos períodos fecha com `Immigrants[3]` em apenas 8/26 linhas porque o Censo 2021 aplica arredondamento aleatório de base 5 a cada célula; a diferença máxima é 10. O DW carrega as duas medidas como vêm da fonte e **não** recalcula o total a partir dos períodos.
+
+### 3.7 Impacto antes/depois das transformações
+
+Cada exclusão é analisada pelo efeito que produz nas comparações possíveis:
+
+| Filtro / exclusão | Antes → Depois | O que se perde (limitação) |
+|---|---|---|
+| Job Bank: `NOC_CNP = NOC_21232` | 44.376 → 86 | Mantém somente a ocupação do escopo; demais 515 ocupações saem da análise. |
+| Job Bank: `Reference_Period = 2023-2024` | 86 → 32 | Elimina os recortes `2024` (25) e `NA` (29); comparações históricas entre releases de salário deixam de ser possíveis. |
+| Job Bank: nível provincial (ER + 2 dígitos) | 32 → 9 provinciais publicados + 1 PEI regional + 3 territórios | **Excluir dados regionais impede comparações entre cidades/regiões econômicas** — o DW compara províncias/territórios, não CMAs/CAs nem regiões econômicas. PEI é preservado como `APENAS_REGIONAL` (ER1110), nunca promovido a provincial. |
+| StatCan imigração: Age/Gender = totais | tabela completa → 26 | **Usar totais de idade e gênero impede segmentações por esses atributos** (ex.: brasileiros por faixa etária ou sexo). Aceito porque o escopo é comparar províncias. |
+| StatCan habitação: 13 províncias/territórios | 2.990 → 117 | Remove CMAs/CAs (comparações intramunicipais) e outras geografias; mantém o grão provincial. |
+| StatCan habitação: `Census year = 2021` | (2016 + 2021) → 2021 | **Excluir 2016 elimina a possibilidade de analisar evolução habitacional** entre censos. A comparação é transversal (um censo). |
+
+Caminho salarial completo (86 → 13 situações de cobertura): dos 86 registros de NOC 21232, 1 é nacional (ER00), 9 são provinciais (ER + 2 dígitos, todos com salário publicado em 2023-2024) e 76 são regionais (ER + 4 dígitos). O filtro por período (2023-2024) mantém 32 registros; o filtro por nível geográfico mantém as 9 provinciais; PEI (ER1110) fica como dado apenas regional e os 3 territórios como indisponíveis — totalizando 13 situações de cobertura em `fato_salario`.
+
 ## 4. O que escrever no trabalho (interpretação)
 
 1. **Cobertura:** o Job Bank publica salário provincial para 9 das 13 jurisdições; PEI aparece só como região econômica (`ER1110`) e os territórios não têm salário publicado. Nenhum valor regional foi usado para "preencher" essas lacunas.

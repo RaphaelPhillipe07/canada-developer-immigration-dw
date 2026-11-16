@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>TR_FATO_IMIGRACAO</name>
+    <description>Fato: 13 provincias x 2 paises x 5 periodos -&gt; fato_imigracao (UNPIVOT dos periodos [4]..[8]; Insert/Update pela PK composta).</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>&#x2f;</directory>
+    <log>
+      <trans-log-table><connection/><schema/><table/><size_limit_lines/><interval/><timeout_days/>
+        <field><id>ID_BATCH</id><enabled>Y</enabled><name>ID_BATCH</name></field>
+        <field><id>CHANNEL_ID</id><enabled>Y</enabled><name>CHANNEL_ID</name></field>
+        <field><id>TRANSNAME</id><enabled>Y</enabled><name>TRANSNAME</name></field>
+        <field><id>STATUS</id><enabled>Y</enabled><name>STATUS</name></field>
+        <field><id>LINES_READ</id><enabled>Y</enabled><name>LINES_READ</name><subject/></field>
+        <field><id>LINES_WRITTEN</id><enabled>Y</enabled><name>LINES_WRITTEN</name><subject/></field>
+        <field><id>LINES_UPDATED</id><enabled>Y</enabled><name>LINES_UPDATED</name><subject/></field>
+        <field><id>LINES_INPUT</id><enabled>Y</enabled><name>LINES_INPUT</name><subject/></field>
+        <field><id>LINES_OUTPUT</id><enabled>Y</enabled><name>LINES_OUTPUT</name><subject/></field>
+        <field><id>LINES_REJECTED</id><enabled>Y</enabled><name>LINES_REJECTED</name><subject/></field>
+        <field><id>ERRORS</id><enabled>Y</enabled><name>ERRORS</name><subject/></field>
+        <field><id>STARTDATE</id><enabled>Y</enabled><name>STARTDATE</name><subject/></field>
+        <field><id>ENDDATE</id><enabled>Y</enabled><name>ENDDATE</name><subject/></field>
+        <field><id>LOGDATE</id><enabled>Y</enabled><name>LOGDATE</name><subject/></field>
+        <field><id>DEPDATE</id><enabled>Y</enabled><name>DEPDATE</name><subject/></field>
+        <field><id>REPLAYDATE</id><enabled>Y</enabled><name>REPLAYDATE</name><subject/></field>
+        <field><id>LOG_FIELD</id><enabled>Y</enabled><name>LOG_FIELD</name><subject/></field>
+        <field><id>EXECUTING_SERVER</id><enabled>N</enabled><name>EXECUTING_SERVER</name><subject/></field>
+        <field><id>EXECUTING_USER</id><enabled>N</enabled><name>EXECUTING_USER</name><subject/></field>
+        <field><id>CLIENT</id><enabled>N</enabled><name>CLIENT</name><subject/></field>
+      </trans-log-table>
+      <perf-log-table><connection/><schema/><table/><interval/><timeout_days/></perf-log-table>
+      <channel-log-table><connection/><schema/><table/><timeout_days/></channel-log-table>
+      <step-log-table><connection/><schema/><table/><timeout_days/></step-log-table>
+      <metrics-log-table><connection/><schema/><table/><timeout_days/></metrics-log-table>
+    </log>
+    <maxdate><connection/><table/><field/><offset>0.0</offset><maxdiff>0.0</maxdiff></maxdate>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <step_performance_capturing_delay>1000</step_performance_capturing_delay>
+    <step_performance_capturing_size_limit>100</step_performance_capturing_size_limit>
+    <dependencies/>
+    <partitionschemas/>
+    <slaveservers/>
+    <clusterschemas/>
+    <created_user>-</created_user>
+    <created_date>2026/10/18 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/18 12:00:00.000</modified_date>
+    <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads/>
+  <connection>
+    <name>DW_CANADA</name>
+    <server>${DW_HOST}</server>
+    <type>ORACLE</type>
+    <access>Native</access>
+    <database>${DW_SID}</database>
+    <port>${DW_PORT}</port>
+    <username>${DW_USER}</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes>
+      <attribute><code>PORT_NUMBER</code><attribute>${DW_PORT}</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute>
+      <attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute>
+      <attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute>
+      <attribute><code>PREFERRED_SCHEMA_NAME</code><attribute></attribute></attribute>
+      <attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute>
+      <attribute><code>USE_POOLING</code><attribute>N</attribute></attribute>
+      <attribute><code>MAXIMUM_POOL_SIZE</code><attribute>10</attribute></attribute>
+      <attribute><code>INITIAL_POOL_SIZE</code><attribute>10</attribute></attribute>
+      <attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute>
+    </attributes>
+  </connection>
+  <order>
+    <hop><from>Le imigracao</from><to>Lookup provincia</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup provincia</from><to>Lookup pais</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup pais</from><to>Lookup periodo</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup periodo</from><to>Lookup tempo censo</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup tempo censo</from><to>Lookup fonte</to><enabled>Y</enabled></hop>
+    <hop><from>Lookup fonte</from><to>Grava fato_imigracao</to><enabled>Y</enabled></hop>
+  </order>
+    <step>
+      <name>Le imigracao</name>
+      <type>TableInput</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <sql>
+SELECT
+  i.dguid AS cd_dguid,
+  CASE WHEN i.place_of_birth_290 LIKE 'Brazil%' THEN 'BRA' ELSE 'TOTAL' END AS cd_pais_nascimento,
+  u.periodo AS cd_periodo_imigracao,
+  2021 AS nr_ano_censo,
+  'STATCAN_0307' AS cd_fonte,
+  TO_NUMBER(REPLACE(u.qt, ',', '')) AS qt_imigrantes
+FROM stg_statcan_imigracao i
+UNPIVOT (qt FOR periodo IN (
+  before_1980_4 AS '[4]',
+  from_1980_to_1990_5 AS '[5]',
+  from_1991_to_2000_6 AS '[6]',
+  from_2001_to_2010_7 AS '[7]',
+  from_2011_to_2021_8 AS '[8]'
+)) u
+WHERE i.dguid IN (SELECT cd_dguid FROM dim_provincia)
+  AND i.age_8d LIKE 'Total%'
+  AND i.gender_3 LIKE 'Total%'
+  AND (i.place_of_birth_290 LIKE 'Brazil%' OR i.place_of_birth_290 LIKE 'Total%Place of birth%')
+</sql>
+      <limit>0</limit>
+      <lookup/>
+      <execute_each_row>N</execute_each_row>
+      <variables_active>N</variables_active>
+      <lazy_conversion_active>Y</lazy_conversion_active>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>100</xloc>
+        <yloc>120</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+
+    <step>
+      <name>Lookup provincia</name>
+      <type>DBLookup</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <schema/>
+      <table>dim_provincia</table>
+      <use_schema>N</use_schema>
+      <ignore_flag_field/>
+      <lookup>
+        <key>
+          <name>cd_dguid</name>
+          <field>cd_dguid</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+      </lookup>
+      <value>
+        <name>sk_provincia</name>
+        <rename>sk_provincia</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+      <not_found/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <order_by/>
+      <cache_size>0</cache_size>
+      <cached>N</cached>
+      <loading_all_data_in_memory>N</loading_all_data_in_memory>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>340</xloc>
+        <yloc>40</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+
+    <step>
+      <name>Lookup pais</name>
+      <type>DBLookup</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <schema/>
+      <table>dim_pais_nascimento</table>
+      <use_schema>N</use_schema>
+      <ignore_flag_field/>
+      <lookup>
+        <key>
+          <name>cd_pais_nascimento</name>
+          <field>cd_pais_nascimento</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+      </lookup>
+      <value>
+        <name>sk_pais_nascimento</name>
+        <rename>sk_pais_nascimento</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+      <not_found/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <order_by/>
+      <cache_size>0</cache_size>
+      <cached>N</cached>
+      <loading_all_data_in_memory>N</loading_all_data_in_memory>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>340</xloc>
+        <yloc>100</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+
+    <step>
+      <name>Lookup periodo</name>
+      <type>DBLookup</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <schema/>
+      <table>dim_periodo_imigracao</table>
+      <use_schema>N</use_schema>
+      <ignore_flag_field/>
+      <lookup>
+        <key>
+          <name>cd_periodo_imigracao</name>
+          <field>cd_periodo_imigracao</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+      </lookup>
+      <value>
+        <name>sk_periodo_imigracao</name>
+        <rename>sk_periodo_imigracao</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+      <not_found/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <order_by/>
+      <cache_size>0</cache_size>
+      <cached>N</cached>
+      <loading_all_data_in_memory>N</loading_all_data_in_memory>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>340</xloc>
+        <yloc>160</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+
+    <step>
+      <name>Lookup tempo censo</name>
+      <type>DBLookup</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <schema/>
+      <table>dim_tempo_censo</table>
+      <use_schema>N</use_schema>
+      <ignore_flag_field/>
+      <lookup>
+        <key>
+          <name>nr_ano_censo</name>
+          <field>nr_ano_censo</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+      </lookup>
+      <value>
+        <name>sk_tempo_censo</name>
+        <rename>sk_tempo_censo</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+      <not_found/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <order_by/>
+      <cache_size>0</cache_size>
+      <cached>N</cached>
+      <loading_all_data_in_memory>N</loading_all_data_in_memory>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>340</xloc>
+        <yloc>220</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+
+    <step>
+      <name>Lookup fonte</name>
+      <type>DBLookup</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <schema/>
+      <table>dim_fonte</table>
+      <use_schema>N</use_schema>
+      <ignore_flag_field/>
+      <lookup>
+        <key>
+          <name>cd_fonte</name>
+          <field>cd_fonte</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+      </lookup>
+      <value>
+        <name>sk_fonte</name>
+        <rename>sk_fonte</rename>
+        <default/>
+        <type>Integer</type>
+      </value>
+      <not_found/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <order_by/>
+      <cache_size>0</cache_size>
+      <cached>N</cached>
+      <loading_all_data_in_memory>N</loading_all_data_in_memory>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>340</xloc>
+        <yloc>280</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+
+    <step>
+      <name>Grava fato_imigracao</name>
+      <type>InsertUpdate</type>
+      <description/>
+      <distribute>Y</distribute>
+      <custom_distribution/>
+      <copies>1</copies>
+      <partitioning>
+        <method>none</method>
+        <schema_name/>
+      </partitioning>
+      <connection>DW_CANADA</connection>
+      <schema/>
+      <table>fato_imigracao</table>
+      <commit>1000</commit>
+      <update_bypassed>N</update_bypassed>
+      <lookup>
+        <key>
+          <name>sk_provincia</name>
+          <field>sk_provincia</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+        <key>
+          <name>sk_pais_nascimento</name>
+          <field>sk_pais_nascimento</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+        <key>
+          <name>sk_periodo_imigracao</name>
+          <field>sk_periodo_imigracao</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+        <key>
+          <name>sk_tempo_censo</name>
+          <field>sk_tempo_censo</field>
+          <condition>=</condition>
+          <name2/>
+        </key>
+      </lookup>
+      <update>
+        <key>
+          <name>sk_fonte</name>
+          <field>sk_fonte</field>
+        </key>
+        <key>
+          <name>qt_imigrantes</name>
+          <field>qt_imigrantes</field>
+        </key>
+      </update>
+      <fields>
+        <field>
+          <column_name>sk_provincia</column_name>
+          <stream_name>sk_provincia</stream_name>
+          <update>N</update>
+        </field>
+        <field>
+          <column_name>sk_pais_nascimento</column_name>
+          <stream_name>sk_pais_nascimento</stream_name>
+          <update>N</update>
+        </field>
+        <field>
+          <column_name>sk_periodo_imigracao</column_name>
+          <stream_name>sk_periodo_imigracao</stream_name>
+          <update>N</update>
+        </field>
+        <field>
+          <column_name>sk_tempo_censo</column_name>
+          <stream_name>sk_tempo_censo</stream_name>
+          <update>N</update>
+        </field>
+        <field>
+          <column_name>sk_fonte</column_name>
+          <stream_name>sk_fonte</stream_name>
+          <update>Y</update>
+        </field>
+        <field>
+          <column_name>qt_imigrantes</column_name>
+          <stream_name>qt_imigrantes</stream_name>
+          <update>Y</update>
+        </field>
+      </fields>
+      <error_ignored>N</error_ignored>
+      <ignore_flag_field/>
+      <skip_lookup>N</skip_lookup>
+      <cluster_schema/>
+      <remotesteps>
+        <input> </input>
+        <output> </output>
+      </remotesteps>
+      <GUI>
+        <xloc>600</xloc>
+        <yloc>120</yloc>
+        <draw>Y</draw>
+      </GUI>
+    </step>
+  <step_error_handling/>
+  <slave-step-copy-partition-distribution/>
+  <slave_transformation>N</slave_transformation>
+</transformation>

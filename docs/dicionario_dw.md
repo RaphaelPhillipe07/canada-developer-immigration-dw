@@ -95,20 +95,23 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 | `dt_extracao` | DATE | — | — | Data de extração |
 | `ds_checksum` | VARCHAR2 | 128 | — | SHA-256 do arquivo bruto |
 
+**O que `sk_fonte` identifica:** `sk_fonte` identifica o **conjunto de dados extraído** (a extração usada no fato), **não um arquivo físico individual**. O grão de `dim_fonte` é um registro por conjunto de dados de origem: `cd_fonte = JOB_BANK_2025` (Job Bank/ESDC Wages), `STATCAN_0307` (imigração) e `STATCAN_0258` (habitação). A **versão/snapshot específica** de cada arquivo baixado é rastreada por `dt_extracao` (data da extração) e `ds_checksum` (SHA-256 do arquivo bruto) — assim, um novo download do mesmo conjunto pode ser registrado com nova data/checksum.
+
 ## 2. Fatos
 
 ### 2.1 `fato_salario`
 
 **Grão:** jurisdição + ocupação + período salarial; há uma linha para cada jurisdição, inclusive quando o salário está apenas regional ou indisponível.
 
+**PK composta:** `(sk_provincia, sk_ocupacao, sk_tempo_salario)` — as FKs que definem o grão. Não há chave substituta própria da fato.
+
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
-| `sk_fato_salario` | NUMBER | 15 | `PK_FATO_SALARIO` | Surrogate key (SEQ_FATO_SALARIO) |
-| `sk_provincia` | NUMBER | 10 | `FK_FATO_SAL_DIM_PROVINCIA` | → `dim_provincia` |
-| `sk_ocupacao` | NUMBER | 10 | `FK_FATO_SAL_DIM_OCUPACAO` | → `dim_ocupacao` |
-| `sk_tempo_salario` | NUMBER | 10 | `FK_FATO_SAL_DIM_TEMPO_SAL` | → `dim_tempo_salario` |
-| `sk_disponibilidade_salario` | NUMBER | 10 | `FK_FATO_SAL_DIM_DISP` | → `dim_disponibilidade_salario` |
-| `sk_fonte` | NUMBER | 10 | `FK_FATO_SAL_DIM_FONTE` | → `dim_fonte` |
+| `sk_provincia` | NUMBER | 10 | `PK_FATO_SALARIO`, `FK_FATO_SAL_DIM_PROVINCIA` | → `dim_provincia` |
+| `sk_ocupacao` | NUMBER | 10 | `PK_FATO_SALARIO`, `FK_FATO_SAL_DIM_OCUPACAO` | → `dim_ocupacao` |
+| `sk_tempo_salario` | NUMBER | 10 | `PK_FATO_SALARIO`, `FK_FATO_SAL_DIM_TEMPO_SAL` | → `dim_tempo_salario` |
+| `sk_disponibilidade_salario` | NUMBER | 10 | `FK_FATO_SAL_DIM_DISP` | → `dim_disponibilidade_salario` (contexto, fora do grão) |
+| `sk_fonte` | NUMBER | 10 | `FK_FATO_SAL_DIM_FONTE` | → `dim_fonte` (contexto, fora do grão) |
 | `vl_salario_minimo` | NUMBER | 10,2 | — | `Low_Wage` (CAD/hora) |
 | `vl_salario_mediano` | NUMBER | 10,2 | — | `Median_Wage` (CAD/hora) |
 | `vl_salario_maximo` | NUMBER | 10,2 | — | `High_Wage` (CAD/hora) |
@@ -124,14 +127,15 @@ Nomenclatura adotada (conforme aula de SQL Data Modeler): `PK_` (primary key), `
 
 **Grão:** província + país de nascimento + período de imigração + Censo.
 
+**PK composta:** `(sk_provincia, sk_pais_nascimento, sk_periodo_imigracao, sk_tempo_censo)`. Não há chave substituta própria da fato.
+
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
-| `sk_fato_imigracao` | NUMBER | 15 | `PK_FATO_IMIGRACAO` | Surrogate key (SEQ_FATO_IMIGRACAO) |
-| `sk_provincia` | NUMBER | 10 | `FK_FATO_IMIG_DIM_PROVINCIA` | → `dim_provincia` |
-| `sk_pais_nascimento` | NUMBER | 10 | `FK_FATO_IMIG_DIM_PAIS` | → `dim_pais_nascimento` |
-| `sk_periodo_imigracao` | NUMBER | 10 | `FK_FATO_IMIG_DIM_PERIODO` | → `dim_periodo_imigracao` |
-| `sk_tempo_censo` | NUMBER | 10 | `FK_FATO_IMIG_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
-| `sk_fonte` | NUMBER | 10 | `FK_FATO_IMIG_DIM_FONTE` | → `dim_fonte` |
+| `sk_provincia` | NUMBER | 10 | `PK_FATO_IMIGRACAO`, `FK_FATO_IMIG_DIM_PROVINCIA` | → `dim_provincia` |
+| `sk_pais_nascimento` | NUMBER | 10 | `PK_FATO_IMIGRACAO`, `FK_FATO_IMIG_DIM_PAIS` | → `dim_pais_nascimento` |
+| `sk_periodo_imigracao` | NUMBER | 10 | `PK_FATO_IMIGRACAO`, `FK_FATO_IMIG_DIM_PERIODO` | → `dim_periodo_imigracao` |
+| `sk_tempo_censo` | NUMBER | 10 | `PK_FATO_IMIGRACAO`, `FK_FATO_IMIG_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
+| `sk_fonte` | NUMBER | 10 | `FK_FATO_IMIG_DIM_FONTE` | → `dim_fonte` (contexto, fora do grão) |
 | `qt_imigrantes` | NUMBER | 12 | `CK_FATO_IMIGRACAO_QT` (`>= 0`) | Contagem de imigrantes (medida aditiva) |
 
 A **participação brasileira** não é coluna do fato; é calculada na apresentação:
@@ -141,15 +145,16 @@ A **participação brasileira** não é coluna do fato; é calculada na apresent
 
 **Grão:** província + posse (tenure) + indicador habitacional + Censo.
 
+**PK composta:** `(sk_provincia, sk_tenencia, sk_indicador_habitacao, sk_tempo_censo)`. Não há chave substituta própria da fato.
+
 | Campo | Tipo | Tamanho | Constraint | Descrição / Origem |
 |---|---|---|---|---|
-| `sk_fato_habitacao` | NUMBER | 15 | `PK_FATO_HABITACAO` | Surrogate key (SEQ_FATO_HABITACAO) |
-| `sk_provincia` | NUMBER | 10 | `FK_FATO_HAB_DIM_PROVINCIA` | → `dim_provincia` |
-| `sk_tenencia` | NUMBER | 10 | `FK_FATO_HAB_DIM_TENENCIA` | → `dim_tenencia` |
-| `sk_indicador_habitacao` | NUMBER | 10 | `FK_FATO_HAB_DIM_INDICADOR` | → `dim_indicador_habitacao` |
-| `sk_tempo_censo` | NUMBER | 10 | `FK_FATO_HAB_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
-| `sk_fonte` | NUMBER | 10 | `FK_FATO_HAB_DIM_FONTE` | → `dim_fonte` |
-| `vl_medida` | NUMBER | 15,2 | `CK_FATO_HABITACAO_VL` (`>= 0`) | Contagem ou percentual (ver `dim_indicador_habitacao.tp_medida`) |
+| `sk_provincia` | NUMBER | 10 | `PK_FATO_HABITACAO`, `FK_FATO_HAB_DIM_PROVINCIA` | → `dim_provincia` |
+| `sk_tenencia` | NUMBER | 10 | `PK_FATO_HABITACAO`, `FK_FATO_HAB_DIM_TENENCIA` | → `dim_tenencia` |
+| `sk_indicador_habitacao` | NUMBER | 10 | `PK_FATO_HABITACAO`, `FK_FATO_HAB_DIM_INDICADOR` | → `dim_indicador_habitacao` |
+| `sk_tempo_censo` | NUMBER | 10 | `PK_FATO_HABITACAO`, `FK_FATO_HAB_DIM_TEMPO_CENSO` | → `dim_tempo_censo` |
+| `sk_fonte` | NUMBER | 10 | `FK_FATO_HAB_DIM_FONTE` | → `dim_fonte` (contexto, fora do grão) |
+| `vl_medida` | NUMBER | 15,2 | `CK_FATO_HABITACAO_VL` (`>= 0`) | Contagem ou percentual (ver `dim_indicador_habitacao.tp_medida`). Estratégia: percentuais publicados são armazenados e marcados como não aditivos (`tp_medida = 'PERCENTUAL'`); as contagens correspondentes também são armazenadas (`tp_medida = 'CONTAGEM'`) para validação — não se recalcula o percentual a partir de numerador/denominador (arredondamento de base 5 do Censo). |
 
 ## 3. Staging (espelha os CSVs antes das transformações)
 

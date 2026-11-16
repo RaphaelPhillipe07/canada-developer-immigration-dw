@@ -255,4 +255,147 @@ markdown_table(
     ],
 )
 
+# ---------------------------------------------------------------------------
+# F. Verificações de qualidade dos dados
+# ---------------------------------------------------------------------------
+section("F. Verificações de qualidade dos dados")
+
+
+def dupes_by_key(rows, key_cols):
+    c = Counter(tuple(r[k] for k in key_cols) for r in rows)
+    return sum(n - 1 for n in c.values())
+
+
+def report_nulls(rows, cols, name):
+    n = [(c, blank(rows, c)) for c in cols if blank(rows, c) > 0]
+    print(f"\nNulos em {name} (somente campos com vazios):")
+    if n:
+        markdown_table(["coluna", "vazios"], n)
+    else:
+        print("  (nenhum vazio)")
+
+
+# F.1 Job Bank — duplicidades, nulos, consistência e faixas
+print("\nF.1 Job Bank (bruto) — duplicidades pela chave natural "
+      "(NOC_CNP + ER_Code_Code_RE + Reference_Period + Annual_Wage_Flag):",
+      dupes_by_key(jb, ["NOC_CNP", "ER_Code_Code_RE", "Reference_Period", "Annual_Wage_Flag_Salaire_annuel"]))
+
+report_nulls(
+    jb,
+    ["Low_Wage_Salaire_Minium", "Median_Wage_Salaire_Median", "High_Wage_Salaire_Maximal",
+     "Average_Wage_Salaire_Moyen", "Quartile1_Wage_Salaire_Quartile1", "Quartile3_Wage_Salaire_Quartile3",
+     "EmployeesWithNonWageBenefit_Pct"],
+    "Job Bank (bruto)",
+)
+
+viol = 0
+ok = 0
+for r in jb:
+    l, m, h = (as_float(r["Low_Wage_Salaire_Minium"]), as_float(r["Median_Wage_Salaire_Median"]),
+               as_float(r["High_Wage_Salaire_Maximal"]))
+    if l is None or m is None or h is None:
+        continue
+    if l <= m <= h:
+        ok += 1
+    else:
+        viol += 1
+print(f"Consistência low ≤ median ≤ high: {ok} OK · {viol} violações (entre as linhas com os 3 valores presentes)")
+
+hourly = [r for r in jb if r["Annual_Wage_Flag_Salaire_annuel"] == "0"]
+oor = sum(1 for r in hourly
+          if (as_float(r["Low_Wage_Salaire_Minium"]) or 0) > 300
+          or (as_float(r["Median_Wage_Salaire_Median"]) or 0) > 300
+          or (as_float(r["High_Wage_Salaire_Maximal"]) or 0) > 300)
+print(f"Salário por hora fora do intervalo esperado (> 300 CAD/h): {oor} de {len(hourly)} linhas horárias")
+oor_pct = sum(1 for r in jb
+              if as_float(r["EmployeesWithNonWageBenefit_Pct"]) is not None
+              and not (0 <= as_float(r["EmployeesWithNonWageBenefit_Pct"]) <= 100))
+print(f"% de benefícios não salariais fora de [0,100]: {oor_pct}")
+
+# F.2 Job Bank — caminho 86 → 9 provinciais
+print("\nF.2 Job Bank — caminho dos filtros (NOC 21232: 86 registros)")
+print("Por nível geográfico:")
+markdown_table(
+    ["nível", "registros"],
+    [
+        ("nacional (ER00)", sum(1 for r in noc21232 if r["ER_Code_Code_RE"] == "ER00")),
+        ("provincial (ER + 2 dígitos)", sum(1 for r in noc21232 if r["ER_Code_Code_RE"] != "ER00" and r["ER_Code_Code_RE"].startswith("ER") and len(r["ER_Code_Code_RE"]) == 4)),
+        ("regional (ER + 4 dígitos)", sum(1 for r in noc21232 if r["ER_Code_Code_RE"].startswith("ER") and len(r["ER_Code_Code_RE"]) == 6)),
+    ],
+)
+print("Por período de referência:")
+markdown_table(
+    ["Reference_Period", "registros", "provinciais com salário publicado"],
+    [
+        (rp, sum(1 for r in noc21232 if r["Reference_Period"] == rp),
+         sum(1 for r in noc21232 if r["Reference_Period"] == rp
+             and r["ER_Code_Code_RE"] != "ER00"
+             and r["ER_Code_Code_RE"].startswith("ER") and len(r["ER_Code_Code_RE"]) == 4
+             and as_float(r["Median_Wage_Salaire_Median"]) is not None))
+        for rp in ["2023-2024", "2024", "NA"]
+    ],
+)
+
+# F.3 imigração — duplicidades, nulos, consistência
+print("\nF.3 Imigração (26 registros)")
+print("Duplicidades pela chave natural (DGUID + Age + Gender + Place of birth):",
+      dupes_by_key(sc, ["DGUID", "Age (8D)", "Gender (3)", "Place of birth (290)"]))
+report_nulls(
+    sc,
+    ["REF_DATE", "GEO", "DGUID", "Age (8D)", "Gender (3)", "Place of birth (290)", "Coordinate",
+     "Immigrant status and period of immigration (11):Total - Immigrant status and period of immigration[1]",
+     "Immigrant status and period of immigration (11):Immigrants[3]",
+     "Immigrant status and period of immigration (11):Before 1980[4]",
+     "Immigrant status and period of immigration (11):1980 to 1990[5]",
+     "Immigrant status and period of immigration (11):1991 to 2000[6]",
+     "Immigrant status and period of immigration (11):2001 to 2010[7]",
+     "Immigrant status and period of immigration (11):2011 to 2021[8]"],
+    "imigração",
+)
+neg = sum(1 for r in sc if any(as_float(r[c]) is not None and as_float(r[c]) < 0 for c in
+           ["Immigrant status and period of immigration (11):Immigrants[3]",
+            "Immigrant status and period of immigration (11):Before 1980[4]",
+            "Immigrant status and period of immigration (11):1980 to 1990[5]",
+            "Immigrant status and period of immigration (11):1991 to 2000[6]",
+            "Immigrant status and period of immigration (11):2001 to 2010[7]",
+            "Immigrant status and period of immigration (11):2011 to 2021[8]"]))
+print(f"Contagens negativas: {neg}")
+period_cols_full = [
+    "Immigrant status and period of immigration (11):Before 1980[4]",
+    "Immigrant status and period of immigration (11):1980 to 1990[5]",
+    "Immigrant status and period of immigration (11):1991 to 2000[6]",
+    "Immigrant status and period of immigration (11):2001 to 2010[7]",
+    "Immigrant status and period of immigration (11):2011 to 2021[8]",
+]
+close = 0
+for r in sc:
+    tot = as_float(r["Immigrant status and period of immigration (11):Immigrants[3]"]) or 0
+    s = sum(as_float(r[c]) or 0 for c in period_cols_full)
+    if abs(tot - s) < 1e-6:
+        close += 1
+print(f"Consistência soma dos períodos == Immigrants[3]: {close} de {len(sc)} linhas (diferença máxima 10, arredondamento de base 5)")
+
+# F.4 habitação — duplicidades, nulos, faixas
+print("\nF.4 Habitação (117 registros)")
+print("Duplicidades pela chave natural (DGUID + Census year + Housing indicators):",
+      dupes_by_key(hsg, ["DGUID", "Census year (2)", "Housing indicators (9)"]))
+report_nulls(
+    hsg,
+    ["REF_DATE", "GEO", "DGUID", "Census year (2)", "Housing indicators (9)", "Coordinate",
+     "Tenure (4):Total - Tenure[1]", "Tenure (4):Owner[2]", "Tenure (4):Renter[3]",
+     "Tenure (4):Dwelling provided by the local government, First Nation or Indian band[4]"],
+    "habitação",
+)
+pct_indic = [r for r in hsg if r["Housing indicators (9)"].startswith("Percent of households")]
+oor = sum(1 for r in pct_indic
+          if any(as_float(r[c]) is not None and not (0 <= as_float(r[c]) <= 100)
+                 for c in ["Tenure (4):Total - Tenure[1]", "Tenure (4):Owner[2]", "Tenure (4):Renter[3]",
+                           "Tenure (4):Dwelling provided by the local government, First Nation or Indian band[4]"]))
+print(f"Percentuais fora de [0,100]: {oor} de {len(pct_indic)} linhas percentuais")
+renter_pct = [as_float(r["Tenure (4):Renter[3]"]) for r in pct_indic
+              if r["Housing indicators (9)"] == "Percent of households in unaffordable housing"
+              and as_float(r["Tenure (4):Renter[3]"]) is not None]
+if renter_pct:
+    print(f"Estatística descritiva — inquilinos em moradia inacessível: min={min(renter_pct):.1f} | max={max(renter_pct):.1f} | média={sum(renter_pct)/len(renter_pct):.1f} | desvio={ (sum((x - sum(renter_pct)/len(renter_pct)) ** 2 for x in renter_pct) / (len(renter_pct) - 1)) ** 0.5 :.1f}")
+
 print("\nFim da EDA.")
