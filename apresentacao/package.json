@@ -1,0 +1,38 @@
+{
+    "name":  "tabd-guia-canada",
+    "private":  true,
+    "type":  "module",
+    "scripts":  {
+                    "dev":  "vite",
+                    "build":  "node scripts/export-notes.mjs \u0026\u0026 vite build",
+                    "check":  "tsc --noEmit",
+                    "test":  "vitest run"
+                },
+    "dependencies":  {
+                         "@fontsource-variable/bricolage-grotesque":  "^5.3.0",
+                         "@fontsource-variable/instrument-sans":  "^5.3.0",
+                         "@radix-ui/react-slot":  "1.2.3",
+                         "class-variance-authority":  "0.7.1",
+                         "clsx":  "2.1.1",
+                         "d3-geo":  "^3.1.2",
+                         "lucide-react":  "0.543.0",
+                         "motion":  "12.23.22",
+                         "react":  "19.1.1",
+                         "react-dom":  "19.1.1",
+                         "recharts":  "^3.10.1",
+                         "tailwind-merge":  "3.3.1"
+                     },
+    "devDependencies":  {
+                            "@tailwindcss/vite":  "4.1.13",
+                            "@testing-library/react":  "^16.3.3",
+                            "@testing-library/user-event":  "^14.6.12",
+                            "@types/d3-geo":  "^3.1.1",
+                            "@types/react":  "19.1.13",
+                            "@types/react-dom":  "19.1.9",
+                            "jsdom":  "^29.1.1",
+                            "tailwindcss":  "4.1.13",
+                            "typescript":  "5.8.3",
+                            "vite":  "6.3.6",
+                            "vitest":  "^3.2.7"
+                        }
+}

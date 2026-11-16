@@ -1,0 +1,29 @@
+﻿.canada-map {color:#f7f3e8;position:relative;isolation:isolate}
+.canada-map>svg {display:block;width:100%;height:auto;max-height:430px;overflow:visible}
+.map-graticule path {fill:none;stroke:#d4e4d4;stroke-opacity:.09;stroke-width:1;stroke-dasharray:3 6}
+.map-region {stroke:#163e32;stroke-width:1.25;stroke-linejoin:round;vector-effect:non-scaling-stroke;transition:fill .25s,filter .2s,stroke .2s;outline:none}
+.map-jurisdiction {outline:none;cursor:default}
+.map-jurisdiction[role=button] {cursor:pointer}
+.map-jurisdiction.is-active .map-region,.map-jurisdiction:focus-visible .map-region {stroke:#fff7d9;stroke-width:2;filter:brightness(1.12)}
+.map-jurisdiction.is-selected .map-region {stroke:#fff7d9;stroke-width:2.3;filter:drop-shadow(0 2px 7px #071e1780)}
+.map-jurisdiction:focus-visible .map-label {fill:#fff;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.map-label {fill:#183f33;font:700 15px var(--body,system-ui);letter-spacing:.03em;paint-order:stroke;stroke:#e6d6b52e;stroke-width:2px;pointer-events:none}
+.map-jurisdiction:has([fill^="url"]) .map-label {fill:#f1efdb;stroke:#183f3380}
+.map-label-external {fill:#f1efdb;stroke:#183f33;stroke-width:3px}
+.map-atlantic {pointer-events:none}
+.map-ocean {fill:#a0b5aa;font:500 9px var(--body,system-ui);letter-spacing:.25em;opacity:.55;pointer-events:none}
+.map-legend {display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:12px;color:#dfebdf;padding:0 10px}
+.map-scale {display:flex;align-items:center;gap:9px;min-width:0}
+.map-scale>i {display:block;height:7px;width:112px;border-radius:100px;background:linear-gradient(90deg,#526f65,#8d9a80,#c7bd98,#e7aa8e,#f28f7b)}
+.map-missing {display:flex;align-items:center;gap:6px;white-space:nowrap;color:#c2d2c4}
+.map-missing>i {display:block;width:14px;height:10px;border:1px solid #789084;background:repeating-linear-gradient(35deg,#39594d 0 4px,#789084 4px 5px)}
+.map-unit {display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;color:#b1c4b5;padding:12px 10px 0;margin:0;line-height:1.5}
+.map-unit>span {opacity:.75}
+.canada-map-compact>svg {max-height:none}
+.canada-map-compact .map-region {stroke:#1a4135;stroke-width:1.2}
+.canada-map-compact .map-label {font-size:16px}
+.province-flag {display:inline-block;width:56px;height:36px;object-fit:contain;flex:none;filter:drop-shadow(0 1px 2px #13231a15)}
+.province-flag-fallback {display:inline-grid;place-items:center;width:56px;height:36px;border-radius:4px;background:#eee2d2;color:#702f35;font-weight:700;font-size:14px}
+.province-silhouette {display:block;width:120px;height:100px;flex:none;fill:currentColor;opacity:.18}
+@media(prefers-reduced-motion:reduce) {.map-region {transition:none}}
+@media(max-width:600px) {.map-label {font-size:17px}.map-scale>i {width:72px}.map-unit {font-size:10px}.map-legend {font-size:11px;padding-inline:0}.province-flag {width:45px;height:30px}}

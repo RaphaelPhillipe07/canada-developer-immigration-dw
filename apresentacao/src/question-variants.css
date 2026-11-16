@@ -1,0 +1,88 @@
+﻿/* Independent layout and motion experiments for slide 02. */
+.questions-lab {padding:0 28px 20px;background:#eee8df;color:#53232c}
+.questions-lab .questions-review {max-width:1480px;min-height:78px}
+.questions-lab .questions-review small {color:#98757b}.questions-lab .questions-review>a {color:#81585f}
+.questions-lab .questions-variants {background:#e3d8cf}.questions-lab .questions-variants button {color:#805960}
+.questions-lab .questions-variants button[aria-pressed=true] {color:white;background:#b73140}
+.animation-review {display:flex;align-items:center;gap:18px;max-width:1480px;margin:0 auto 18px;font-size:11px}
+.animation-review>span {font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#926c72}
+.animation-review>div {display:flex;gap:5px}.animation-review button {border:1px solid #c9aaa64f;border-radius:999px;padding:7px 12px;min-height:36px;color:#8a6067;font-size:11px;transition:background .15s,color .15s,transform .15s}
+.animation-review button[aria-pressed=true] {background:#fffaf2;border-color:#b73140;color:#a52a39}.animation-review button:active {transform:scale(.97)}
+.animation-review>p {margin-left:auto;color:#95777a;font-size:10px}
+.questions-lab .questions-stage {max-width:1480px;aspect-ratio:16/9;min-height:650px;border-radius:20px;padding:30px 44px;box-shadow:0 12px 40px #621c2c0c}
+.questions-lab .questions-caption {color:#53232c}.questions-lab .questions-caption p,.questions-lab .questions-caption>span {color:#99797b}
+.questions-lab .questions-body {padding-block:24px}.questions-lab .question-wheel {height:420px}
+.questions-lab .questions-intro h1 {font-size:clamp(42px,4.1vw,60px)}
+.questions-lab .questions-topics {margin-top:26px;padding-top:22px;gap:15px}
+.questions-lab .questions-top .flag img {border-radius:0;box-shadow:0 0 0 1px #ffffff20}
+/* B: cream editorial composition, Canadian red punctuation. */
+.questions-lab .questions-stage.questions-b {background:#fcf7ee;color:#642530}
+.questions-lab .questions-b .questions-backdrop {background:linear-gradient(90deg,#f7eee3 0 35%,#fcf7ee 35%)}
+.questions-lab .questions-b .questions-body {grid-template-columns:minmax(240px,.8fr) minmax(0,1.55fr);gap:46px}
+.questions-lab .questions-b .questions-intro {text-align:left}
+.questions-lab .questions-b .questions-intro h1 {font-size:clamp(39px,3.7vw,54px);color:#632430}
+.questions-lab .questions-b .questions-intro h1 br {display:initial}.questions-lab .questions-b .questions-intro h1 em {display:block;color:#b73140;margin:0}
+.questions-lab .questions-b .questions-intro>p {font-size:15px;max-width:28ch;color:#94787a;margin-top:23px}
+.questions-lab .questions-b .questions-kicker {color:#b73140;margin-bottom:22px}.questions-lab .questions-b .questions-kicker:before {background:#b73140}
+.questions-lab .questions-b .questions-top {border-color:#c9a6a633}
+.questions-lab .questions-b .questions-top>.opening-brand>span:last-child,.questions-lab .questions-b .questions-top>span {color:#96797c;border-color:#c9a6a655}
+.questions-lab .questions-b .questions-topics {display:grid;border-color:#c9a6a633}
+.questions-lab .questions-b .questions-topics>span {color:#632430}.questions-lab .questions-b .questions-topics svg {color:#b73140}.questions-lab .questions-b .questions-topics small {color:#9d8282}
+.questions-lab .questions-b .questions-selector {width:auto;margin:0;padding:0 0 0 36px;border:0;border-left:1px solid #c9a6a633;border-radius:0;background:transparent;backdrop-filter:none;box-shadow:none}
+.questions-lab .questions-b .selector-header {color:#ae8c8f}.questions-lab .questions-b .selector-header>span:last-child {border-color:#b7314033;color:#b73140}
+.questions-lab .questions-b .wheel-focus {background:#b73140;border:0;border-radius:12px;box-shadow:0 10px 25px #b7314020}
+.questions-lab .questions-b .wheel-question {color:#8f6d72;font-size:clamp(22px,2vw,28px)}
+.questions-lab .questions-b .wheel-question.is-selected {color:#fff9f0}.questions-lab .questions-b .wheel-number {color:#b73140}.questions-lab .questions-b .wheel-question.is-selected .wheel-number {background:#fff9f0;color:#b73140}
+.questions-lab .questions-b .selector-controls {color:#9e7a7f}.questions-lab .questions-b kbd {color:#a76b75;border-color:#b7314033}
+.questions-lab .questions-b .selector-controls i {background:#c59499}.questions-lab .questions-b .selector-controls button {color:#b73140;border-color:#b7314033}.questions-lab .questions-b .selector-controls button:hover:not(:disabled) {color:white;background:#b73140}
+.questions-lab .questions-b .questions-footer {border-color:#c9a6a633}.questions-lab .questions-b .questions-footer>a,.questions-lab .questions-b .questions-slide-count {color:#9b777c}
+.questions-lab .questions-b .question-dots span {color:#b49296}.questions-lab .questions-b .question-dots button[aria-pressed=true] span {background:#b73140;color:white;border-color:#b73140}
+.questions-lab .questions-b .question-dots button:hover span {background:#b7314015;border-color:#b7314050;color:#b73140}
+.questions-lab .questions-b .questions-fullscreen {color:#b73140;background:#f8eee5;border-color:#b7314033}
+.questions-lab .questions-b .questions-canada-motif {opacity:.045}.questions-lab .questions-b .questions-canada-motif .map-region {fill:#b73140;stroke:#fcf7ee}
+.questions-lab .questions-b :is(a,button,[tabindex]):focus-visible {outline-color:#b73140}.questions-lab .questions-b .wheel-question.is-selected:focus-visible {outline-color:#fff9f0}
+/* C: deep red stage and individually surfaced cards. */
+.questions-lab .questions-stage.questions-c {background:#591c2a}
+.questions-lab .questions-c .questions-backdrop {background:radial-gradient(ellipse at 90% 25%,#aa334837,transparent 70%),#591c2a}
+.questions-lab .questions-c .questions-body {grid-template-columns:minmax(230px,.85fr) minmax(0,1.6fr);gap:50px}
+.questions-lab .questions-c .questions-intro h1 {font-size:37px}.questions-lab .questions-c .questions-intro>p {font-size:14px;margin-top:18px}
+.questions-lab .questions-c .questions-topics {display:none}
+.questions-lab .questions-c .stage-number {font-size:clamp(95px,11vw,150px);color:#f3cdc5;margin-top:22px}.questions-lab .questions-c .stage-number small {color:#c7919b}
+.questions-lab .questions-c .questions-selector {padding-left:30px}
+.questions-lab .questions-c .wheel-focus {background:transparent;box-shadow:none;border:0}
+.questions-lab .questions-c .wheel-question {grid-template-columns:40px 1fr;font-size:clamp(22px,2vw,28px);background:#ffdbd00c;border:1px solid #ffd0c31c;border-radius:14px;padding:17px 24px}
+.questions-lab .questions-c .wheel-number {display:grid;color:#e5adaf}
+.questions-lab .questions-c .wheel-question.is-selected {background:#fff6ec;color:#6b2030;border-color:#fff6ec;box-shadow:0 12px 28px #2b081b2e}
+.questions-lab .questions-c .wheel-question.is-selected .wheel-number {background:#b73140;color:#fff6ec}
+.questions-lab .questions-c .questions-canada-motif {opacity:.035}
+.questions-lab .motion-glide .wheel-drag {transform-style:flat}.questions-lab .motion-glide .question-wheel {perspective:none}
+.questions-lab .questions-stage:fullscreen {max-width:none;width:100vw;min-height:0;height:100dvh;aspect-ratio:auto;border-radius:0;padding:24px 38px}
+@media(min-width:1000px) and (max-height:850px) {
+ .questions-lab .questions-stage {min-height:570px;padding:24px 32px}.questions-lab .questions-top {padding-bottom:18px}.questions-lab .questions-body {padding-block:18px}
+ .questions-lab .question-wheel {height:355px}.questions-lab .questions-intro h1 {font-size:46px}.questions-lab .questions-b .questions-intro h1 {font-size:42px}
+ .questions-lab .questions-c .questions-intro h1 {font-size:34px}.questions-lab .questions-c .stage-number {font-size:100px;margin-top:15px}
+ .questions-lab .questions-footer {padding-top:10px}.questions-lab .questions-topics {margin-top:20px;padding-top:18px}
+}
+@media(max-width:1000px) {
+ .questions-lab .questions-review {padding-block:15px}.questions-lab .questions-variants {width:100%;justify-content:center}.animation-review {gap:10px;flex-wrap:wrap}.animation-review>p {display:none}
+ .questions-lab .questions-stage {aspect-ratio:auto;padding:26px}.questions-lab .questions-body,.questions-lab .questions-b .questions-body,.questions-lab .questions-c .questions-body {grid-template-columns:minmax(200px,.8fr) minmax(0,1.5fr);gap:24px}
+ .questions-lab .questions-b .questions-selector,.questions-lab .questions-c .questions-selector {padding-left:22px}.questions-lab .questions-b .questions-intro h1 {font-size:39px}
+ .questions-lab .questions-c .wheel-question {padding:14px;grid-template-columns:30px 1fr;gap:10px;font-size:23px}
+}
+@media(max-width:650px) {
+ .questions-lab {padding:0 12px 20px}.questions-lab .questions-review {gap:12px}.questions-lab .questions-review>a {font-size:10px}.questions-lab .questions-variants button {padding:8px 10px;font-size:10px}
+ .animation-review {display:block;margin-bottom:14px}.animation-review>span {display:block;margin-bottom:8px}.animation-review>div {flex-wrap:wrap}.animation-review button {font-size:10px;padding:7px 10px;min-height:40px}
+ .questions-lab .questions-stage {padding:22px 18px}.questions-lab .questions-body,.questions-lab .questions-b .questions-body,.questions-lab .questions-c .questions-body {grid-template-columns:1fr;gap:26px}
+ .questions-lab .questions-b .questions-backdrop {background:#fcf7ee}.questions-lab .questions-b .questions-intro h1 {font-size:36px}.questions-lab .questions-b .questions-intro h1 br {display:none}
+ .questions-lab .questions-b .questions-selector,.questions-lab .questions-c .questions-selector {border:0;padding:0}
+ .questions-lab .question-wheel {height:390px}.questions-lab .questions-b .wheel-question,.questions-lab .questions-c .wheel-question {font-size:20px;grid-template-columns:28px 1fr;gap:10px;padding:12px}
+ .questions-lab .questions-b .questions-intro>p {max-width:35ch}.questions-lab .questions-c .stage-number {display:none}
+ .questions-lab .questions-b .questions-topics {display:flex}.questions-lab .questions-caption>span {display:none}.questions-lab .questions-stage:fullscreen {height:auto;min-height:100dvh;padding:22px 18px}
+}
+/* Approved combination: Foco vermelho + Relógio 3D. */
+.questions-lab.questions-accepted {padding:0;background:#b73140}
+.questions-lab.questions-accepted .questions-stage {max-width:none;min-height:100dvh;aspect-ratio:auto;border-radius:0;box-shadow:none;padding:32px clamp(28px,4.5vw,80px)}
+.questions-lab.questions-accepted .questions-body {padding-block:32px}
+.questions-lab.questions-accepted .question-wheel {height:460px}
+@media(min-width:1000px) and (max-height:800px) {.questions-lab.questions-accepted .questions-stage {padding:22px 38px}.questions-lab.questions-accepted .questions-body {padding-block:18px}.questions-lab.questions-accepted .question-wheel {height:405px}}
+@media(max-width:650px) {.questions-lab.questions-accepted .questions-stage {padding:22px 18px}.questions-lab.questions-accepted .question-wheel {height:395px}}

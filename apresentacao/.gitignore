@@ -1,0 +1,11 @@
+﻿node_modules/
+dist/
+.deployment/
+.tmp/
+*.log
+.env
+.env.*
+!.env.example
+
+.presentation-checkout/
+
