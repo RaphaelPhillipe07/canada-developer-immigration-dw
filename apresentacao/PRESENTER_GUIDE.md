@@ -6,7 +6,7 @@ Este guia acompanha as 14 telas: abertura, perguntas, método, consultas 1–10 
 
 Reserve cerca de 1 minuto para abertura/perguntas, 2 minutos para método e 40–60 segundos para cada consulta. Em cada resultado: leia a pergunta, diga a resposta, mostre a marca visual que a comprova e explique a limitação principal. Ajuste o ritmo ao tempo concedido pelo professor.
 
-No método, mantenha as quatro etapas visíveis. Na fala, diferencie o processo conceitual do DW, a integração documentada dos extratos e o contrato de dados usado pela interface. Abra os detalhes apenas para responder a uma dúvida.
+No método, mantenha as quatro etapas visíveis. Na fala, diferencie o modelo Oracle, a integração dos extratos, os planos de carga e o contrato da interface. Abra os detalhes apenas para responder a uma dúvida.
 
 ## Lembretes essenciais
 
@@ -22,16 +22,27 @@ No método, mantenha as quatro etapas visíveis. Na fala, diferencie o processo 
 
 ## Evidência documental consultada
 
-Os seguintes arquivos locais foram lidos; o diretório `.deployment` permaneceu somente para leitura:
+Fontes consultadas no repositório [canada-developer-immigration-dw](https://github.com/RaphaelPhillipe07/canada-developer-immigration-dw). A cópia `.presentation-checkout` foi usada somente para leitura nesta revisão das notas. Os arquivos de interface continuam sendo a referência dos valores aprovados:
 
 | Arquivo | O que confirma |
 | --- | --- |
 | `src/data.ts` | 13 jurisdições, métricas, unidades, períodos, dez perguntas/respostas, cortes e scores fornecidos |
 | `src/charts.tsx` | Recortes dos gráficos, cruzamentos, grupos, fontes e tabelas de apoio |
 | `src/MethodPreview.tsx` | Quatro etapas do processo, contrato parcial e distinção do esquema físico |
-| `.deployment/README.md` | Fonte censitária 98-10-0307-01; filtros idade/gênero total e Brazil; NOC 21232 provincial; left join por nome inglês normalizado; referência salarial 2023–2024 e publicação 2025 |
-| `.deployment/filtered/statcan_98100307_brazil_provinces_territories.csv` | Cabeçalho e linhas de exemplo do extrato censitário, DGUIDs, universo e períodos |
-| `.deployment/filtered/job_bank_wages_2025_noc_21232.csv` | Cabeçalho e linhas de exemplo: unidade horária, referência, revisão e cobertura provincial |
-| `.deployment/canada_provinces_brazil_software_developer_wages.csv` | Cabeçalho e linhas de exemplo do arquivo integrado e N/A salarial em Prince Edward Island |
+| `main: README.md` e `resumo_do_projeto.txt` | Duas fontes institucionais, três datasets; imigração 98-10-0307-01, habitação 98-10-0258-01 e Job Bank NOC 21232 |
+| `main: docs/modelo_dimensional.md` e `docs/dicionario_dw.md` | Constelação de três fatos, dez dimensões, grãos, chaves, medidas não aditivas e cobertura salarial explícita |
+| `main: sql/script_oracle.sql` | DDL Oracle: três staging, dimensões, fatos, constraints, sequências e gatilhos de chaves substitutas |
+| `main: filtered/statcan_98100258_housing_provinces_territories.csv` | Colunas por posse, incluindo Renter; nove indicadores habitacionais por jurisdição; Censo 2021 |
+| `segunda-nota-consultas: etl/README.md` e `docs/etl_planos.md` | Planos PDI/Spoon: três cargas de staging, dez dimensões, três fatos e um job sequencial; regras e contagens esperadas |
 
-A pasta irmã `../tabd-source-1794768513259` estava vazia na inspeção. Os arquivos consultados não descrevem um esquema físico, código SQL ou ferramenta de ETL. O README do extrato não identifica a tabela censitária específica do indicador de moradia; não atribuí-la à tabela de imigração. Esses limites são registrados nas notas e não impedem apresentar os resultados aprovados do conjunto.
+## Processo técnico para lembrar durante a fala
+
+1. **Extrair:** três CSVs de duas instituições. Conservar unidade, período, origem e identificadores; filtrar treze DGUIDs canônicos e NOC 21232.
+2. **Preparar:** staging conserva os campos brutos antes da transformação. Os planos PDI documentados transformam os cinco períodos de chegada e as quatro posses habitacionais de colunas em linhas (`UNPIVOT`).
+3. **Modelar:** `dim_provincia` conecta os três fatos. Salário tem grão jurisdição/ocupação/período; imigração, província/país/período de chegada/Censo; habitação, província/posse/indicador/Censo. Cruzar diretamente linhas de grãos diferentes pode repetir salários; agregar cada tema no recorte necessário antes de combinar.
+4. **Carregar:** o job documentado executa staging → dimensões → fatos. Dimensões usam busca por chave natural; fatos resolvem chaves substitutas. As constraints do Oracle protegem relacionamentos e unicidade do grão. A documentação descreve atualização sem duplicar nas dimensões/fatos; isso exige verificação em uma execução real, inclusive da staging.
+5. **Consultar:** usar apenas `PROVINCIAL_PUBLICADO` nos rankings. PEI é `APENAS_REGIONAL`; os territórios são `INDISPONIVEL`. Manter a ausência e os dados censitários; nunca converter salário ausente em zero.
+
+**Estado da evidência:** o README de `main` marca a Entrega 1 como concluída e o ETL como pendente. A branch `segunda-nota-consultas` contém planos PDI e documentação de execução. Esta revisão não executou Oracle/PDI, não validou logs de carga e não recalculou resultados a partir do DW. Apresente o que está definido e documentado sem afirmar que a carga foi validada.
+
+**Divergência a conferir no DW:** o plano de imigração documentado carrega 13 jurisdições × 2 países × 5 períodos = 130 linhas; não inclui um período separado para o total publicado. Os totais de comunidade da apresentação são os valores censitários aprovados, que podem diferir da soma dos períodos por arredondamento. Preservamos esses totais; antes de substituir o conjunto da interface por uma consulta ao DW, incluir ou recuperar o total publicado e reconciliar os resultados.

@@ -12,14 +12,14 @@ const designs=[
 ]
 const steps=[
  {title:'Reunir',label:'Fontes oficiais',icon:FileSearch,summary:'Duas fontes. Três indicadores.',detail:'Partimos de dados oficiais sobre remuneração, imigração e habitação para investigar as diferenças entre as jurisdições.',items:[['Statistics Canada','Censo 2021: imigrantes nascidos no Brasil, período de chegada e moradia.'],['Job Bank','NOC 21232: salário mediano em CAD/h, referência de 2023–2024.']]},
- {title:'Organizar',label:'Data Warehouse',icon:Database,summary:'Os indicadores no mesmo recorte geográfico.',detail:'Reunimos os indicadores por província e território no Data Warehouse, mantendo as unidades e o período de cada fonte explícitos.',items:[['Recorte comum','Províncias e territórios identificados pela mesma jurisdição.'],['Ausência preservada','Salário indisponível aparece como “Sem dado”; não é convertido em zero.']]},
+ {title:'Organizar',label:'Data Warehouse',icon:Database,summary:'Três fatos. Uma dimensão geográfica em comum.',detail:'O modelo Oracle separa salários, imigração e habitação em três fatos. A dimensão conformada dim_provincia conecta os temas, preservando seus grãos e períodos próprios.',items:[['Recorte comum','dim_provincia é compartilhada pelos três fatos. O modelo documenta dez dimensões e três tabelas de staging.'],['Ausência preservada','O status diferencia salário provincial, apenas regional e indisponível. Ausência não é convertida em zero.']]},
  {title:'Consultar',label:'Consultas analíticas',icon:Layers3,summary:'Transformar perguntas em comparações.',detail:'As dez consultas investigam rankings, períodos de chegada e combinações entre salário, comunidade e comprometimento com moradia.',items:[['Critérios explícitos','Cruzamentos usam cortes de referência; cada consulta explica quais.'],['Índice de equilíbrio','Normalização min–max, pesos iguais e menor comprometimento com moradia como fator favorável.']]},
  {title:'Explicar',label:'Evidências e resultados',icon:Presentation,summary:'Uma pergunta. Uma resposta. Uma evidência.',detail:'Apresentamos uma resposta direta, acompanhada de gráfico ou tabela e da explicação de como chegamos ao resultado.',items:[['Leitura sem hover','Valores, unidades e destaques precisam fazer sentido para quem está assistindo.'],['Transparência','Cada resultado informa recorte, método, fonte e período de referência.']]},
 ]
 const number=(n:number)=>String(n).padStart(2,'0')
 const technical=[
  {title:'Entradas e referências',kind:'FONTES',rows:[['Statistics Canada','Censo 2021','Comunidade · moradia'],['Job Bank','2023–2024','NOC 21232 · salário']],caption:'Os períodos de referência permanecem separados.'},
- {title:'Recorte do contrato de dados',kind:'DADOS',rows:[['code','string','Jurisdição'],['salary','number | null','CAD/h'],['community','number','pessoas'],['housing','number','%']],caption:'Campos usados na visualização; não representa o esquema físico do DW.'},
+ {title:'Uma dimensão conecta três fatos',kind:'MODELO ORACLE',rows:[['dim_provincia','Dimensão','Geografia conformada'],['fato_salario','Fato','Jurisdição · ocupação · período'],['fato_imigracao','Fato','Província · origem · chegada · censo'],['fato_habitacao','Fato','Província · posse · indicador · censo']],caption:'Modelo dimensional e DDL documentados no repositório de pesquisa.'},
  {title:'Critérios reproduzíveis',kind:'ANÁLISE',rows:[['Rankings','Ordenação','Conforme o indicador'],['Cruzamentos','Cortes de referência','Explicitados por consulta'],['Equilíbrio','Min–max · pesos iguais','Nove províncias completas']],caption:'A cobertura define quais jurisdições entram em cada cálculo.'},
  {title:'Resultado com contexto',kind:'SAÍDA',rows:[['title','Pergunta','O que investigamos'],['answer','Resposta','Conclusão direta'],['evidence','Evidência','Gráfico ou tabela'],['note / source','Contexto','Método, fonte e período']],caption:'Campos das consultas usados na apresentação.'},
 ]
@@ -31,7 +31,7 @@ const traces=[
 ]
 function TechnicalVisual({step}:{step:number}){
  const item=technical[step]
- return <div className="technical-visual"><header><span><Database size={14}/>{item.kind}</span><span className="tech-window-dots" aria-hidden="true"><i/><i/><i/></span></header><h3>{item.title}</h3><div className="tech-table-wrap"><table><thead><tr><th>{step===0?'Origem':step===1?'Campo':step===2?'Consulta':'Campo'}</th><th>{step===0?'Referência':step===1?'Tipo':'Regra'}</th><th>{step===1?'Unidade / papel':'Contexto'}</th></tr></thead><tbody>{item.rows.map(row=><tr key={row[0]}>{row.map((cell,index)=>index===0?<th scope="row" key={index}>{cell}</th>:<td key={index}>{cell}</td>)}</tr>)}</tbody></table></div>{step===1&&<div className="tech-rule"><code>salary === null</code><ArrowRight size={14}/><b>Sem dado</b></div>}{step===2&&<div className="tech-rule"><code>filtro → cálculo → comparação</code></div>}<p className="tech-caption">{item.caption}</p></div>
+ return <div className="technical-visual"><header><span><Database size={14}/>{item.kind}</span><span className="tech-window-dots" aria-hidden="true"><i/><i/><i/></span></header><h3>{item.title}</h3><div className="tech-table-wrap"><table><thead><tr><th>{step===0?'Origem':step===1?'Objeto':step===2?'Consulta':'Campo'}</th><th>{step===0?'Referência':step===1?'Papel':'Regra'}</th><th>{step===1?'Recorte':'Contexto'}</th></tr></thead><tbody>{item.rows.map(row=><tr key={row[0]}>{row.map((cell,index)=>index===0?<th scope="row" key={index}>{cell}</th>:<td key={index}>{cell}</td>)}</tr>)}</tbody></table></div>{step===1&&<div className="tech-rule"><code>NULL salarial</code><ArrowRight size={14}/><b>Sem dado</b></div>}{step===2&&<div className="tech-rule"><code>filtro → cálculo → comparação</code></div>}<p className="tech-caption">{item.caption}</p></div>
 }
 function TraceVisual({step}:{step:number}){
  const item=traces[step]
@@ -105,6 +105,7 @@ export function MethodPreview(){
   {!combined&&<footer className="method-caption"><div><b>{designs.find(item=>item.id===design)?.code} — {designs.find(item=>item.id===design)?.name}</b><p>{designs.find(item=>item.id===design)?.description}</p></div><span>Clique nas etapas ou use ← →</span></footer>}
  </div>
 }
+
 
 
 

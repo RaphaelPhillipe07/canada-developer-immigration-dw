@@ -65,15 +65,18 @@ O processo tem quatro etapas: reunir, organizar, consultar e explicar. Mostre o 
 - No extrato de imigração documentado: tabela Statistics Canada 98-10-0307-01, treze DGUIDs provinciais/territoriais, idade total, gênero total e local de nascimento Brazil. As linhas Total – Place of birth são mantidas separadamente para o total de imigrantes.
 - No extrato salarial documentado: filtrar NOC_21232 e reter registros provinciais. A publicação é o recurso Job Bank 2025, revisado em 19/11/2025, mas o período salarial é 2023–2024; annual_wage_flag = 0 confirma CAD por hora.
 - A integração documentada é um left join das treze jurisdições censitárias com os salários provinciais por nome inglês normalizado. DGUID e código de região econômica são identificadores distintos; salário regional não substitui salário provincial.
-- Organizar: alinhar indicadores por província ou território, manter CAD/h, pessoas e percentual e preservar salário ausente como Sem dado. O contrato de visualização usa code, salary, community e housing; esse é um recorte dos campos, não o esquema físico do banco.
+- Moradia vem da tabela Statistics Canada 98-10-0258-01: filtrar as treze jurisdições e Census year = 2021; selecionar o indicador Percent of households in unaffordable housing e a coluna Renter. Não somar percentuais provinciais.
+- Organizar: o modelo Oracle define três staging, dez dimensões e três fatos separados: fato_salario, fato_imigracao e fato_habitacao. A dim_provincia é compartilhada; tempo salarial e tempo censitário permanecem distintos.
+- Explique o grão: salário por jurisdição + ocupação + período; imigração por província + país de nascimento + período de chegada + Censo; habitação por província + posse + indicador + Censo. Separar os fatos evita multiplicar salários ao cruzar períodos de chegada.
+- A dim_disponibilidade_salario distingue PROVINCIAL_PUBLICADO, APENAS_REGIONAL e INDISPONIVEL; somente o primeiro participa dos rankings provinciais. O contrato code, salary, community e housing da interface é um recorte para visualização, não o esquema físico.
 - Consultar: ordenar valores, analisar períodos de chegada, aplicar os cortes de cada pergunta e comparar grupos. O índice de equilíbrio usa normalização min–max e pesos iguais nos três indicadores.
 - Explicar: apresentar a pergunta completa, uma resposta direta, um gráfico ou tabela, o critério e a fonte com seu período. Os gráficos devem ser compreendidos sem hover.
 
 ### Cuidados
 
 - Não afirmar que os períodos das duas fontes são o mesmo ano: Censo 2021 e salários 2023–2024. O nome do arquivo salarial 2025 indica a publicação, não o período de medição.
-- O README do extrato documenta imigração, salários e integração; não documenta a linhagem específica do indicador de moradia. Não atribuir moradia à tabela 98-10-0307-01.
-- O material consultado não documenta tabelas físicas, comandos SQL ou ferramenta de ETL do DW; distinguir o processo de integração documentado da implementação física.
+- O main documenta o modelo e o DDL Oracle, mas marca a entrega ETL como pendente. A branch segunda-nota-consultas contém planos PDI/Spoon: CSV → staging → dimensões → fatos, orquestrados por JOB_CARGA_DW.kjb. A existência desses arquivos não comprova execução ou validação da carga.
+- O plano de imigração da branch de ETL transforma os cinco períodos em linhas; ele não conserva o total censitário publicado como medida separada. Não substituir os totais aprovados pela soma dos períodos, pois o arredondamento censitário pode gerar diferenças.
 
 ### Transição
 
